@@ -415,6 +415,136 @@ IMPORTANT: You MUST respond in ${getLanguageName(context.language)}. All JSON va
 
 
 
+// ── Clinical Rule-Based Fallback Engine (works without Ollama) ─────────────
+const clinicalFallbackResponse = (message: string, context: PatientContext): string => {
+    const msg = message.toLowerCase();
+    const profile = context.profile;
+    const name = profile?.name?.split(' ')[0] || 'there';
+    const scores = context.riskScores;
+    const meds = profile?.currentMedications || [];
+    const conditions = profile?.conditions?.map(c => c.name) || [];
+    const hasDiabetes = profile?.hasDiabetes;
+    const hasHighBP = profile?.hasHighBP;
+    const hasHeart = profile?.hasHeartDisease;
+    const hasLiver = profile?.hasLiverDisease;
+    const hasKidney = profile?.hasKidneyDisease;
+
+    // ── Greetings ──────────────────────────────────────────────────────────
+    if (/^(hi|hello|hey|good|namaste|vanakam|namaskar)\b/.test(msg)) {
+        return `Hello ${name}! 👋 I'm your Health Intelligence Guardian. I can help you with symptoms, medications, diet, and health advice. How are you feeling today?`;
+    }
+
+    // ── Fever ──────────────────────────────────────────────────────────────
+    if (/fever|temperature|feaver|temp high|body heat|bukhar/.test(msg)) {
+        const duration = /2 day|two day|3 day|three day|4 day|four day/.test(msg) ? '2+ days' : /week|7 day/.test(msg) ? 'a week' : '';
+        let response = `🌡️ **Fever Assessment for ${name}:**\n\nA fever lasting ${duration || 'multiple days'} requires attention.\n\n`;
+        response += `**Immediate steps:**\n• Take Paracetamol 500mg every 6 hours (with food)\n• Drink 3–4 litres of water/ORS daily\n• Rest and avoid outdoor exposure\n• Monitor temperature every 4 hours\n\n`;
+        if (hasDiabetes) response += `⚠️ **Diabetic Alert:** Fever can spike blood sugar — check glucose every 6 hours.\n\n`;
+        if (hasHighBP) response += `⚠️ **BP Alert:** Dehydration from fever can affect BP — stay well hydrated.\n\n`;
+        response += `**Red Flags — Go to ER immediately if:**\n• Temperature > 104°F (40°C)\n• Severe headache or stiff neck\n• Difficulty breathing\n• Rash appears suddenly\n\n`;
+        response += `*In Andhra Pradesh, dengue and malaria are active in 2025. If fever is with joint pain or chills — get a blood test immediately.*`;
+        return response;
+    }
+
+    // ── Headache ────────────────────────────────────────────────────────────
+    if (/headache|head pain|head ache|migraine|sir dard/.test(msg)) {
+        let response = `🧠 **Headache Assessment for ${name}:**\n\n`;
+        response += `**Likely causes:** Dehydration, tension, eyestrain, or seasonal viral infection.\n\n`;
+        response += `**Immediate care:**\n• Drink 2 glasses of water now\n• Rest in a dark, quiet room\n• Apply cold compress to forehead\n• Take Paracetamol 500mg if pain > 5/10\n\n`;
+        if (hasHighBP) response += `⚠️ **Your BP history:** Sudden severe headache with BP can indicate hypertensive crisis. Check BP immediately.\n\n`;
+        response += `**See a doctor if:** Headache is worst of your life, comes with vomiting, fever, or vision changes.`;
+        return response;
+    }
+
+    // ── Chest pain ─────────────────────────────────────────────────────────
+    if (/chest pain|chest tight|heart pain|left arm|breathing tight|angina/.test(msg)) {
+        return `🚨 **URGENT — Chest Pain Protocol for ${name}:**\n\n${hasHeart ? '⚠️ You have a cardiac history — this is HIGH PRIORITY.\n\n' : ''}**Call emergency services immediately (108) if:**\n• Pain radiates to left arm or jaw\n• Shortness of breath\n• Cold sweat + nausea\n• Pain lasting > 5 minutes\n\n**While waiting:** Sit upright, loosen clothing, do NOT lie flat.\n${meds.some(m => /aspirin/i.test(m)) ? '• You have Aspirin — take 1 tablet (325mg) if not already taken.\n' : ''}\n⚕️ **Do NOT drive yourself. Call 108 now.**`;
+    }
+
+    // ── Diabetes / Blood sugar ─────────────────────────────────────────────
+    if (/sugar|diabetes|glucose|insulin|hba1c|blood sugar/.test(msg)) {
+        let response = `🩸 **Diabetes Management for ${name}:**\n\n`;
+        if (hasDiabetes) {
+            response += `Your profile shows Type 2 Diabetes. Current guidelines:\n\n`;
+            response += `• **Target fasting glucose:** 80–130 mg/dL\n• **Post-meal (2hr):** < 180 mg/dL\n• **HbA1c target:** < 7%\n\n`;
+            response += `**Diet tips:**\n• Eat small meals every 3–4 hours\n• Avoid white rice, maida, sugary drinks\n• Include: bitter gourd, fenugreek seeds, whole grains\n\n`;
+            response += `**Red flags:** Dizziness + sweating = low sugar → eat glucose/sugar immediately.`;
+        } else {
+            response += `Your profile doesn't show diabetes. For prevention:\n• Maintain healthy weight\n• Exercise 30 min/day\n• Limit refined carbohydrates\n• Get fasting glucose tested annually.`;
+        }
+        return response;
+    }
+
+    // ── Blood pressure ─────────────────────────────────────────────────────
+    if (/blood pressure|bp|hypertension|high bp|pressure/.test(msg)) {
+        let response = `💉 **Blood Pressure Guidance for ${name}:**\n\n`;
+        if (hasHighBP) {
+            response += `You have hypertension on record.\n\n**BP targets:** < 130/80 mmHg\n\n`;
+            response += `**Daily tips:**\n• Reduce salt intake to < 5g/day\n• Avoid processed/packaged food\n• 30 min brisk walk daily\n• Avoid stress and smoking\n• Check BP twice daily — morning & evening\n\n`;
+            response += `**Danger range:** BP > 180/120 = Hypertensive crisis → Go to ER immediately.`;
+        } else {
+            response += `Your profile doesn't show hypertension. Normal BP is < 120/80.\n\nFor good BP: Stay active, reduce salt, manage stress, and avoid smoking.`;
+        }
+        return response;
+    }
+
+    // ── Cough / Cold ────────────────────────────────────────────────────────
+    if (/cough|cold|runny nose|sore throat|throat pain|sneezing/.test(msg)) {
+        return `🤧 **Cold & Cough Guidance for ${name}:**\n\n**Home remedies (first 48 hours):**\n• Warm water with honey + ginger tea (3x daily)\n• Steam inhalation with Vicks/tulsi leaves (morning & night)\n• Gargle with warm salt water 3x daily\n• Rest and stay warm\n\n**Medications if needed:**\n• Cetirizine 10mg (for runny nose/sneezing)\n• Paracetamol 500mg (for body ache)\n• Avoid antibiotics — colds are viral!\n\n**See a doctor if:** Cough > 7 days, yellow-green phlegm, high fever, or breathing difficulty.`;
+    }
+
+    // ── Stomach / Digestion ─────────────────────────────────────────────────
+    if (/stomach|diarrhea|vomit|nausea|acidity|gas|bloat|constipation|abdominal|loose motion/.test(msg)) {
+        let response = `🫃 **Digestive Health for ${name}:**\n\n`;
+        if (/diarrhea|loose motion/.test(msg)) {
+            response += `**For diarrhea:**\n• ORS every 30 minutes\n• Eat banana, rice, boiled potato\n• Avoid dairy, spicy food\n• Take ORS + zinc tablet for 10 days\n• See doctor if > 3 days or blood in stool\n\n`;
+        } else if (/vomit|nausea/.test(msg)) {
+            response += `**For vomiting:**\n• Sip cold water/ORS in small amounts\n• Avoid solid food for 2–4 hours\n• Ginger tea or plain crackers help\n• Take ORS to prevent dehydration\n\n`;
+        } else if (/acidity|gas/.test(msg)) {
+            response += `**For acidity:**\n• Avoid spicy, fried, and oily food\n• Don't eat 2 hours before bedtime\n• Chew fennel seeds (saunf) after meals\n• Take Pantoprazole 40mg before breakfast if persistent\n\n`;
+        }
+        if (hasLiver) response += `⚠️ **Liver Alert:** Avoid Ibuprofen/NSAIDs. Use Paracetamol at minimal dose.`;
+        if (hasKidney) response += `⚠️ **Kidney Alert:** Maintain hydration. Avoid high-protein diet during episode.`;
+        return response;
+    }
+
+    // ── Medication questions ─────────────────────────────────────────────────
+    if (/medicine|tablet|drug|dose|paracetamol|ibuprofen|metformin|medication/.test(msg)) {
+        const medList = meds.length > 0 ? `\n\nYour registered medications: **${meds.join(', ')}**` : '';
+        return `💊 **Medication Guidance for ${name}:**${medList}\n\n**General rules:**\n• Never stop BP/diabetes medication suddenly\n• Paracetamol: max 4g/day (8 tablets of 500mg)\n• Avoid Ibuprofen on empty stomach${hasLiver ? '\n• ⚠️ With your liver condition — avoid NSAIDs entirely' : ''}\n${hasKidney ? '• ⚠️ With your kidney condition — avoid Ibuprofen/NSAIDs' : ''}\n\n**Use the Medication Safety Checker** in the Pharmacy tab to check drug interactions for your specific combination.`;
+    }
+
+    // ── Sleep / Fatigue ─────────────────────────────────────────────────────
+    if (/sleep|tired|fatigue|weakness|energy|exhausted|insomnia/.test(msg)) {
+        return `😴 **Energy & Sleep for ${name}:**\n\n**Your vitality score: ${scores?.healthScore || 'N/A'}%**\n\n**To improve energy:**\n• Sleep 7–8 hours at consistent times\n• Wake up & sleep at same time daily\n• Avoid screens 1 hour before bed\n• Walk 20–30 min in morning sunlight\n• Check Vitamin D and B12 levels (common deficiency in India)\n\n**Foods for energy:** Banana, dates, lentils, leafy greens, eggs (if non-veg)\n\n**If fatigue is severe or persistent > 2 weeks:** Get CBC, Thyroid, Vitamin B12 blood test done.`;
+    }
+
+    // ── Health score / Risk ─────────────────────────────────────────────────
+    if (/health score|risk score|risk|vitality|organ|liver risk|heart risk|kidney/.test(msg)) {
+        const scoreText = scores ? `\n• **Overall Vitality:** ${scores.healthScore}%\n• **Heart Risk:** ${scores.heart}%\n• **Liver Risk:** ${scores.liver}%\n• **Kidney Risk:** ${scores.kidney}%\n• **Breathing:** ${scores.breathing}%` : '\nHealth scores not yet calculated. Please complete your profile.';
+        return `📊 **Your Health Intelligence Report for ${name}:**${scoreText}\n\n**Interpretation:**\n• 80–100%: Excellent — maintain current habits\n• 60–79%: Good — minor improvements needed\n• 40–59%: Moderate — consult doctor for checkup\n• < 40%: High Risk — immediate medical attention\n\nVisit the **Dashboard** tab for your full Organ Stress Map and trend analysis.`;
+    }
+
+    // ── AYUSH / Ayurveda ───────────────────────────────────────────────────
+    if (/ayush|ayurveda|homeopathy|yoga|herbal|natural remedy|dosha|vata|pitta|kapha/.test(msg)) {
+        return `🌿 **AYUSH Guidance for ${name}:**\n\nFor personalized Ayurvedic protocols, use the **AYUSH AI tab** where our system:\n\n• Analyses your Dosha (Vata/Pitta/Kapha) imbalance\n• Prescribes specific herbs with dosage & preparation\n• Provides Pathya (diet inclusions) and Apathya (diet exclusions)\n• Recommends Yoga asanas with physiological rationale\n• Suggests Pranayama techniques\n\n**General AYUSH tips:**\n• Turmeric milk (haldi doodh) daily for immunity\n• Triphala before sleep for digestion\n• Ashwagandha for stress & energy\n• Tulsi leaves (3–4 fresh daily) for respiratory health`;
+    }
+
+    // ── Disease Finder / Diagnosis ─────────────────────────────────────────
+    if (/diagnos|check symptom|disease finder|triage|what disease|what illness/.test(msg)) {
+        return `🔬 **Symptom Diagnosis:**\n\nFor a full clinical assessment, go to the **Disease Finder tab** where I will:\n\n1. Ask you 7–10 detailed follow-up questions\n2. Generate 3 possible diagnoses with likelihood\n3. Recommend the right specialist\n4. Provide immediate action steps\n5. Generate an AYUSH protocol\n\nType your main symptom there to begin the clinical triage.`;
+    }
+
+    // ── Emergency ──────────────────────────────────────────────────────────
+    if (/emergency|ambulance|911|108|critical|dying|unconscious|stroke/.test(msg)) {
+        return `🚨 **EMERGENCY RESPONSE:**\n\n**Call 108 (Ambulance) immediately.**\n\nWhile waiting:\n• Keep patient sitting upright (for breathing issues)\n• Lay flat with legs elevated (for fainting/shock)\n• Do NOT give food or water\n• Stay on line with emergency services\n\n**AP Emergency Numbers:**\n• Ambulance: 108\n• Police: 100\n• Fire: 101\n• Disaster Management: 1070`;
+    }
+
+    // ── Default smart response ─────────────────────────────────────────────
+    const conditionStr = conditions.length > 0 ? `Your registered conditions: ${conditions.join(', ')}.` : '';
+    return `I understand you're asking about "${message}", ${name}.\n\n${conditionStr}\n\nFor the most accurate clinical advice on your specific concern, please:\n\n1. **Disease Finder tab** → Enter your symptoms for AI diagnosis\n2. **AYUSH tab** → For natural treatment protocols\n3. **Pharmacy tab** → For medication safety checks\n4. **Vitality Lab** → For nutrition & wellness guidance\n\nYou can also describe your symptoms in more detail here and I'll provide the best guidance I can.\n\n*Health Intelligence is in Demo Mode. For full AI responses, run Ollama locally.*`;
+};
+
 export const getAIPersonalAssistantResponse = async (
     context: PatientContext,
     message: string,
@@ -447,9 +577,13 @@ export const getAIPersonalAssistantResponse = async (
     ];
 
     try {
-        return await callOllama(AI_CONFIG.textModel, messages);
+        // Try Ollama first (works in local dev)
+        const ollamaResponse = await callOllama(AI_CONFIG.textModel, messages);
+        return ollamaResponse;
     } catch (e) {
-        return "I am currently offline. Please check your connection.";
+        // Ollama offline (production/Netlify) — use clinical rule engine
+        console.info('[AI] Ollama unavailable — using clinical rule-based fallback');
+        return clinicalFallbackResponse(message, context);
     }
 };
 
