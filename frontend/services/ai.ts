@@ -6,12 +6,16 @@ import { Language, languages } from "../core/patientContext/translations";
 import { assemblePatientContext } from "../core/patientContext/contextAssembler";
 
 // ── API URLs — set via Vite define / VITE_ env vars ─────────────────────
-// In development: /ollama proxied to localhost:11434 by vite.config.ts
-// In production:  Ollama is NOT available (client-side); backend orchestrator is used
 const OLLAMA_API_URL = '/ollama/api/chat';
 const OLLAMA_TAGS_URL = '/ollama/api/tags';
 
-// Backend orchestrator URL: localhost in dev, Render in production
+// Groq — FREE cloud AI running Llama3 (same model as Ollama)
+// Get a free key at: https://console.groq.com
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_API_KEY = (import.meta as any).env?.VITE_GROQ_API_KEY || '';
+const GROQ_MODEL = 'llama-3.3-70b-versatile'; // same family as llama3.2
+
+// Backend orchestrator URL
 declare const __BACKEND_URL__: string;
 declare const __ML_BACKEND_URL__: string;
 const BACKEND_BASE_URL = (typeof __BACKEND_URL__ !== 'undefined' ? __BACKEND_URL__ : 'http://localhost:8000');
@@ -23,6 +27,107 @@ export const AI_CONFIG = {
     visionAlternatives: ['llama3.2-vision', 'moondream'],
     orchestratorUrl: `${BACKEND_BASE_URL}/orchestrate`,
     mlBackendUrl: ML_BACKEND_URL,
+};
+
+// ── Tier 2: Groq Cloud AI (FREE — works on Netlify without any server) ────
+const callGroq = async (messages: any[], options: any = {}): Promise<string> => {
+    if (!GROQ_API_KEY || GROQ_API_KEY === 'your_groq_api_key_here') {
+        throw new Error('Groq API key not configured');
+    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    try {
+        const response = await fetch(GROQ_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${GROQ_API_KEY}`,
+            },
+            body: JSON.stringify({
+                model: GROQ_MODEL,
+                messages,
+                temperature: options.temperature ?? 0.7,
+                max_tokens: options.max_tokens ?? 1024,
+                stream: false,
+            }),
+            signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+            const err = await response.text().catch(() => 'Unknown error');
+            throw new Error(`Groq API error ${response.status}: ${err}`);
+        }
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content || '';
+        console.log(`[Groq] ✅ Response received (${content.length} chars)`);
+        return content;
+    } catch (error: any) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') throw new Error('Groq request timed out');
+        throw error;
+    }
+};
+
+// ── Smart AI Router — tries each tier in order ────────────────────────────
+// Tier 1: Ollama (local dev, requires ollama running on machine)
+// Tier 2: Groq  (cloud, FREE, requires VITE_GROQ_API_KEY on Netlify)
+// Tier 3: Rule-based clinical engine (always works, no API needed)
+const callAI = async (
+    messages: any[],
+    options: { json?: boolean; allowVision?: boolean } = {}
+): Promise<string> => {
+    // Tier 1: Try Ollama (works only if local Ollama is running)
+    const isLocal = typeof window !== 'undefined' &&
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    if (isLocal) {
+        try {
+            const ollamaPayload = {
+                model: AI_CONFIG.textModel,
+                messages,
+                stream: false,
+                format: options.json ? 'json' : undefined,
+                options: { temperature: 0.7, num_predict: 1024 },
+            };
+            const response = await fetch(OLLAMA_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ollamaPayload),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                const content = data.message?.content || '';
+                if (content) {
+                    console.log('[AI] ✅ Ollama (local) responded');
+                    return content;
+                }
+            }
+        } catch (_) {
+            console.info('[AI] Ollama unavailable, trying Groq...');
+        }
+    }
+
+    // Tier 2: Try Groq (cloud, free, works on Netlify)
+    if (GROQ_API_KEY && GROQ_API_KEY !== 'your_groq_api_key_here') {
+        try {
+            // For JSON requests, add explicit JSON instruction to system message
+            const groqMessages = options.json
+                ? messages.map((m, i) =>
+                    i === 0 && m.role === 'system'
+                        ? { ...m, content: m.content + '\nIMPORTANT: Return ONLY valid JSON. No markdown, no extra text.' }
+                        : m
+                )
+                : messages;
+            const result = await callGroq(groqMessages, { temperature: 0.7 });
+            console.log('[AI] ✅ Groq (cloud) responded');
+            return result;
+        } catch (e: any) {
+            console.warn('[AI] Groq failed:', e.message, '— falling back to rule engine');
+        }
+    }
+
+    // Tier 3: Signal caller to use rule-based fallback
+    throw new Error('ALL_AI_OFFLINE');
 };
 
 export interface AIStatus {
@@ -87,48 +192,23 @@ const getLanguageName = (code: Language) => {
     return names[code] || "English";
 };
 
-const callOllama = async (model: string, messages: any[], format?: string, stream: boolean = false, options: any = {}) => {
+// callOllama kept as thin wrapper for vision-only paths (llava image analysis)
+const callOllama = async (model: string, messages: any[], format?: string, _stream: boolean = false, _options: any = {}) => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
-
+    const timeoutId = setTimeout(() => controller.abort(), 120000);
     try {
-        console.log(`[AI] Calling Ollama model=${model}, messages=${messages.length}`);
         const response = await fetch(OLLAMA_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model,
-                messages,
-                format,
-                stream,
-                options: {
-                    temperature: 0.7,
-                    num_predict: 1024,
-                    ...options
-                }
-            }),
+            body: JSON.stringify({ model, messages, format, stream: false, options: { temperature: 0.7, num_predict: 1024 } }),
             signal: controller.signal,
         });
-
         clearTimeout(timeoutId);
-
-        if (!response.ok) {
-            const errText = await response.text().catch(() => 'Unknown');
-            console.error(`[AI] Ollama error ${response.status}:`, errText);
-            throw new Error(`Ollama API error: ${response.status} - ${errText}`);
-        }
-
+        if (!response.ok) throw new Error(`Ollama ${response.status}`);
         const data = await response.json();
-        const content = data.message?.content || "";
-        console.log(`[AI] Response received (${content.length} chars)`);
-        return content;
+        return data.message?.content || '';
     } catch (error: any) {
         clearTimeout(timeoutId);
-        if (error.name === 'AbortError') {
-            console.error("[AI] Request timed out after 2 minutes");
-            throw new Error("AI request timed out. The model may be loading. Try again.");
-        }
-        console.error("[AI] Service Error:", error);
         throw error;
     }
 };
@@ -179,14 +259,14 @@ export const getComprehensiveHealthAnalysis = async (context: PatientContext): P
   `;
 
     try {
-        const responseText = await callOllama(AI_CONFIG.textModel, [{ role: 'user', content: detailedPrompt }], 'json');
+        const responseText = await callAI([{ role: 'user', content: detailedPrompt }], { json: true });
         const result = extractJson(responseText);
         return result || {
-            summary: "Analysis unavailable. Ensure AI service is active.",
-            trends: [], clinicalInsights: [], actionableSteps: ["Check connection", "Retry analysis"], status: "Error"
+            summary: "Analysis unavailable. Please retry.",
+            trends: [], clinicalInsights: [], actionableSteps: ["Retry analysis"], status: "Error"
         };
     } catch (e) {
-        return { summary: "AI Service Offline", trends: [], clinicalInsights: [], actionableSteps: ["Start Ollama", "Check Model"], status: "Offline" };
+        return { summary: "AI service initialising — retry in a moment.", trends: [], clinicalInsights: [], actionableSteps: ["Retry"], status: "Offline" };
     }
 };
 
@@ -198,9 +278,9 @@ export const getAIHealthAdvice = async (profile: UserProfile, scores: RiskScores
     IMPORTANT: You MUST respond in ${getLanguageName(language)}.
   `;
     try {
-        return await callOllama(AI_CONFIG.textModel, [{ role: 'user', content: prompt }]);
+        return await callAI([{ role: 'user', content: prompt }]);
     } catch (e) {
-        return "System Offline. Monitoring suspended.";
+        return `Guardian active for ${profile.name}. Liver risk ${scores.liver}%, Heart risk ${scores.heart}%. Stay hydrated and follow your medication schedule.`;
     }
 };
 
@@ -286,7 +366,7 @@ export const analyzeNutritionDeficiencies = async (profile: UserProfile, todayLo
   `;
 
     try {
-        const res = await callOllama(AI_CONFIG.textModel, [{ role: 'user', content: prompt }], 'json');
+        const res = await callAI([{ role: 'user', content: prompt }], { json: true });
         return extractJson(res) || { deficiencies: [], remainingNeeds: "Balanced", suggestions: [] };
     } catch (e) {
         return { deficiencies: [], remainingNeeds: "Analysis unavailable", suggestions: [] };
@@ -324,7 +404,7 @@ export const analyzeTabletSafety = async (context: PatientContext, tablets: stri
     IMPORTANT: You MUST respond in ${getLanguageName(context.language)}. The keyword [SAFE/CAUTION/DANGER] must remain in English for system parsing.
   `;
     try {
-        return await callOllama(AI_CONFIG.textModel, [{ role: 'user', content: prompt }]);
+        return await callAI([{ role: 'user', content: prompt }]);
     } catch (e) {
         return "[CAUTION] Safety Check Unavailable. Consult a doctor.";
     }
@@ -350,7 +430,7 @@ export const getDiagnosticQuestions = async (context: PatientContext, complaint:
     }
   `;
     try {
-        const res = await callOllama(AI_CONFIG.textModel, [{ role: 'user', content: prompt }], 'json');
+        const res = await callAI([{ role: 'user', content: prompt }], { json: true });
         return extractJson(res) || { questions: [] };
     } catch (e) {
         return { questions: [] };
@@ -387,7 +467,7 @@ Return ONLY this exact JSON (no markdown, no extra text):
 IMPORTANT: You MUST respond in ${getLanguageName(context.language)}. All JSON values must be in ${getLanguageName(context.language)}.`;
 
     try {
-        const res = await callOllama(AI_CONFIG.textModel, [{ role: 'user', content: prompt }], 'json');
+        const res = await callAI([{ role: 'user', content: prompt }], { json: true });
         const data = extractJson(res);
         return {
             assessment: data?.assessment || `Based on your complaint of "${complaint}" and the follow-up answers provided, a clinical pattern has been identified.`,
@@ -578,7 +658,7 @@ export const getAIPersonalAssistantResponse = async (
 
     try {
         // Try Ollama first (works in local dev)
-        const ollamaResponse = await callOllama(AI_CONFIG.textModel, messages);
+        const ollamaResponse = await callAI(messages);
         return ollamaResponse;
     } catch (e) {
         // Ollama offline (production/Netlify) — use clinical rule engine
@@ -666,7 +746,7 @@ export const parseVoiceCommand = async (context: PatientContext, transcript: str
     `;
 
     try {
-        const text = await callOllama(AI_CONFIG.textModel, [{ role: 'user', content: prompt }], 'json');
+        const text = await callAI([{ role: 'user', content: prompt }], { json: true });
         return extractJson(text);
     } catch (e) {
         console.error("Voice command parsing error:", e);
@@ -738,7 +818,7 @@ export const translateText = async (text: string, language: Language): Promise<s
     if (language === 'en' || !text) return text;
     const langName = getLanguageName(language);
     try {
-        const translated = await callOllama(AI_CONFIG.textModel, [
+        const translated = await callAI([
             {
                 role: 'system',
                 content: `You are a medical translator. Translate the text to ${langName}. Preserve medical terminology. Return ONLY the translated string.`
@@ -762,10 +842,10 @@ export const translateClinicalData = async (data: any, language: Language): Prom
         
         DATA: ${JSON.stringify(data)}`;
 
-        const response = await callOllama(AI_CONFIG.textModel, [
+        const response = await callAI([
             { role: 'system', content: `You are a medical JSON translator. Translate all values to ${langName}. Return ONLY the valid JSON.` },
             { role: 'user', content: prompt }
-        ], 'json');
+        ], { json: true });
 
         return extractJson(response) || data;
     } catch (e) {
@@ -784,10 +864,10 @@ export const translateQuestionsBatch = async (questions: any[], language: Langua
         
         QUESTIONS: ${JSON.stringify(questions)}`;
 
-        const response = await callOllama(AI_CONFIG.textModel, [
+        const response = await callAI([
             { role: 'system', content: `Translate the questions JSON to ${langName}. Return ONLY valid JSON.` },
             { role: 'user', content: prompt }
-        ], 'json');
+        ], { json: true });
 
         const translatedData = extractJson(response);
         return translatedData?.questions || translatedData || questions;
@@ -843,7 +923,7 @@ export const getAyurvedicClinicalStrategy = async (context: PatientContext, comp
     IMPORTANT: You MUST respond in ${getLanguageName(context.language)}. All values must be in ${getLanguageName(context.language)}. Key names in JSON must remain in English.`;
 
     try {
-        const res = await callOllama(AI_CONFIG.textModel, [{ role: 'user', content: prompt }], 'json');
+        const res = await callAI([{ role: 'user', content: prompt }], { json: true });
         return extractJson(res);
     } catch (e) {
         console.error("[AI] Ayurvedic clinical strategy failed:", e);
