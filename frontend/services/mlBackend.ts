@@ -10,9 +10,10 @@
 // CONFIGURATION
 // ============================================================
 
-const ML_API_BASE = 'https://lifeshield-backend.onrender.com';
+const ML_API_BASE = 'https://health-intelligence-backend.onrender.com';
 const PREDICT_URL = `${ML_API_BASE}/predict`;
 const HEALTH_URL = `${ML_API_BASE}/health`;
+
 
 // ============================================================
 // TYPES
