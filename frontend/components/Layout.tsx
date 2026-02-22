@@ -45,8 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, isDan
               <ShieldCheck size={18} />
             </div>
             <div className="min-w-0">
-              <p className={`text-[7px] font-black uppercase tracking-[0.3em] leading-none ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>Health Intelligence AI</p>
-              <h1 className={`font-black text-[13px] uppercase tracking-tight leading-tight truncate ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>Health Guardian</h1>
+              <h1 className={`font-black text-[13px] uppercase tracking-tight leading-loose truncate ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>Health Intelligence</h1>
             </div>
             <div className="ml-auto flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100 shrink-0">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -107,7 +106,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, isDan
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-[11px] font-black uppercase truncate ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{profile?.name || 'User'}</p>
-                <p className={`text-[8px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>Active Guardian</p>
+                <p className={`text-[8px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>Health Node</p>
               </div>
               <button
                 onClick={() => (window as any).handleGlobalLogout?.()}

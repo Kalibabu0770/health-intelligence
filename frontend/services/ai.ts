@@ -19,7 +19,7 @@ const GROQ_MODEL = 'llama-3.3-70b-versatile'; // same family as llama3.2
 declare const __BACKEND_URL__: string;
 declare const __ML_BACKEND_URL__: string;
 const BACKEND_BASE_URL = (typeof __BACKEND_URL__ !== 'undefined' ? __BACKEND_URL__ : 'http://localhost:8000');
-const ML_BACKEND_URL = (typeof __ML_BACKEND_URL__ !== 'undefined' ? __ML_BACKEND_URL__ : 'https://lifeshield-backend.onrender.com/predict');
+const ML_BACKEND_URL = (typeof __ML_BACKEND_URL__ !== 'undefined' ? __ML_BACKEND_URL__ : 'https://health-intelligence-backend.onrender.com/predict');
 
 export const AI_CONFIG = {
     textModel: 'llama3.2',

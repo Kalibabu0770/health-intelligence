@@ -6,7 +6,7 @@ import uvicorn
 import os
 
 app = FastAPI(
-    title="Health Intelligence Engine",
+    title="Health Intelligence",
     description="AI + ML Health Guardian Backend — India AI Innovation Challenge 2026",
     version="2.0.0"
 )
@@ -14,8 +14,8 @@ app = FastAPI(
 # ── CORS ─────────────────────────────────────────────────────────────────────
 ALLOWED_ORIGINS = [
     "https://health-intelligence-hi.netlify.app",   # ← Actual Netlify URL
-    "https://lifeshield.netlify.app",               # Legacy
-    "https://lifeshield-ai.netlify.app",
+    "https://health-intelligence.netlify.app",
+    "https://health-intelligence-ai.netlify.app",
     "http://localhost:3001",
     "http://localhost:5173",
     "http://127.0.0.1:3001",
@@ -51,7 +51,7 @@ async def health():
     groq_key_set = bool(os.getenv("GROQ_API_KEY", ""))
     ml_url = os.getenv("ML_BACKEND_URL", "https://health-intelligence-backend.onrender.com/predict")
     return {
-        "status": "Health Intelligence Engine Online",
+        "status": "Health Intelligence Online",
         "version": "2.0.0",
         "ai_engine": "Groq (Llama 3.3 70b)" if groq_key_set else "Rule-based (Groq key missing)",
         "ml_backend": ml_url,

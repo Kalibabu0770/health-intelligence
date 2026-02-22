@@ -320,7 +320,7 @@ User types: "I have a headache and fever"
 POST /orchestrate
        │
        ▼
-   LifeShieldOrchestrator.process()
+   Health IntelligenceOrchestrator.process()
        │
        │── asyncio.gather() ──────────────────────────────────────┐
        │                                                           │

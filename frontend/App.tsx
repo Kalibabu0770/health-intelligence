@@ -478,7 +478,7 @@ const App: React.FC = () => {
     (window as any).handleGlobalLogout = () => {
       setIsAuthenticated(false);
       updateProfile(null as any);
-      localStorage.removeItem('lifeshield_profile');
+      localStorage.removeItem('hi_profile');
       window.location.reload();
     };
   }, [updateProfile]);
@@ -587,7 +587,7 @@ const App: React.FC = () => {
   }, [profile?.role]);
 
   useEffect(() => {
-    const lastCheckIn = localStorage.getItem('lifeshield_last_checkin');
+    const lastCheckIn = localStorage.getItem('hi_last_checkin');
     const today = new Date().toDateString();
     if (lastCheckIn !== today && profile && profile.role === 'citizen') {
       setTimeout(() => setShowDailyCheckIn(true), 1500);
@@ -633,7 +633,7 @@ const App: React.FC = () => {
       context.medicationReminders.forEach(m => {
         m.slots.forEach(slot => {
           if (slot.time === currentTime) {
-            const alertKey = `life_med_${m.name}_${slot.time}_${new Date().toDateString()}`;
+            const alertKey = `hi_med_${m.name}_${slot.time}_${new Date().toDateString()}`;
             if (!localStorage.getItem(alertKey)) {
               alert((t.med_reminder_alert || "🔔 MEDICINE REMINDER: It is time to take {name} ({dosage}).\nInstruction: {instruction}").replace('{name}', m.name).replace('{dosage}', m.dosage).replace('{instruction}', slot.instruction || 'None'));
               localStorage.setItem(alertKey, 'alerted');
@@ -698,7 +698,7 @@ const App: React.FC = () => {
 
           {showDailyCheckIn && <DailyCheckInModal onClose={() => {
             setShowDailyCheckIn(false);
-            localStorage.setItem('lifeshield_last_checkin', new Date().toDateString());
+            localStorage.setItem('hi_last_checkin', new Date().toDateString());
             refreshUnifiedHealth({ includeDailyCheckIn: true });
           }} />}
         </div>
@@ -724,7 +724,7 @@ const App: React.FC = () => {
       case 'checkin': return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
           <DailyCheckInModal onClose={() => {
-            localStorage.setItem('lifeshield_last_checkin', new Date().toDateString());
+            localStorage.setItem('hi_last_checkin', new Date().toDateString());
             refreshUnifiedHealth({ includeDailyCheckIn: true });
             handleTabChange('home');
           }} />
@@ -1210,14 +1210,14 @@ const Dashboard: React.FC<{
               <ShieldCheck size={32} />
             </div>
             <div>
-              <p className={`text-[8px] font-black uppercase tracking-[0.35em] mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Health Intelligence AI Guardian • Active</p>
+              <p className={`text-[8px] font-black uppercase tracking-[0.35em] mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Health Intelligence • Active</p>
               <h1 className={`text-xl lg:text-2xl font-black leading-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
                 {profile?.name ? `Hello, ${profile.name.split(' ')[0]}` : 'Welcome Back'}
               </h1>
               <p className={`text-sm font-bold mt-1 leading-relaxed max-w-md ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>
                 {isOrchestrating
                   ? '⚙️ Running clinical orchestration...'
-                  : (unifiedData?.guardian_summary || 'Your AI health guardian is monitoring all vitals. Stay healthy!')}
+                  : (unifiedData?.guardian_summary || 'Health Intelligence is monitoring all vitals. Stay healthy!')}
               </p>
             </div>
           </div>

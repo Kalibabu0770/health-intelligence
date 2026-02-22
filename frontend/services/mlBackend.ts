@@ -1,8 +1,8 @@
 /**
- * ML Backend Service — Health Intelligence AI
+ * ML Backend Service — Health Intelligence
  * Connects to deployed FastAPI backend on Render
  * 
- * Backend: https://lifeshield-backend.onrender.com
+ * Backend: https://health-intelligence-backend.onrender.com
  * Endpoints: POST /predict, GET /health
  */
 

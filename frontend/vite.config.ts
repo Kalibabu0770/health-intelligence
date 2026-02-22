@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => {
       'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
       '__BACKEND_URL__': JSON.stringify(env.VITE_BACKEND_URL || 'http://localhost:8000'),
-      '__ML_BACKEND_URL__': JSON.stringify(env.VITE_ML_BACKEND_URL || 'https://lifeshield-backend.onrender.com/predict'),
+      '__ML_BACKEND_URL__': JSON.stringify(env.VITE_ML_BACKEND_URL || 'https://health-intelligence-backend.onrender.com/predict'),
     },
     resolve: {
       alias: {

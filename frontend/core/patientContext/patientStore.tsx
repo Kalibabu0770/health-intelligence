@@ -68,15 +68,15 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // Load from LocalStorage on mount
     useEffect(() => {
         try {
-            const savedProfile = localStorage.getItem('lifeshield_profile');
-            const savedMeds = localStorage.getItem('lifeshield_reminders');
-            const savedSymptoms = localStorage.getItem('lifeshield_symptoms');
-            const savedFoods = localStorage.getItem('lifeshield_foods');
-            const savedWorkouts = localStorage.getItem('lifeshield_workouts');
-            const savedMeditations = localStorage.getItem('lifeshield_meditations');
-            const savedCheckIns = localStorage.getItem('lifeshield_checkins');
-            const savedDocs = localStorage.getItem('lifeshield_docs');
-            const savedLang = localStorage.getItem('lifeshield_lang');
+            const savedProfile = localStorage.getItem('hi_profile');
+            const savedMeds = localStorage.getItem('hi_reminders');
+            const savedSymptoms = localStorage.getItem('hi_symptoms');
+            const savedFoods = localStorage.getItem('hi_foods');
+            const savedWorkouts = localStorage.getItem('hi_workouts');
+            const savedMeditations = localStorage.getItem('hi_meditations');
+            const savedCheckIns = localStorage.getItem('hi_checkins');
+            const savedDocs = localStorage.getItem('hi_docs');
+            const savedLang = localStorage.getItem('hi_lang');
 
             const profile = savedProfile ? JSON.parse(savedProfile) : null;
             const medications = savedMeds ? JSON.parse(savedMeds) : [];
@@ -87,7 +87,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const dailyCheckIns = savedCheckIns ? JSON.parse(savedCheckIns) : [];
             const clinicalVault = savedDocs ? JSON.parse(savedDocs) : [];
             const language = (savedLang as Language) || 'en';
-            const savedTheme = localStorage.getItem('lifeshield_theme');
+            const savedTheme = localStorage.getItem('hi_theme');
             const theme = (savedTheme as 'light' | 'dark') || 'light';
 
             // Calculate initial risk
@@ -133,16 +133,16 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
     useEffect(() => {
         if (!isInitialized) return;
 
-        if (context.profile) localStorage.setItem('lifeshield_profile', JSON.stringify(context.profile));
-        localStorage.setItem('lifeshield_reminders', JSON.stringify(context.medications));
-        localStorage.setItem('lifeshield_symptoms', JSON.stringify(context.symptoms));
-        localStorage.setItem('lifeshield_foods', JSON.stringify(context.nutritionLogs));
-        localStorage.setItem('lifeshield_workouts', JSON.stringify(context.activityLogs));
-        localStorage.setItem('lifeshield_meditations', JSON.stringify(context.meditationLogs));
-        localStorage.setItem('lifeshield_checkins', JSON.stringify(context.dailyCheckIns));
-        localStorage.setItem('lifeshield_docs', JSON.stringify(context.clinicalVault));
-        localStorage.setItem('lifeshield_lang', context.language);
-        localStorage.setItem('lifeshield_theme', context.theme);
+        if (context.profile) localStorage.setItem('hi_profile', JSON.stringify(context.profile));
+        localStorage.setItem('hi_reminders', JSON.stringify(context.medications));
+        localStorage.setItem('hi_symptoms', JSON.stringify(context.symptoms));
+        localStorage.setItem('hi_foods', JSON.stringify(context.nutritionLogs));
+        localStorage.setItem('hi_workouts', JSON.stringify(context.activityLogs));
+        localStorage.setItem('hi_meditations', JSON.stringify(context.meditationLogs));
+        localStorage.setItem('hi_checkins', JSON.stringify(context.dailyCheckIns));
+        localStorage.setItem('hi_docs', JSON.stringify(context.clinicalVault));
+        localStorage.setItem('hi_lang', context.language);
+        localStorage.setItem('hi_theme', context.theme);
 
     }, [context, isInitialized]);
 
