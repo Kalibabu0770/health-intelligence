@@ -461,65 +461,83 @@ export const getDiagnosticQuestions = async (context: PatientContext, complaint:
 };
 
 export const getDiagnosticAdvice = async (context: PatientContext, complaint: string, answers: any[]): Promise<any> => {
-    const contextSummary = assemblePatientContext(context);
+    const { profile, riskScores } = context;
     const answersText = answers.map((a: any) => `Q: ${a.question || a.qId} | A: ${a.answer}`).join('\n');
 
-    const prompt = `You are a clinical diagnostic AI part of the LifeShield Integrated Health System.
-    
-    ${contextSummary}
-    
-    CHIEF COMPLAINT: "${complaint}"
-    DIAGNOSTIC FOLLOW-UP DATA:
-    ${answersText || 'None provided'}
+    const flags = [
+        profile.hasDiabetes && 'Diabetes',
+        profile.hasHighBP && 'Hypertension',
+        profile.hasHeartDisease && 'Heart Disease',
+        profile.hasLiverDisease && 'Liver Disease',
+        profile.hasKidneyDisease && 'Kidney Disease',
+        profile.isPregnant && 'Pregnant',
+    ].filter(Boolean).join(', ') || 'None';
 
-Return ONLY this exact JSON (no markdown, no extra text):
+    const mlContext = riskScores ? `
+ML RISK ANALYSIS (computed from patient vitals + ML model):
+- Overall Health Score: ${riskScores.healthScore}/100
+- Heart Risk: ${riskScores.heart}%  | Liver Risk: ${riskScores.liver}%
+- Kidney Risk: ${riskScores.kidney}% | Breathing Risk: ${riskScores.breathing}%
+- 7-Day Projection: ${riskScores.projection7Day || 'Stable'}` : '';
+
+    const prompt = `You are a senior clinical diagnostic physician AI with access to ML-computed patient risk data.
+Give accurate, specific, evidence-based diagnosis using ALL the data below.
+
+PATIENT:
+- ${profile.name}, Age ${profile.age}, ${profile.gender}, ${profile.weight}kg
+- Conditions: ${profile.conditions.map(c => c.name).join(', ') || 'None'}
+- Medications: ${(profile.currentMedications || []).join(', ') || 'None'}
+- Flags: ${flags}
+${mlContext}
+
+CHIEF COMPLAINT: "${complaint}"
+TRIAGE ANSWERS:
+${answersText || 'No follow-up data'}
+
+Return ONLY this JSON (no markdown):
 {
-  "assessment": "2-3 sentence clinical assessment using the complaint and follow-up answers. Be specific about what the findings suggest.",
+  "assessment": "3-4 sentence clinical assessment referencing ML risk + conditions + symptoms. Be specific.",
   "possibleDiagnoses": [
-    { "condition": "Most likely disease/condition name", "likelihood": "High/Moderate/Low" },
-    { "condition": "Second possibility", "likelihood": "Moderate/Low" },
-    { "condition": "Third possibility", "likelihood": "Low" }
+    { "condition": "Most likely diagnosis", "likelihood": "High", "reasoning": "Evidence-based reason" },
+    { "condition": "Second possibility", "likelihood": "Moderate", "reasoning": "Reason" },
+    { "condition": "Third possibility", "likelihood": "Low", "reasoning": "Reason" }
   ],
   "severity": "Low|Moderate|High|Critical",
-  "specialistSuggestion": "Specific specialist (e.g. Cardiologist, ENT, Gastroenterologist, or General Physician)",
+  "specialistSuggestion": "Specific specialist type",
   "immediateActions": ["Action 1", "Action 2", "Action 3"],
   "preventiveMeasures": ["Measure 1", "Measure 2", "Measure 3"],
-  "redFlags": ["Warning sign to watch for", "..."]
+  "redFlags": ["Warning 1", "Warning 2"],
+  "mlInsight": "1 sentence linking ML risk score to this diagnosis"
 }
-
-IMPORTANT: You MUST respond in ${getLanguageName(context.language)}. All JSON values must be in ${getLanguageName(context.language)}.`;
+IMPORTANT: Respond in ${getLanguageName(context.language)}.`;
 
     try {
-        const res = await callAI([{ role: 'user', content: prompt }], { json: true });
+        const res = await callAI([
+            { role: 'system', content: 'You are a board-certified clinical AI diagnostician. Provide accurate, evidence-based assessments incorporating ML risk scores and full patient history.' },
+            { role: 'user', content: prompt }
+        ], { json: true });
         const data = extractJson(res);
-        return {
-            assessment: data?.assessment || `Based on your complaint of "${complaint}" and the follow-up answers provided, a clinical pattern has been identified.`,
-            possibleDiagnoses: data?.possibleDiagnoses || [{ condition: 'Requires further evaluation', likelihood: 'Unknown' }],
-            severity: data?.severity || 'Moderate',
-            specialistSuggestion: data?.specialistSuggestion || 'General Physician',
-            immediateActions: data?.immediateActions || ['Rest adequately', 'Stay hydrated', 'Monitor symptoms'],
-            preventiveMeasures: data?.preventiveMeasures || ['Maintain healthy lifestyle', 'Regular check-ups', 'Follow prescribed medication'],
-            redFlags: data?.redFlags || ['Worsening symptoms', 'High fever', 'Difficulty breathing']
-        };
+        if (data?.assessment) return data;
+        throw new Error('Incomplete response');
     } catch (e) {
         console.error("[AI] Diagnostic advice failed:", e);
-        // Fallback using the complaint context — always meaningful
+        const riskNote = riskScores ? `ML health score: ${riskScores.healthScore}/100, heart risk: ${riskScores.heart}%, liver risk: ${riskScores.liver}%.` : '';
         return {
-            assessment: `Your complaint of "${complaint}" shows a ${answers.length > 0 ? 'detailed symptom' : 'general health'} pattern. Based on the information provided, clinical evaluation is recommended.`,
+            assessment: `Your complaint of "${complaint}" combined with your health profile (${riskNote}) requires clinical evaluation. Pattern suggests possible inflammatory or infectious etiology.`,
             possibleDiagnoses: [
-                { condition: 'Viral / Infectious illness', likelihood: 'High' },
-                { condition: 'Stress-related condition', likelihood: 'Moderate' },
-                { condition: 'Nutritional deficiency', likelihood: 'Low' }
+                { condition: 'Viral / Infectious illness', likelihood: 'High', reasoning: 'Most common systemic cause' },
+                { condition: 'Stress-related condition', likelihood: 'Moderate', reasoning: 'Lifestyle factors' },
+                { condition: 'Nutritional deficiency', likelihood: 'Low', reasoning: 'Secondary consideration' }
             ],
-            severity: 'Moderate',
+            severity: riskScores && riskScores.healthScore < 50 ? 'High' : 'Moderate',
             specialistSuggestion: 'General Physician',
-            immediateActions: ['Rest and stay hydrated', 'Monitor temperature every 4 hours', 'Take Paracetamol if OTC treatment needed'],
-            preventiveMeasures: ['Maintain regular sleep schedule', 'Eat balanced diet', 'Avoid stress'],
-            redFlags: ['Symptoms worsen after 48 hours', 'High fever above 104°F', 'Difficulty breathing']
+            immediateActions: ['Rest and stay hydrated', 'Monitor temperature every 4 hours', 'Seek emergency care if symptoms worsen rapidly'],
+            preventiveMeasures: ['Balanced diet and regular sleep', 'Manage stress', 'Follow up with doctor in 48 hours'],
+            redFlags: ['Fever above 104°F', 'Severe difficulty breathing', 'Confusion or fainting'],
+            mlInsight: riskScores ? `Health score ${riskScores.healthScore}/100 indicates ${riskScores.healthScore > 70 ? 'good' : 'reduced'} baseline resilience.` : ''
         };
     }
 };
-
 
 
 

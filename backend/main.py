@@ -6,21 +6,23 @@ import uvicorn
 import os
 
 app = FastAPI(
-    title="LifeShield Intelligence Engine",
-    description="AI-Powered Health Guardian Backend — IndiaAI Innovation Challenge 2026",
-    version="1.0.0"
+    title="Health Intelligence Engine",
+    description="AI + ML Health Guardian Backend — India AI Innovation Challenge 2026",
+    version="2.0.0"
 )
 
-# ── CORS: allow Netlify production + local dev ─────────────────────────────
+# ── CORS ─────────────────────────────────────────────────────────────────────
 ALLOWED_ORIGINS = [
-    "https://lifeshield.netlify.app",      # ← Replace with your actual Netlify URL
-    "https://lifeshield-ai.netlify.app",   # ← Keep both if URL changes
-    "http://localhost:3001",               # Vite dev server
-    "http://localhost:5173",               # Vite fallback
+    "https://health-intelligence-hi.netlify.app",   # ← Actual Netlify URL
+    "https://lifeshield.netlify.app",               # Legacy
+    "https://lifeshield-ai.netlify.app",
+    "http://localhost:3001",
+    "http://localhost:5173",
     "http://127.0.0.1:3001",
+    "http://127.0.0.1:5173",
 ]
 
-# Allow override via environment variable (set in Render dashboard)
+# Allow additional origin via Render env var
 EXTRA_ORIGIN = os.getenv("CORS_ORIGIN", "")
 if EXTRA_ORIGIN:
     ALLOWED_ORIGINS.append(EXTRA_ORIGIN)
@@ -41,14 +43,19 @@ async def orchestrate(request: UnifiedRequest):
         response = await orchestrator.process(request)
         return response
     except Exception as e:
-        print(f"[LifeShield] Orchestration Error: {e}")
+        print(f"[Engine] Orchestration Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
 async def health():
+    groq_key_set = bool(os.getenv("GROQ_API_KEY", ""))
+    ml_url = os.getenv("ML_BACKEND_URL", "https://health-intelligence-backend.onrender.com/predict")
     return {
-        "status": "LifeShield Engine Online",
-        "version": "1.0.0",
+        "status": "Health Intelligence Engine Online",
+        "version": "2.0.0",
+        "ai_engine": "Groq (Llama 3.3 70b)" if groq_key_set else "Rule-based (Groq key missing)",
+        "ml_backend": ml_url,
+        "groq_configured": groq_key_set,
         "environment": os.getenv("RENDER", "local")
     }
 
