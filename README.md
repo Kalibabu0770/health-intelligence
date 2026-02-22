@@ -1,4 +1,4 @@
-# 🛡️ LifeShield — AI Personal Health Guardian
+# 🧠 Health Intelligence — AI-Powered Health Guardian Platform
 
 > **IndiaAI Innovation Challenge 2026** — Government of Andhra Pradesh
 
@@ -8,8 +8,8 @@ An AI-powered full-stack health guardian platform providing personal bio-risk mo
 
 ## 🚀 Live Demo
 
-- **Frontend:** https://lifeshield.netlify.app
-- **Backend API:** https://lifeshield-backend.onrender.com/health
+- **Frontend:** https://health-intelligence.netlify.app
+- **Backend API:** https://health-intelligence-backend.onrender.com/health
 
 ---
 
@@ -29,7 +29,7 @@ An AI-powered full-stack health guardian platform providing personal bio-risk mo
 ## 📦 Project Structure
 
 ```
-lifeshield/
+health-intelligence/
 ├── frontend/          ← React app (deploy to Netlify)
 │   ├── App.tsx
 │   ├── services/ai.ts
@@ -76,7 +76,7 @@ uvicorn main:app --reload --port 8000
 - Root: `frontend/`
 - Build: `npm install && npm run build`
 - Publish: `dist/`
-- Set env var: `VITE_BACKEND_URL=https://lifeshield-backend.onrender.com`
+- Set env var: `VITE_BACKEND_URL=https://health-intelligence-backend.onrender.com`
 
 ### Backend → Render
 - Root: `backend/`
@@ -110,4 +110,5 @@ uvicorn main:app --reload --port 8000
 
 ## 📄 License
 
-MIT — Built for IndiaAI Innovation Challenge 2026
+MIT — Built for IndiaAI Innovation Challenge 2026  
+Project: **Health Intelligence** | Repository: `health-intelligence`
