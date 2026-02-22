@@ -595,6 +595,13 @@ const App: React.FC = () => {
   }, [profile]);
 
   useEffect(() => {
+    // Ollama runs locally only — skip status checks in production (Netlify)
+    const isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocalEnv) {
+      // In production, mark AI as "demo mode" — features gracefully degrade
+      setAiStatus({ isConnected: false, hasTextModel: false, hasVisionModel: false, availableModels: [], error: 'production' });
+      return;
+    }
     checkAIStatus().then(setAiStatus);
     const interval = setInterval(() => checkAIStatus().then(setAiStatus), 30000);
     return () => clearInterval(interval);
@@ -1085,11 +1092,34 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {!aiStatus.isConnected && (
-        <div className="fixed top-0 left-0 right-0 bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest text-center py-2 z-[9999]">
-          ⚠️ AI Service Disconnected. Ensure Ollama is running.
-        </div>
-      )}
+      {/* AI Status Banner */}
+      {!aiStatus.isConnected && (() => {
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isProductionError = aiStatus.error === 'production';
+
+        if (isProductionError) {
+          // Production: Show a soft informational banner (not scary red)
+          return (
+            <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[9px] font-bold uppercase tracking-widest text-center py-2 z-[9999] flex items-center justify-center gap-2">
+              <span className="text-yellow-300">⚡</span>
+              Health Intelligence — Demo Mode &nbsp;·&nbsp;
+              <span className="text-blue-200 font-normal normal-case tracking-normal">Run Ollama locally for full AI features</span>
+              <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-[7px]">Cloud features active ✓</span>
+            </div>
+          );
+        }
+
+        if (isLocal) {
+          // Dev: Show red warning to start Ollama
+          return (
+            <div className="fixed top-0 left-0 right-0 bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest text-center py-2 z-[9999]">
+              ⚠️ AI Service Disconnected. Start Ollama: <code className="bg-red-800 px-2 py-0.5 rounded ml-1 normal-case">ollama run llama3.2</code>
+            </div>
+          );
+        }
+
+        return null;
+      })()}
 
       {!isAssistantOpen && (
         <button
