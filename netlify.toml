@@ -1,6 +1,4 @@
-# ============================================================
-# LifeShield — Netlify Production Configuration
-# ============================================================
+# Health Intelligence — Netlify Production Configuration
 
 [build]
   base    = "frontend"

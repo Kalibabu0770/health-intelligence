@@ -1,5 +1,5 @@
 """
-LifeShield Orchestrator — Production Version
+Health Intelligence Orchestrator — Production Version
 Uses Groq (Llama 3.3 70b, FREE) + ML Backend (Render) for accurate, fused AI+ML outputs.
 Local Ollama dependency removed — works in cloud (Render) deployment.
 """
@@ -19,7 +19,7 @@ GROQ_MODEL      = "llama-3.3-70b-versatile"
 ML_BACKEND_URL  = os.getenv("ML_BACKEND_URL", "https://lifeshield-backend.onrender.com/predict")
 
 
-class LifeShieldOrchestrator:
+class HealthIntelligenceOrchestrator:
     def __init__(self):
         pass
 
@@ -251,7 +251,7 @@ Return ONLY this exact JSON:
         triage_info  = f"Triage: {triage.triage_level}" if triage else ""
         vault_info   = f"Reports on file: {len(request.clinical_vault)}" if request.clinical_vault else ""
 
-        prompt = f"""You are LifeShield's AI Health Guardian. Write a warm, professional 2-sentence health summary for {p.name}.
+        prompt = f"""You are Health Intelligence's AI Health Guardian. Write a warm, professional 2-sentence health summary for {p.name}.
 
 Data: {risk_info}. {med_info}. {triage_info}. {vault_info}.
 Conditions: {[c.name for c in p.conditions] or 'None'}.

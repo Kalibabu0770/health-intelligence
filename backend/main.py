@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from models import UnifiedRequest, UnifiedResponse
-from orchestrator import LifeShieldOrchestrator
+from orchestrator import HealthIntelligenceOrchestrator
 import uvicorn
 import os
 
@@ -35,7 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-orchestrator = LifeShieldOrchestrator()
+orchestrator = HealthIntelligenceOrchestrator()
 
 @app.post("/orchestrate", response_model=UnifiedResponse)
 async def orchestrate(request: UnifiedRequest):

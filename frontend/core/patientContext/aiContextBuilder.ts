@@ -8,7 +8,7 @@ export const buildAIPrompt = (context: PatientContext, userQuery: string, taskTy
   switch (taskType) {
     case 'CHAT':
       instructions = `
-        ROLE: You are "LifeShield Bio-Guardian", a specialized medical AI assistant.
+        ROLE: You are "Health Intelligence Bio-Guardian", a specialized medical AI assistant.
         GOAL: Provide clinical guidance based on the patient's full context.
         RULES:
         1. ALWAYS reference specific data points from the context (e.g., "Given your history of asthma...").

@@ -1210,7 +1210,7 @@ const Dashboard: React.FC<{
               <ShieldCheck size={32} />
             </div>
             <div>
-              <p className={`text-[8px] font-black uppercase tracking-[0.35em] mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>LifeShield AI Guardian • Active</p>
+              <p className={`text-[8px] font-black uppercase tracking-[0.35em] mb-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Health Intelligence AI Guardian • Active</p>
               <h1 className={`text-xl lg:text-2xl font-black leading-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
                 {profile?.name ? `Hello, ${profile.name.split(' ')[0]}` : 'Welcome Back'}
               </h1>

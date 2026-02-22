@@ -1,5 +1,5 @@
 /**
- * ML Backend Service — LifeShield AI
+ * ML Backend Service — Health Intelligence AI
  * Connects to deployed FastAPI backend on Render
  * 
  * Backend: https://lifeshield-backend.onrender.com

@@ -45,7 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, isDan
               <ShieldCheck size={18} />
             </div>
             <div className="min-w-0">
-              <p className={`text-[7px] font-black uppercase tracking-[0.3em] leading-none ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>LifeShield AI</p>
+              <p className={`text-[7px] font-black uppercase tracking-[0.3em] leading-none ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>Health Intelligence AI</p>
               <h1 className={`font-black text-[13px] uppercase tracking-tight leading-tight truncate ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>Health Guardian</h1>
             </div>
             <div className="ml-auto flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100 shrink-0">

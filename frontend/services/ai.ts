@@ -966,7 +966,7 @@ export const getAyurvedicClinicalStrategy = async (context: PatientContext, comp
     const contextSummary = assemblePatientContext(context);
     const answersText = answers.map((a: any) => `Q: ${a.question || a.qId} | A: ${a.answer}`).join('\n');
 
-    const prompt = `You are a Senior Ayurvedic Physician and Clinical Researcher at the LifeShield AYUSH Integrated Node.
+    const prompt = `You are a Senior Ayurvedic Physician and Clinical Researcher at the Health Intelligence AYUSH Integrated Node.
     
     PATIENT BIOMETRICS & HISTORY:
     - Age: ${context.profile.age}
