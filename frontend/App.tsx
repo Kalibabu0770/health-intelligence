@@ -2943,7 +2943,7 @@ const StructuredSymptomChecker: React.FC = () => {
       if (data.questions && data.questions.length > 0) {
         setStep('questions');
       }
-    } catch (err) { alert(t.diagnostic_error); } finally { setLoading(false); }
+    } catch (err) { alert('Could not load questions. Please try again.'); } finally { setLoading(false); }
   };
 
   const submitAnswers = async () => {
@@ -2999,7 +2999,7 @@ const StructuredSymptomChecker: React.FC = () => {
       setStep('result');
     } catch (err) {
       console.error("[Triage] Synthesis error:", err);
-      alert(t.synthesis_error || "Synthesis error. Ensure Ollama is running and responsive.");
+      alert('Analysis could not complete. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }

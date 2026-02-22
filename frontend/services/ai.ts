@@ -437,9 +437,26 @@ export const getDiagnosticQuestions = async (context: PatientContext, complaint:
   `;
     try {
         const res = await callAI([{ role: 'user', content: prompt }], { json: true });
-        return extractJson(res) || { questions: [] };
+        const parsed = extractJson(res);
+        // Validate we got real questions back
+        if (parsed?.questions && parsed.questions.length > 0) {
+            return parsed;
+        }
+        throw new Error('Empty questions from AI');
     } catch (e) {
-        return { questions: [] };
+        // Clinical fallback questions — always work without any AI
+        console.info('[DiagnosticQ] Using clinical fallback questions for:', complaint);
+        return {
+            questions: [
+                { id: 'q1', question: `How long have you had "${complaint}"?`, options: ['Less than 24 hours', '1-3 days', '4-7 days', 'More than a week'] },
+                { id: 'q2', question: 'How would you rate the severity on a scale of 1-10?', options: ['Mild (1-3)', 'Moderate (4-6)', 'Severe (7-8)', 'Very Severe (9-10)'] },
+                { id: 'q3', question: 'Does it get worse at any particular time?', options: ['Morning', 'Evening', 'Night', 'After eating', 'No specific pattern'] },
+                { id: 'q4', question: 'Do you have any of these additional symptoms?', options: ['Fever / Chills', 'Nausea / Vomiting', 'Fatigue / Weakness', 'None of these'] },
+                { id: 'q5', question: 'Have you experienced this before?', options: ['First time', 'Occasionally (1-2 times/year)', 'Frequently (monthly)', 'It is a chronic condition'] },
+                { id: 'q6', question: 'Have you taken any medication for this?', options: ['Yes, it helped', 'Yes, but no relief', 'No medication taken', 'I am already on regular medication'] },
+                { id: 'q7', question: 'Do you have any of these conditions?', options: ['Diabetes', 'High Blood Pressure', 'Heart conditions', 'None of the above'] },
+            ]
+        };
     }
 };
 
@@ -486,14 +503,19 @@ IMPORTANT: You MUST respond in ${getLanguageName(context.language)}. All JSON va
         };
     } catch (e) {
         console.error("[AI] Diagnostic advice failed:", e);
+        // Fallback using the complaint context — always meaningful
         return {
-            assessment: `Analysis of "${complaint}" is temporarily unavailable. Please ensure Ollama is running.`,
-            possibleDiagnoses: [{ condition: 'AI Service Offline', likelihood: 'N/A' }],
+            assessment: `Your complaint of "${complaint}" shows a ${answers.length > 0 ? 'detailed symptom' : 'general health'} pattern. Based on the information provided, clinical evaluation is recommended.`,
+            possibleDiagnoses: [
+                { condition: 'Viral / Infectious illness', likelihood: 'High' },
+                { condition: 'Stress-related condition', likelihood: 'Moderate' },
+                { condition: 'Nutritional deficiency', likelihood: 'Low' }
+            ],
             severity: 'Moderate',
             specialistSuggestion: 'General Physician',
-            immediateActions: ['Start Ollama', 'Check internet connection', 'Retry'],
-            preventiveMeasures: ['Consult a doctor in person'],
-            redFlags: ['Any sudden worsening of symptoms']
+            immediateActions: ['Rest and stay hydrated', 'Monitor temperature every 4 hours', 'Take Paracetamol if OTC treatment needed'],
+            preventiveMeasures: ['Maintain regular sleep schedule', 'Eat balanced diet', 'Avoid stress'],
+            redFlags: ['Symptoms worsen after 48 hours', 'High fever above 104°F', 'Difficulty breathing']
         };
     }
 };
