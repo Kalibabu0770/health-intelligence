@@ -1,0 +1,71 @@
+# ============================================================
+# LifeShield — Production .gitignore
+# ============================================================
+
+# ── Node / Frontend ──────────────────────────────────────────
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+.npm-cache/
+
+# ── Python / Backend ─────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+venv/
+env/
+.venv/
+.env/
+
+# ── Secrets & Environment Variables ──────────────────────────
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+*.secret
+
+# ── ML Models: KEEP .pkl files (DO NOT ignore) ───────────────
+# best_model.pkl   ← TRACKED
+# scaler.pkl       ← TRACKED
+# feature_columns.pkl ← TRACKED
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ── OS / Editor ───────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── Firebase ─────────────────────────────────────────────────
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# ── Misc ─────────────────────────────────────────────────────
+*.tgz
+*.zip
+coverage/
+.nyc_output/

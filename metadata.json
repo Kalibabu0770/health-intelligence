@@ -1,0 +1,10 @@
+
+{
+  "name": "LifeShield – AI Personal Tablet Safety Guardian",
+  "description": "A high-stakes preventive AI health guardian designed to prevent medicine misuse and organ damage through rule-based and AI-powered risk assessment.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera",
+    "microphone"
+  ]
+}
