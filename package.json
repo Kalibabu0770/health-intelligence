@@ -1,0 +1,9 @@
+{
+    "name": "lifeshield-root",
+    "version": "1.0.0",
+    "scripts": {
+        "frontend": "cd frontend && npm run dev",
+        "backend": "source backend/venv/bin/activate && python3 backend/main.py",
+        "dev": "npm run frontend"
+    }
+}

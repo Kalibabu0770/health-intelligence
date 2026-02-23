@@ -37,6 +37,23 @@ const callGroq = async (messages: any[], options: any = {}): Promise<string> => 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
     try {
+        // Handle images in messages if present (OpenAI-like format)
+        const groqMessages = messages.map(msg => {
+            if (msg.images && msg.images.length > 0) {
+                return {
+                    role: msg.role,
+                    content: [
+                        { type: "text", text: msg.content },
+                        ...msg.images.map((img: string) => ({
+                            type: "image_url",
+                            image_url: { url: img.startsWith('data:') ? img : `data:image/jpeg;base64,${img}` }
+                        }))
+                    ]
+                };
+            }
+            return msg;
+        });
+
         const response = await fetch(GROQ_API_URL, {
             method: 'POST',
             headers: {
@@ -44,11 +61,12 @@ const callGroq = async (messages: any[], options: any = {}): Promise<string> => 
                 'Authorization': `Bearer ${GROQ_API_KEY}`,
             },
             body: JSON.stringify({
-                model: GROQ_MODEL,
-                messages,
+                model: options.model || GROQ_MODEL,
+                messages: groqMessages,
                 temperature: options.temperature ?? 0.7,
                 max_tokens: options.max_tokens ?? 1024,
                 stream: false,
+                response_format: options.json ? { type: "json_object" } : undefined
             }),
             signal: controller.signal,
         });
@@ -76,6 +94,7 @@ const callAI = async (
     messages: any[],
     options: { json?: boolean; allowVision?: boolean } = {}
 ): Promise<string> => {
+    console.log("[AI] Requesting synthesis...", { tier1: "Ollama", tier2: "Groq" });
     // Tier 1: Try Ollama (works only if local Ollama is running)
     const isLocal = typeof window !== 'undefined' &&
         (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
@@ -801,7 +820,7 @@ export const identifyMedicineFromImage = async (base64Image: string, language: L
         {
             role: 'user',
             content: `Identify the medicine shown in this photo. Return ONLY a JSON object with keys "name" and "dosage". Use ${langName} for the name if possible. Format: {"name": "...", "dosage": "..."}`,
-            images: [base64Image.split(',')[1] || base64Image]
+            images: [base64Image.startsWith('data:') ? base64Image : `data:image/jpeg;base64,${base64Image}`]
         }
     ];
 
@@ -810,15 +829,27 @@ export const identifyMedicineFromImage = async (base64Image: string, language: L
     try {
         // Tier 1: Local llava vision
         if (isLocal) {
-            const text = await callOllama(AI_CONFIG.visionModel, messages, 'json');
-            const data = extractJson(text);
-            if (data) return data;
+            try {
+                const text = await callOllama(AI_CONFIG.visionModel, messages, 'json');
+                const data = extractJson(text);
+                if (data && data.name) return data;
+            } catch (e) {
+                console.warn("[AI] Local vision failed, trying cloud fallback.");
+            }
         }
-        // Tier 2: Ask user to type medicine name — return helpful message
+
+        // Tier 2: Groq Vision (Cloud fallback for Netlify)
+        const groqResult = await callGroq(messages, {
+            json: true,
+            model: "llama-3.2-11b-vision-preview"
+        });
+        const cloudData = extractJson(groqResult);
+        if (cloudData && cloudData.name) return cloudData;
+
         return { name: 'Please type medicine name manually', dosage: 'See packaging' };
     } catch (e) {
         console.error("Medicine identification error:", e);
-        return null;
+        return { name: 'Please type medicine name manually', dosage: 'See packaging' };
     }
 };
 

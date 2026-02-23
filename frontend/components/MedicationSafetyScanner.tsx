@@ -59,6 +59,7 @@ const MedicationSafetyScanner: React.FC = () => {
         if (activeMeds.length === 0) return;
 
         setIsAnalyzing(true);
+        console.log("[Scanner] Starting analysis for meds:", activeMeds);
         try {
             const context = { profile, medications: [], symptoms: [], nutritionLogs: [], activityLogs: [], riskScores, language } as any;
             const res = await analyzeTabletSafety(context, activeMeds, problemContext || 'General safety check');

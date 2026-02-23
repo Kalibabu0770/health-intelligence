@@ -4,6 +4,9 @@ from models import UnifiedRequest, UnifiedResponse
 from orchestrator import HealthIntelligenceOrchestrator
 import uvicorn
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(
     title="Health Intelligence",
@@ -17,8 +20,10 @@ ALLOWED_ORIGINS = [
     "https://health-intelligence.netlify.app",
     "https://health-intelligence-ai.netlify.app",
     "http://localhost:3001",
+    "http://localhost:3002",
     "http://localhost:5173",
     "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
     "http://127.0.0.1:5173",
 ]
 
