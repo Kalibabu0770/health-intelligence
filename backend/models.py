@@ -30,6 +30,9 @@ class UnifiedRequest(BaseModel):
     problem_context: Optional[str] = None
     image_b64: Optional[str] = None
     clinical_vault: Optional[List[Dict]] = []
+    symptoms: Optional[List[Dict]] = []
+    nutrition_logs: Optional[List[Dict]] = []
+    activity_logs: Optional[List[Dict]] = []
     language: str = "en"
 
 class OrganStress(BaseModel):

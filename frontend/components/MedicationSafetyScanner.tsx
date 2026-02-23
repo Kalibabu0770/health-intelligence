@@ -5,7 +5,7 @@ import { analyzeTabletSafety, identifyMedicineFromImage, orchestrateHealth } fro
 import { startListening } from '../services/speech';
 
 const MedicationSafetyScanner: React.FC = () => {
-    const { profile, t, language, riskScores, theme } = usePatientContext();
+    const { profile, t, language, riskScores, theme, clinicalVault, symptoms, nutritionLogs, activityLogs } = usePatientContext();
     const [meds, setMeds] = useState<string[]>(['']);
     const [problemContext, setProblemContext] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -61,8 +61,7 @@ const MedicationSafetyScanner: React.FC = () => {
         setIsAnalyzing(true);
         console.log("[Scanner] Starting analysis for meds:", activeMeds);
         try {
-            const context = { profile, clinicalVault: [], riskScores, language } as any;
-            const res = await orchestrateHealth(context, {
+            const res = await orchestrateHealth({ profile, clinicalVault, symptoms, nutritionLogs, activityLogs, riskScores, language } as any, {
                 medications: activeMeds,
                 problem_context: problemContext || 'General safety check'
             });

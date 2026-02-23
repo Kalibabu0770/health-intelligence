@@ -185,17 +185,30 @@ class HealthIntelligenceOrchestrator:
         conflict_text = "; ".join(conflicts) if conflicts else "No major drug interactions detected."
         ml_context = f"ML Predictor shows {bio.risk_level} risk ({bio.risk_probability*100:.0f}%) with vitality {bio.vitality_score}/100." if bio else ""
         
+        # Comprehensive context assembly
+        symptom_summary = "; ".join([f"{s.get('name', 'Symptom')} ({s.get('severity', 'moderate')})" for s in (request.symptoms or [])])
+        nutrition_summary = "; ".join([f"Log: {l.get('description', '')}" for l in (request.nutrition_logs or [])[:3]])
+        vault_summary = "; ".join([f"Report: {v.get('name', 'Lab Result')}" for v in (request.clinical_vault or [])])
+
         lang = self.get_language_name(request.language)
         prompt = f"""You are a clinical pharmacist AI. 
 Patient: Age {p.age}, Gender {p.gender}.
 ML Risk Data: {ml_context}
 Organ Stress: {f'L:{bio.organ_stress.liver}, K:{bio.organ_stress.kidney}, C:{bio.organ_stress.cardio}' if bio else 'Unknown'}
-Medications: {', '.join(request.medications or [])}.
-Problem Context: {request.problem_context or 'General safety check'}
+
+PATIENT HISTORY:
+Symptoms: {symptom_summary or 'None logged recently'}
+Recent Nutrition: {nutrition_summary or 'Standard diet'}
+Clinical Reports: {vault_summary or 'No past reports available'}
+
+Medications to scan: {', '.join(request.medications or [])}.
+Problem Context (Reason for taking): {request.problem_context or 'General safety check'}
+
 Rule-based findings: {conflict_text}. Safety status: {status}.
 
 IMPORTANT: Write your response in {lang}. 
-Write a 2-sentence highly specific clinical synthesis. Fuse the ML risk scores into your reasoning (e.g. 'Given your vitality score...')."""
+Write a 2-sentence highly specific clinical synthesis. Base your answer on the FUSION of their symptoms, past reports, and the current medication scan. 
+Address them by name if known: {p.name}."""
 
         explanation = await self.call_groq(prompt)
         return MedSafetyResponse(
@@ -205,11 +218,15 @@ Write a 2-sentence highly specific clinical synthesis. Fuse the ML risk scores i
             next_action="Consult your doctor before taking these medications together."
         )
 
-    # ── Triage: ML-Informed + Groq ────────────────────────────────────────────
+    # ── Triage: ML-Informed + History + Groq ──────────────────────────────────
     async def run_triage(self, request: UnifiedRequest, bio: BioRiskResponse = None) -> TriageResponse:
         p          = request.profile
         input_text = request.query or request.problem_context or ""
         conditions = [c.name for c in p.conditions]
+
+        # Context assembly
+        symptom_summary = "; ".join([f"{s.get('name', 'Symptom')}" for s in (request.symptoms or [])])
+        vault_summary = "; ".join([f"Docs: {v.get('name', 'Report')}" for v in (request.clinical_vault or [])])
 
         # High-risk keyword rules (instant triage)
         HIGH_RISK_KEYWORDS = ["chest pain", "heart attack", "stroke", "seizure",
@@ -222,13 +239,15 @@ Write a 2-sentence highly specific clinical synthesis. Fuse the ML risk scores i
         prompt = f"""You are an emergency triage AI doctor.
 PATIENT: {p.name}, Age {p.age}, Gender {p.gender}. {ml_note}
 CONDITIONS: {', '.join(conditions) if conditions else 'None'}
+PAST SYMPTOMS: {symptom_summary}
+CLINICAL VAULT: {vault_summary}
 CHIEF COMPLAINT: {input_text}
 
 IMPORTANT: All JSON values must be in {lang}.
 Return ONLY this exact JSON:
 {{
   "triage_level": "{'Critical' if is_critical else 'Mild|Moderate|High'}",
-  "basic_care_advice": "Specific 2-sentence actionable advice.",
+  "basic_care_advice": "Specific 2-sentence actionable advice based on their history and complaint.",
   "specialist_recommendation": "Specific doctor type",
   "follow_up_questions": ["Question 1", "Question 2", "Question 3"],
   "disclaimer": "AI guidance only. Consult a doctor."
@@ -287,14 +306,20 @@ Return ONLY this exact JSON:
         med_info     = f"Medication Safety: {med.interaction_level}" if med else ""
         triage_info  = f"Triage: {triage.triage_level}" if triage else ""
         vault_info   = f"Reports on file: {len(request.clinical_vault)}" if request.clinical_vault else ""
+        symptom_info = f"Symptoms: {len(request.symptoms)} logged." if request.symptoms else ""
 
         lang = self.get_language_name(request.language)
         prompt = f"""You are Health Intelligence's AI Health Guardian. Write a warm, professional 2-sentence health summary for {p.name} in {lang}.
 
-Data: {risk_info}. {med_info}. {triage_info}. {vault_info}.
-Conditions: {[c.name for c in p.conditions] or 'None'}.
+Context for synthesis: 
+- {risk_info}
+- {med_info}
+- {triage_info}
+- {vault_info}
+- {symptom_info}
+- Nutrition Profile: {"; ".join([l.get('description', '') for l in (request.nutrition_logs or [])[:2]])}
 
-Be empathetic, specific, and actionable. Address the patient by name."""
+Be empathetic, specific, and actionable. Base your advice on the FUSION of all this data."""
         return await self.call_groq(prompt) or f"Guardian monitoring active for {p.name}. {risk_info}."
 
     # ── Groq API Call (replaces Ollama) ──────────────────────────────────────

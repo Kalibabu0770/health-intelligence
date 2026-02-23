@@ -896,7 +896,10 @@ export const orchestrateHealth = async (context: PatientContext, options: {
             medications: options.medications,
             problem_context: options.problem_context,
             image_b64: options.image_b64,
-            clinical_vault: context.clinicalVault,
+            clinical_vault: context.clinicalVault || [],
+            symptoms: context.symptoms || [],
+            nutrition_logs: context.nutritionLogs || [],
+            activity_logs: context.activityLogs || [],
             language: context.language
         };
 
