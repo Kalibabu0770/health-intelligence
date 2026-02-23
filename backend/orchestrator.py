@@ -23,20 +23,35 @@ class HealthIntelligenceOrchestrator:
     def __init__(self):
         pass
 
+    def get_language_name(self, code: str) -> str:
+        mapping = {
+            "en": "English",
+            "te": "Telugu",
+            "hi": "Hindi",
+            "ta": "Tamil",
+            "kn": "Kannada",
+            "ml": "Malayalam",
+            "mr": "Marathi"
+        }
+        return mapping.get(code, "English")
+
     # ── Main Entry ────────────────────────────────────────────────────────────
     async def process(self, request: UnifiedRequest) -> UnifiedResponse:
-        tasks = [self.run_bio_risk(request)]
-
+        # Step 1: Run ML Bio Risk First (Foundation for fusion)
+        bio_risk = await self.run_bio_risk(request)
+        
+        # Step 2: Run other tasks with ML context
+        tasks = []
         if request.medications:
-            tasks.append(self.run_med_safety(request))
+            tasks.append(self.run_med_safety(request, bio_risk))
         if request.query or request.problem_context:
-            tasks.append(self.run_triage(request))
-        tasks.append(self.run_nutrition(request))
+            tasks.append(self.run_triage(request, bio_risk))
+        tasks.append(self.run_nutrition(request, bio_risk))
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         response_data = {
-            "bio_risk": None,
+            "bio_risk": bio_risk,
             "medication_safety": None,
             "triage": None,
             "nutrition": None,
@@ -49,7 +64,6 @@ class HealthIntelligenceOrchestrator:
             if isinstance(res, Exception):
                 print(f"[Orchestrator] Task error: {res}")
                 continue
-            if isinstance(res, BioRiskResponse):    response_data["bio_risk"]          = res
             if isinstance(res, MedSafetyResponse):  response_data["medication_safety"] = res
             if isinstance(res, TriageResponse):     response_data["triage"]            = res
             if isinstance(res, NutritionResponse):  response_data["nutrition"]         = res
@@ -127,8 +141,8 @@ class HealthIntelligenceOrchestrator:
             organ_stress=organ_stress
         )
 
-    # ── Medication Safety: Rules + Groq ──────────────────────────────────────
-    async def run_med_safety(self, request: UnifiedRequest) -> MedSafetyResponse:
+    # ── Medication Safety: Rules + ML + Groq ──────────────────────────────────
+    async def run_med_safety(self, request: UnifiedRequest, bio: BioRiskResponse = None) -> MedSafetyResponse:
         p    = request.profile
         meds = [m.lower() for m in (request.medications or [])]
         conflicts = []
@@ -147,26 +161,41 @@ class HealthIntelligenceOrchestrator:
                 conflicts.append(msg)
                 status = "DANGER"
 
-        # Condition-based warnings
-        if p.hasLiverDisease and "paracetamol" in meds:
-            conflicts.append("Paracetamol hepatotoxicity risk with liver disease.")
-            status = "CAUTION" if status != "DANGER" else "DANGER"
-        if p.hasKidneyDisease and "ibuprofen" in meds:
-            conflicts.append("NSAIDs worsen renal function in kidney disease.")
-            status = "CAUTION" if status != "DANGER" else "DANGER"
-        if p.hasDiabetes and "prednisolone" in meds:
-            conflicts.append("Steroids elevate blood glucose in diabetics.")
-            status = "CAUTION" if status != "DANGER" else "DANGER"
+        # Condition-based & ML-Informed warnings
+        if p.hasLiverDisease or (bio and bio.organ_stress.liver > 0.6):
+            if any(m in meds for m in ["paracetamol", "acetaminophen", "statin"]):
+                conflicts.append(f"Elevated Liver Stress ({bio.organ_stress.liver if bio else 'Known'}): Hepatotoxicity risk.")
+                status = "DANGER"
+        
+        if p.hasKidneyDisease or (bio and bio.organ_stress.kidney > 0.6):
+            if any(m in meds for m in ["ibuprofen", "naproxen", "diclofenac"]):
+                conflicts.append(f"Elevated Renal Stress ({bio.organ_stress.kidney if bio else 'Known'}): NSAID contraindication.")
+                status = "DANGER"
+
+        if bio and bio.organ_stress.cardio > 0.7:
+            if any(m in meds for m in ["pseudoephedrine", "caffeine"]):
+                conflicts.append(f"Elevated Cardio Stress ({bio.organ_stress.cardio}): Stimulant risk.")
+                status = "CAUTION" if status != "DANGER" else "DANGER"
+
         if p.isPregnant and any(m in meds for m in ["ibuprofen", "aspirin", "warfarin"]):
             conflicts.append("Medication contraindicated in pregnancy.")
             status = "DANGER"
 
-        # Groq explanation
+        # Groq explanation fused with ML scores
         conflict_text = "; ".join(conflicts) if conflicts else "No major drug interactions detected."
-        prompt = f"""You are a clinical pharmacist AI. Patient: Age {p.age}, Gender {p.gender}.
+        ml_context = f"ML Predictor shows {bio.risk_level} risk ({bio.risk_probability*100:.0f}%) with vitality {bio.vitality_score}/100." if bio else ""
+        
+        lang = self.get_language_name(request.language)
+        prompt = f"""You are a clinical pharmacist AI. 
+Patient: Age {p.age}, Gender {p.gender}.
+ML Risk Data: {ml_context}
+Organ Stress: {f'L:{bio.organ_stress.liver}, K:{bio.organ_stress.kidney}, C:{bio.organ_stress.cardio}' if bio else 'Unknown'}
 Medications: {', '.join(request.medications or [])}.
+Problem Context: {request.problem_context or 'General safety check'}
 Rule-based findings: {conflict_text}. Safety status: {status}.
-Write a 2-sentence clear clinical explanation for the patient. Be specific about the risk."""
+
+IMPORTANT: Write your response in {lang}. 
+Write a 2-sentence highly specific clinical synthesis. Fuse the ML risk scores into your reasoning (e.g. 'Given your vitality score...')."""
 
         explanation = await self.call_groq(prompt)
         return MedSafetyResponse(
@@ -177,7 +206,7 @@ Write a 2-sentence clear clinical explanation for the patient. Be specific about
         )
 
     # ── Triage: ML-Informed + Groq ────────────────────────────────────────────
-    async def run_triage(self, request: UnifiedRequest) -> TriageResponse:
+    async def run_triage(self, request: UnifiedRequest, bio: BioRiskResponse = None) -> TriageResponse:
         p          = request.profile
         input_text = request.query or request.problem_context or ""
         conditions = [c.name for c in p.conditions]
@@ -187,20 +216,22 @@ Write a 2-sentence clear clinical explanation for the patient. Be specific about
                                "difficulty breathing", "unconscious", "severe bleeding"]
         is_critical = any(kw in input_text.lower() for kw in HIGH_RISK_KEYWORDS)
 
-        prompt = f"""You are an emergency triage AI doctor with clinical decision-making ability.
+        ml_note = f"ML Predictor Risk: {bio.risk_level}" if bio else ""
 
-PATIENT: {p.name}, Age {p.age}, Gender {p.gender}
+        lang = self.get_language_name(request.language)
+        prompt = f"""You are an emergency triage AI doctor.
+PATIENT: {p.name}, Age {p.age}, Gender {p.gender}. {ml_note}
 CONDITIONS: {', '.join(conditions) if conditions else 'None'}
 CHIEF COMPLAINT: {input_text}
-{"⚠️ HIGH-RISK KEYWORD DETECTED — Escalate immediately." if is_critical else ""}
 
+IMPORTANT: All JSON values must be in {lang}.
 Return ONLY this exact JSON:
 {{
   "triage_level": "{'Critical' if is_critical else 'Mild|Moderate|High'}",
-  "basic_care_advice": "Specific 2-sentence actionable advice for this symptom.",
-  "specialist_recommendation": "Specific doctor type (e.g. Cardiologist, ENT, Gastroenterologist)",
-  "follow_up_questions": ["Specific question 1", "Specific question 2", "Specific question 3"],
-  "disclaimer": "This is AI-assisted triage. Always consult a licensed doctor."
+  "basic_care_advice": "Specific 2-sentence actionable advice.",
+  "specialist_recommendation": "Specific doctor type",
+  "follow_up_questions": ["Question 1", "Question 2", "Question 3"],
+  "disclaimer": "AI guidance only. Consult a doctor."
 }}"""
 
         raw = await self.call_groq(prompt, json_mode=True)
@@ -211,14 +242,14 @@ Return ONLY this exact JSON:
             level = "Critical" if is_critical else "Moderate"
             return TriageResponse(
                 triage_level=level,
-                basic_care_advice=f"For '{input_text}': Rest, monitor vitals, seek medical help if worsening.",
+                basic_care_advice=f"For '{input_text}': Rest, monitor vitals.",
                 specialist_recommendation="General Physician",
-                follow_up_questions=["How long have you had this?", "Any fever?", "Any medications taken?"],
-                disclaimer="AI guidance only. Consult a doctor."
+                follow_up_questions=["How long?", "Fever?", "Medications?"],
+                disclaimer="AI guidance only."
             )
 
     # ── Nutrition ─────────────────────────────────────────────────────────────
-    async def run_nutrition(self, request: UnifiedRequest) -> NutritionResponse:
+    async def run_nutrition(self, request: UnifiedRequest, bio: BioRiskResponse = None) -> NutritionResponse:
         p   = request.profile
         bmr = 10 * p.weight + 6.25 * 170 - 5 * p.age
         if p.gender == "male": bmr += 5
@@ -226,12 +257,18 @@ Return ONLY this exact JSON:
 
         multiplier = 1.375 if getattr(p, 'activity_level', '') == "Active" else 1.2
         required   = int(bmr * multiplier)
+        
+        # ML Vitality adjustment
+        vitality_note = ""
+        if bio and bio.vitality_score < 50:
+            vitality_note = "Caloric intake adjusted for recovery due to low ML vitality score."
+            required += 200
 
         return NutritionResponse(
             required_calories=required,
             current_status="Balanced",
             macro_balance_score=85,
-            profession_adjustment=f"Calibrated for {getattr(p, 'profession', 'General')} lifestyle.",
+            profession_adjustment=f"Calibrated for {getattr(p, 'profession', 'General')} lifestyle. {vitality_note}",
             recommendations={
                 "vegetarian":     ["Dal Khichdi", "Paneer Sabzi", "Rajma"],
                 "non_vegetarian": ["Grilled Chicken", "Fish Curry", "Egg Bhurji"],
@@ -251,7 +288,8 @@ Return ONLY this exact JSON:
         triage_info  = f"Triage: {triage.triage_level}" if triage else ""
         vault_info   = f"Reports on file: {len(request.clinical_vault)}" if request.clinical_vault else ""
 
-        prompt = f"""You are Health Intelligence's AI Health Guardian. Write a warm, professional 2-sentence health summary for {p.name}.
+        lang = self.get_language_name(request.language)
+        prompt = f"""You are Health Intelligence's AI Health Guardian. Write a warm, professional 2-sentence health summary for {p.name} in {lang}.
 
 Data: {risk_info}. {med_info}. {triage_info}. {vault_info}.
 Conditions: {[c.name for c in p.conditions] or 'None'}.

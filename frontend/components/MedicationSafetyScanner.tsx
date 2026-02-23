@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Plus, Minus, ShieldAlert, ShieldCheck, Loader2, Pill, Activity, Heart, Info, ChevronRight, Stethoscope, Camera, Mic } from 'lucide-react';
 import { usePatientContext } from '../core/patientContext/patientStore';
-import { analyzeTabletSafety, identifyMedicineFromImage } from '../services/ai';
+import { analyzeTabletSafety, identifyMedicineFromImage, orchestrateHealth } from '../services/ai';
 import { startListening } from '../services/speech';
 
 const MedicationSafetyScanner: React.FC = () => {
@@ -61,17 +61,24 @@ const MedicationSafetyScanner: React.FC = () => {
         setIsAnalyzing(true);
         console.log("[Scanner] Starting analysis for meds:", activeMeds);
         try {
-            const context = { profile, medications: [], symptoms: [], nutritionLogs: [], activityLogs: [], riskScores, language } as any;
-            const res = await analyzeTabletSafety(context, activeMeds, problemContext || 'General safety check');
+            const context = { profile, clinicalVault: [], riskScores, language } as any;
+            const res = await orchestrateHealth(context, {
+                medications: activeMeds,
+                problem_context: problemContext || 'General safety check'
+            });
 
-            let status: 'SAFE' | 'CAUTION' | 'DANGER' = 'CAUTION';
-            if (res.includes('[SAFE]')) status = 'SAFE';
-            if (res.includes('[DANGER]')) status = 'DANGER';
-
-            const explanation = res.replace(/\[(SAFE|CAUTION|DANGER)\]/i, '').trim();
-            setResult({ status, explanation });
+            if (res && res.medication_safety) {
+                const medRes = res.medication_safety;
+                setResult({
+                    status: medRes.interaction_level as 'SAFE' | 'CAUTION' | 'DANGER',
+                    explanation: medRes.explanation
+                });
+            } else {
+                throw new Error("No medication safety data returned");
+            }
         } catch (error) {
-            setResult({ status: 'CAUTION', explanation: 'Error performing analysis. Please try again.' });
+            console.error("Analysis failed:", error);
+            setResult({ status: 'CAUTION', explanation: 'Error performing fused analysis. Please ensure your backend is online or try again.' });
         } finally {
             setIsAnalyzing(false);
         }
