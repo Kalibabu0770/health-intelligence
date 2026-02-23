@@ -50,6 +50,7 @@ export const buildAIPrompt = (context: PatientContext, userQuery: string, taskTy
     
     SYSTEM INSTRUCTIONS:
     ${instructions}
+    6. LANGUAGE: YOU MUST RESPOND ENTIRELY IN THE LANGUAGE: ${context.language}. Use the script and vocabulary appropriate for this language.
 
     USER QUERY: "${userQuery}"
     

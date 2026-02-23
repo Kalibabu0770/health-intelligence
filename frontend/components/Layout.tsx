@@ -23,6 +23,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, isDan
   const menuItems = [
     { id: 'home', icon: Home, label: t.dashboard || 'Dashboard', desc: t.central_intelligence || 'Central Intelligence' },
     { id: 'lifeaudit', icon: Activity, label: 'Life Audit', desc: 'Wellness Tracking Suite' },
+    { id: 'medsafety', icon: ShieldAlert, label: t.med_danger_predict || 'Medication Safety', desc: t.danger_analysis || 'Predictive Danger Analysis' },
     { id: 'ayush', icon: Leaf, label: t.ayush_ai || 'AYUSH AI', desc: t.ancient_wisdom || 'Ancient Wisdom Hub' },
     { id: 'meds', icon: ClipboardList, label: t.pharmacy || 'Medication Reminder', desc: t.safety_adherence || 'Safety & Adherence' },
     { id: 'symptoms', icon: Stethoscope, label: t.triage_hub || 'Disease Finder', desc: t.clinical_analysis || 'Clinical Analysis' },

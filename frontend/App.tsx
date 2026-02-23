@@ -33,6 +33,7 @@ import { collection, getDocs, deleteDoc, doc, setDoc, query, orderBy } from 'fir
 import { calculateComprehensiveRisk, getWorkBasedNutrition } from './core/patientContext/riskEngine';
 import { predictHealthRisk, mapProfileToFeatures, checkMLHealth, MLPredictionResponse } from './services/mlBackend';
 import Layout from './components/Layout';
+import MedicationSafetyScanner from './components/MedicationSafetyScanner';
 import { Zap, ShieldCheck, Activity, Heart, Eye, Loader2, Play, Pause, RefreshCcw, RefreshCw, Stethoscope, ChevronRight, UserCircle, LogOut, Upload, FileUp, Sparkles, AlertTriangle, X, Check, Brain, Bot, Send, Search, ArrowRight, Video, Mic, Calendar, Clock, MapPin, Phone, MessageSquare, ChevronLeft, Dumbbell, Apple, Moon, Pill, Droplet, FileText, CheckCircle2, Camera, Trash2, Plus, Pencil, Globe, TrendingUp, Map, Languages, UserCheck, Shield, Edit3, Lock, Wind, History, Leaf } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, PieChart, Pie, Cell } from 'recharts';
 
@@ -332,125 +333,270 @@ const LoginScreen: React.FC<{ onLogin: (profile?: UserProfile) => void }> = ({ o
     }
   };
 
-  if (!role) {
-    return (
-      <div className={`min-h-screen flex items-center justify-center p-6 ${isDark ? 'bg-slate-950 text-white' : 'bg-[#f8fafc] text-slate-900'} transition-colors duration-500`}>
-        <div className="w-full max-w-4xl space-y-12">
-          <div className="text-center space-y-4">
-            <div className="bg-emerald-600 text-white w-20 h-20 rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl border-4 border-white">
-              <ShieldCheck size={40} />
-            </div>
-            <h1 className={`text-5xl font-black uppercase tracking-tighter italic ${isDark ? 'text-white' : 'text-slate-900'}`}>{lt.login_title}</h1>
-            <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.4em]">{lt.protocol_selection}</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
-            <button onClick={() => setRole('citizen')} className={`group relative p-10 rounded-[3rem] shadow-xl border-2 transition-all text-left overflow-hidden active:scale-95 ${isDark ? 'bg-slate-900 border-slate-800 hover:border-emerald-500' : 'bg-white border-slate-100 hover:border-emerald-500'}`}>
-              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-125 transition-transform duration-700"><UserCircle size={150} /></div>
-              <div className="relative z-10 space-y-6">
-                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100 group-hover:bg-emerald-600 group-hover:text-white transition-colors"><Heart size={32} /></div>
-                <div>
-                  <h2 className={`text-3xl font-black uppercase mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>{lt.login_citizen_guardian}</h2>
-                  <p className="text-sm font-bold text-slate-400 uppercase leading-relaxed">{lt.login_citizen_desc}</p>
-                </div>
-                <div className="flex items-center gap-2 text-emerald-600 font-black text-[10px] uppercase tracking-widest">
-                  <span>{lt.initialize_personal_node}</span><ArrowRight size={14} />
-                </div>
-              </div>
-            </button>
-            <button onClick={() => setRole('officer')} className={`group relative p-10 rounded-[3rem] shadow-xl border-2 transition-all text-left overflow-hidden active:scale-95 ${isDark ? 'bg-slate-900 border-slate-800 hover:border-blue-500' : 'bg-white border-slate-200 hover:border-blue-500'}`}>
-              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform duration-700"><Brain size={150} className="text-blue-400" /></div>
-              <div className="relative z-10 space-y-6">
-                <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-400 border border-blue-500/20 group-hover:bg-blue-500 group-hover:text-white transition-colors"><UserCheck size={32} /></div>
-                <div>
-                  <h2 className={`text-3xl font-black uppercase mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>{lt.login_health_officer}</h2>
-                  <p className="text-sm font-bold text-slate-400 uppercase leading-relaxed">{lt.login_officer_desc}</p>
-                </div>
-                <div className="flex items-center gap-2 text-blue-400 font-black text-[10px] uppercase tracking-widest">
-                  <span>{lt.initialize_governance_portal}</span><ArrowRight size={14} />
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 ${isDark ? 'bg-slate-950' : 'bg-[#f0f2f5]'} transition-colors`}>
-      <div className={`${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} w-full max-w-md rounded-[3rem] shadow-2xl overflow-hidden border flex flex-col max-h-[95vh]`}>
-        <div className="p-10 text-center space-y-4 shrink-0">
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'} w-20 h-20 rounded-[2rem] flex items-center justify-center mx-auto backdrop-blur-md shadow-xl border`}>
-            {role === 'officer' ? <UserCheck size={40} className={isDark ? 'text-blue-400' : 'text-slate-900'} /> : <ShieldCheck size={40} className={isDark ? 'text-emerald-400' : 'text-slate-900'} />}
-          </div>
-          <div>
-            <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'} px-3 py-1 rounded-full w-fit mx-auto mb-2 backdrop-blur-md border`}>
-              <span className={`text-[8px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white' : 'text-slate-900'}`}>{lt.ap_govt_label}</span>
-            </div>
-            <h1 className={`text-3xl font-black uppercase tracking-tighter ${isDark ? 'text-white' : 'text-slate-900'}`}>{lt.life_shield}</h1>
-            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em] mt-1">
-              {role === 'officer' ? lt.officer_node_label : lt.citizen_node_label}
-            </p>
-          </div>
-          <div className="flex items-center justify-center gap-4 pt-2">
-            <button onClick={() => setRole(null)} className="text-[8px] font-black text-slate-400 uppercase tracking-widest hover:text-emerald-500 transition-colors">{lt.change_mode}</button>
-            <span className="text-slate-700">|</span>
-            <button onClick={handleWipeDatabase} className="text-[8px] font-black text-rose-400/60 uppercase tracking-widest hover:text-rose-500 transition-colors">{lt.wipe_all_data}</button>
-          </div>
-        </div>
-        <div className={`${isDark ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-100'} border-y p-4 flex justify-center gap-2`}>
-          {[{ id: 'en', label: 'EN' }, { id: 'te', label: 'తెలుగు' }, { id: 'hi', label: 'हिन्दी' }].map(l => (
-            <button key={l.id} onClick={() => { setLocalLang(l.id); setLanguage(l.id as any); }}
-              className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${localLang === l.id ? 'bg-emerald-600 text-white shadow-md' : (isDark ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-white text-slate-400 border-slate-200')} border`}>{l.label}</button>
-          ))}
-        </div>
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-10 flex flex-col space-y-6">
-          <div className="text-center space-y-2">
-            <h2 className={`text-sm font-black uppercase tracking-[0.15em] ${isDark ? 'text-white' : 'text-slate-900'}`}>{lt.initialization}</h2>
-            <p className="text-[9px] font-bold text-slate-500 uppercase">{lt.auth_biometric_desc}</p>
-          </div>
-          <div className="space-y-4">
-            <input type="text" placeholder={lt.id_placeholder} className={`w-full border-2 p-5 rounded-[1.5rem] font-black text-sm uppercase outline-none transition-all font-mono ${isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-600 focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 placeholder:text-slate-300 focus:border-emerald-500'}`} value={name} onChange={e => setName(e.target.value)} />
-            <input type="password" placeholder={lt.node_password} className={`w-full border-2 p-5 rounded-[1.5rem] font-black text-sm uppercase outline-none transition-all font-mono ${isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-600 focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 placeholder:text-slate-300 focus:border-emerald-500'}`} value={password} onChange={e => setPassword(e.target.value)} />
-            <div className={`border-2 p-2 rounded-[1.5rem] flex items-center gap-2 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
-              <input type="text" maxLength={6} placeholder={lt.enter_pin} className={`flex-1 bg-transparent p-3 pl-4 font-black text-sm uppercase outline-none ${isDark ? 'text-white placeholder:text-slate-600' : 'text-slate-900 placeholder:text-slate-300'}`} value={pincode} onChange={e => setPincode(e.target.value.replace(/\D/g, ''))} />
-              <button onClick={fetchAddressByPin} disabled={isFetchingPin} className="bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase hover:bg-emerald-700 active:scale-95 transition-all disabled:opacity-50">{isFetchingPin ? '...' : lt.track_address}</button>
-            </div>
-            <div className="space-y-3 pt-2">
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest pl-1">{lt.jurisdiction_label}</p>
-              <select className={`w-full border-2 p-4 rounded-2xl font-black text-[11px] uppercase outline-none transition-all ${isDark ? 'bg-slate-800 border-slate-700 text-white focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'}`} value={selectedDistrict} onChange={e => setSelectedDistrict(e.target.value)}>
-                {Object.keys(AP_GOVT_HIERARCHY).sort().map(d => <option key={d} value={d} className={isDark ? 'bg-slate-900' : ''}>{d}</option>)}
-              </select>
-              <div className="grid grid-cols-2 gap-2">
-                <select className={`border-2 p-4 rounded-2xl font-black text-[10px] uppercase outline-none transition-all ${isDark ? 'bg-slate-800 border-slate-700 text-white focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'}`} value={selectedMandal} onChange={e => setSelectedMandal(e.target.value)}>
-                  {Object.keys(AP_GOVT_HIERARCHY[selectedDistrict] || {}).sort().map(m => <option key={m} value={m} className={isDark ? 'bg-slate-900' : ''}>{m}</option>)}
-                </select>
-                <select className={`border-2 p-4 rounded-2xl font-black text-[10px] uppercase outline-none transition-all ${isDark ? 'bg-slate-800 border-slate-700 text-white focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'}`} value={selectedVillage} onChange={e => setSelectedVillage(e.target.value)}>
-                  {(AP_GOVT_HIERARCHY[selectedDistrict]?.[selectedMandal] || []).sort().map(v => <option key={v} value={v} className={isDark ? 'bg-slate-900' : ''}>{v}</option>)}
-                </select>
-              </div>
-            </div>
-          </div>
-          <button onClick={handleAuth} className={`w-full py-6 rounded-[1.5rem] font-black uppercase text-xs tracking-widest shadow-xl transition-all flex items-center justify-center gap-3 ${role === 'officer' ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-900/20' : (isDark ? 'bg-white text-slate-950 hover:bg-emerald-400' : 'bg-slate-900 text-white hover:bg-emerald-950')}`}>
-            {lt.log_in_node} <ChevronRight size={18} />
-          </button>
-          {existingUsers.filter(u => u.role === role).length > 0 && (
-            <div className={`pt-8 border-t space-y-4 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
-              <h3 className="text-[10px] font-black text-slate-500 uppercase text-center">{lt.cached_nodes}</h3>
-              <div className="space-y-3">
-                {existingUsers.filter(u => u.role === role).map(user => (
-                  <button key={user.id} onClick={() => handleCachedLogin(user)} className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all group ${isDark ? 'bg-slate-800 border-slate-700 hover:border-emerald-500' : 'bg-slate-50 border-slate-100 hover:border-emerald-500'}`}>
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs ${role === 'officer' ? 'bg-blue-600 text-white' : (isDark ? 'bg-slate-700 text-white group-hover:bg-emerald-600' : 'bg-white text-slate-900 group-hover:bg-emerald-600 group-hover:text-white')}`}>{user.name?.charAt(0)}</div>
-                    <span className={`flex-1 text-[10px] font-black uppercase truncate text-left ${isDark ? 'text-white' : 'text-slate-900'}`}>{user.name}</span>
-                    <Trash2 size={16} className="text-slate-500 hover:text-rose-500 transition-colors" onClick={(e) => handleDeleteUser(user.id, e)} />
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-        <div className={`p-5 text-center border-t ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-100'}`}><p className={`text-[8px] font-black uppercase tracking-[0.3em] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{lt.bio_metric_online}</p></div>
+    <div className={`min-h-screen flex items-center justify-center relative overflow-hidden transition-all duration-700 ${isDark ? 'bg-slate-950' : 'bg-[#f4f7fa]'}`}>
+
+      {/* ── Background Aesthetics ── */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className={`absolute -top-24 -left-24 w-96 h-96 rounded-full blur-[100px] opacity-20 animate-pulse ${isDark ? 'bg-emerald-500' : 'bg-emerald-300'}`} />
+        <div className={`absolute top-1/2 -right-48 w-[400px] h-[400px] rounded-full blur-[120px] opacity-10 animate-bounce transition-all duration-[10s] ${isDark ? 'bg-blue-500' : 'bg-blue-300'}`} />
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]" />
       </div>
+
+      {!role ? (
+        <div className="relative z-10 w-full max-w-5xl px-6 py-12 flex flex-col items-center">
+
+          {/* Header */}
+          <div className="text-center mb-16 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-emerald-500 blur-2xl opacity-20 rounded-full animate-pulse" />
+              <div className={`relative w-24 h-24 rounded-[2.5rem] flex items-center justify-center mx-auto border-4 shadow-2xl transition-all duration-500 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-50'}`}>
+                <ShieldCheck size={48} className="text-emerald-500" />
+              </div>
+            </div>
+            <div>
+              <h1 className={`text-6xl font-black uppercase tracking-tight italic mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                {lt.login_title}
+              </h1>
+              <div className="flex items-center justify-center gap-3">
+                <span className="h-px w-8 bg-slate-500/20" />
+                <p className="text-slate-500 font-black uppercase text-[10px] tracking-[0.4em]">
+                  {lt.protocol_selection}
+                </p>
+                <span className="h-px w-8 bg-slate-500/20" />
+              </div>
+            </div>
+          </div>
+
+          {/* Role Selection Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+
+            {/* Citizen Node */}
+            <button
+              onClick={() => setRole('citizen')}
+              className={`group relative p-1 transition-all duration-500 active:scale-[0.98] rounded-[3.5rem] overflow-hidden shadow-2xl ${isDark ? 'bg-slate-900/40 hover:bg-slate-900/60' : 'bg-white/80 hover:bg-white'}`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className={`relative p-10 rounded-[3.4rem] border-2 transition-all duration-500 ${isDark ? 'border-slate-800/50 group-hover:border-emerald-500/50' : 'border-white group-hover:border-emerald-500/30'}`}>
+                <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 blur-3xl rounded-full transition-all group-hover:scale-150 duration-700" />
+                <div className="space-y-8 relative z-10">
+                  <div className="flex items-center justify-between">
+                    <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 transition-transform group-hover:rotate-12 duration-500">
+                      <Heart size={32} />
+                    </div>
+                    <ArrowRight size={24} className="text-emerald-500/50 group-hover:translate-x-2 transition-transform" />
+                  </div>
+                  <div>
+                    <h2 className={`text-3xl font-black uppercase mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>{lt.login_citizen_guardian}</h2>
+                    <p className="text-xs font-bold text-slate-400 uppercase leading-relaxed tracking-wider">{lt.login_citizen_desc}</p>
+                  </div>
+                  <div className="bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/10 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                    <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">{lt.initialize_personal_node}</p>
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            {/* Officer Node */}
+            <button
+              onClick={() => setRole('officer')}
+              className={`group relative p-1 transition-all duration-500 active:scale-[0.98] rounded-[3.5rem] overflow-hidden shadow-2xl ${isDark ? 'bg-slate-900/40 hover:bg-slate-900/60' : 'bg-white/80 hover:bg-white'}`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className={`relative p-10 rounded-[3.4rem] border-2 transition-all duration-500 ${isDark ? 'border-slate-800/50 group-hover:border-blue-500/50' : 'border-white group-hover:border-blue-500/30'}`}>
+                <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/10 blur-3xl rounded-full transition-all group-hover:scale-150 duration-700" />
+                <div className="space-y-8 relative z-10">
+                  <div className="flex items-center justify-between">
+                    <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 transition-transform group-hover:-rotate-12 duration-500">
+                      <UserCheck size={32} />
+                    </div>
+                    <ArrowRight size={24} className="text-blue-500/50 group-hover:translate-x-2 transition-transform" />
+                  </div>
+                  <div>
+                    <h2 className={`text-3xl font-black uppercase mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>{lt.login_health_officer}</h2>
+                    <p className="text-xs font-bold text-slate-400 uppercase leading-relaxed tracking-wider">{lt.login_officer_desc}</p>
+                  </div>
+                  <div className="bg-blue-500/5 rounded-2xl p-4 border border-blue-500/10 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                    <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest">{lt.initialize_governance_portal}</p>
+                  </div>
+                </div>
+              </div>
+            </button>
+
+          </div>
+
+          {/* Footer Controls */}
+          <div className="mt-12 flex items-center gap-6 animate-in fade-in duration-1000">
+            <div className="flex bg-slate-500/5 p-1 rounded-2xl border border-slate-500/10">
+              {[{ id: 'en', label: 'English' }, { id: 'te', label: 'తెలుగు' }, { id: 'hi', label: 'हिन्दी' }].map(l => (
+                <button
+                  key={l.id}
+                  onClick={() => { setLocalLang(l.id); setLanguage(l.id as any); }}
+                  className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${localLang === l.id ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-400'}`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+            <button onClick={handleWipeDatabase} className="text-[9px] font-black text-rose-500/40 hover:text-rose-500 uppercase tracking-widest transition-colors flex items-center gap-2">
+              <Trash2 size={12} /> {lt.wipe_all_data}
+            </button>
+          </div>
+
+        </div>
+      ) : (
+        <div className="relative z-10 w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-500">
+          <div className={`rounded-[3.5rem] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.1)] border-2 overflow-hidden flex flex-col max-h-[90vh] transition-all duration-500 ${isDark ? 'bg-slate-900/80 border-slate-800 backdrop-blur-xl' : 'bg-white/90 border-white backdrop-blur-xl'}`}>
+
+            {/* Form Header */}
+            <div className={`p-10 text-center space-y-4 shrink-0 transition-colors ${role === 'officer' ? 'bg-blue-500/5' : 'bg-emerald-500/5'}`}>
+              <div className="relative inline-block">
+                <div className={`w-20 h-20 rounded-[2.2rem] flex items-center justify-center mx-auto border transition-all duration-500 ${isDark ? 'bg-slate-800 border-slate-700 shadow-xl' : 'bg-white border-slate-100 shadow-lg'}`}>
+                  {role === 'officer' ? <UserCheck size={36} className="text-blue-500" /> : <ShieldCheck size={36} className="text-emerald-500" />}
+                </div>
+              </div>
+              <div>
+                <div className={`px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] w-fit mx-auto mb-3 ${isDark ? 'bg-slate-950/50 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-100 text-slate-500'}`}>
+                  {lt.ap_govt_label}
+                </div>
+                <h2 className={`text-2xl font-black uppercase tracking-tighter ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  {role === 'officer' ? lt.officer_node_label : lt.citizen_node_label}
+                </h2>
+                <button onClick={() => setRole(null)} className="mt-4 text-[9px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-2 mx-auto bg-emerald-500/5 px-4 py-1.5 rounded-full hover:bg-emerald-500/10 transition-all">
+                  <ChevronLeft size={12} /> {lt.change_mode}
+                </button>
+              </div>
+            </div>
+
+            {/* Form Scroll Area */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-10 py-8 space-y-8">
+
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h3 className={`text-[11px] font-black uppercase tracking-[0.2em] mb-1 ${isDark ? 'text-white' : 'text-slate-400'}`}>{lt.initialization}</h3>
+                  <div className="h-0.5 w-12 bg-emerald-500 mx-auto rounded-full" />
+                </div>
+
+                <div className="space-y-4">
+                  <div className="group space-y-2">
+                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest pl-2">Security ID</p>
+                    <input
+                      type="text"
+                      placeholder={lt.id_placeholder}
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      className={`w-full px-6 py-4 rounded-2xl border-2 transition-all font-bold text-sm outline-none ${isDark ? 'bg-slate-950/50 border-slate-800 text-white focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'}`}
+                    />
+                  </div>
+
+                  <div className="group space-y-2">
+                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest pl-2">Access Key</p>
+                    <input
+                      type="password"
+                      placeholder={lt.node_password}
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      className={`w-full px-6 py-4 rounded-2xl border-2 transition-all font-bold text-sm outline-none ${isDark ? 'bg-slate-950/50 border-slate-800 text-white focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'}`}
+                    />
+                  </div>
+
+                  <div className="group space-y-2">
+                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest pl-2">Geo-Location PIN</p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        maxLength={6}
+                        placeholder={lt.pin_code}
+                        value={pincode}
+                        onChange={e => setPincode(e.target.value.replace(/\D/g, ''))}
+                        className={`flex-1 px-6 py-4 rounded-2xl border-2 transition-all font-bold text-sm outline-none ${isDark ? 'bg-slate-950/50 border-slate-800 text-white focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'}`}
+                      />
+                      <button
+                        onClick={fetchAddressByPin}
+                        className="bg-slate-800 text-white px-5 rounded-2xl hover:bg-slate-700 active:scale-95 transition-all"
+                      >
+                        <MapPin size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Jurisdiction Selectors */}
+              <div className="space-y-4">
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest pl-2">{lt.jurisdiction_label}</p>
+                <div className="space-y-3">
+                  <select
+                    className={`w-full px-5 py-4 rounded-2xl border-2 transition-all font-black text-[11px] uppercase outline-none appearance-none ${isDark ? 'bg-slate-950/50 border-slate-800 text-white focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'}`}
+                    value={selectedDistrict}
+                    onChange={e => setSelectedDistrict(e.target.value)}
+                  >
+                    {Object.keys(AP_GOVT_HIERARCHY).sort().map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                  <div className="grid grid-cols-2 gap-3">
+                    <select
+                      className={`px-4 py-4 rounded-2xl border-2 transition-all font-black text-[10px] uppercase outline-none appearance-none ${isDark ? 'bg-slate-950/50 border-slate-800 text-white focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'}`}
+                      value={selectedMandal}
+                      onChange={e => setSelectedMandal(e.target.value)}
+                    >
+                      {Object.keys(AP_GOVT_HIERARCHY[selectedDistrict] || {}).sort().map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                    <select
+                      className={`px-4 py-4 rounded-2xl border-2 transition-all font-black text-[10px] uppercase outline-none appearance-none ${isDark ? 'bg-slate-950/50 border-slate-800 text-white focus:border-emerald-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'}`}
+                      value={selectedVillage}
+                      onChange={e => setSelectedVillage(e.target.value)}
+                    >
+                      {(AP_GOVT_HIERARCHY[selectedDistrict]?.[selectedMandal] || []).sort().map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cached Users */}
+              {existingUsers.filter(u => u.role === role).length > 0 && (
+                <div className="space-y-4 pt-4 border-t border-slate-500/10">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-center">{lt.cached_nodes}</p>
+                  <div className="grid grid-cols-1 gap-3">
+                    {existingUsers.filter(u => u.role === role).map(user => (
+                      <button
+                        key={user.id}
+                        onClick={() => handleCachedLogin(user)}
+                        className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all ${isDark ? 'bg-slate-800/40 border-slate-800 hover:border-emerald-500' : 'bg-slate-50 border-slate-100 hover:border-emerald-500'}`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm transition-all ${role === 'officer' ? 'bg-blue-600 text-white' : 'bg-emerald-600 text-white'}`}>
+                          {user.name?.charAt(0)}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className={`text-[11px] font-black uppercase truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{user.name}</p>
+                          <p className="text-[7px] font-bold text-slate-500 uppercase">{new Date(user.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <Trash2
+                          size={16}
+                          className="text-slate-500 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
+                          onClick={(e) => handleDeleteUser(user.id, e)}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Login Button */}
+            <div className="p-8 shrink-0">
+              <button
+                onClick={handleAuth}
+                className={`w-full py-6 rounded-[2rem] font-black uppercase text-xs tracking-[0.2em] shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-4 ${role === 'officer' ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'}`}
+              >
+                {lt.log_in_node} <ArrowRight size={20} />
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
@@ -730,6 +876,7 @@ const App: React.FC = () => {
           }} />
         </div>
       );
+      case 'medsafety': return <MedicationSafetyScanner />;
       case 'lifeaudit': return (() => {
         // Internal Life Audit page state
         const LifeAuditPage = () => {
@@ -1754,7 +1901,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
       };
 
       const base64 = await resizeImage(file);
-      const result = await analyzeFoodImage(base64);
+      const result = await analyzeFoodImage(base64, language);
 
       logFood({
         id: Date.now().toString(),
@@ -1818,7 +1965,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
           {analyzing ? <Loader2 className="animate-spin" size={28} /> : <Camera size={28} />}
         </div>
         <div>
-          <h3 className="text-base font-black text-slate-900 uppercase">AI Food Scanner</h3>
+          <h3 className="text-base font-black text-slate-900 uppercase">{t.food_scanner}</h3>
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Capture meal for macro-nutrient synthesis.</p>
         </div>
         <button
@@ -1826,7 +1973,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
           disabled={analyzing}
           className="w-full bg-orange-600 text-slate-900 font-black py-6 rounded-2xl shadow-xl active:scale-95 disabled:opacity-50 transition-all text-[11px] uppercase tracking-widest flex items-center justify-center gap-2"
         >
-          {analyzing ? "Analyzing..." : <><Upload size={14} /> Launch Scanner</>}
+          {analyzing ? t.scanning_safety : <><Upload size={14} /> Launch Scanner</>}
         </button>
         <input type="file" accept="image/*" capture="environment" ref={fileInputRef} className="hidden" onChange={handleImageUpload} />
       </div>
@@ -1848,7 +1995,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                   <p className={`font-black text-xl uppercase mt-1 tracking-tighter ${isDark ? 'text-white' : 'text-slate-900'}`}>{profile.profession || "General Public"}</p>
                 </div>
                 <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-100'} px-3 py-1.5 rounded-lg border`}>
-                  <p className="text-[8px] font-black text-slate-500 uppercase">Workload</p>
+                  <p className="text-[8px] font-black text-slate-500 uppercase">{t.workload}</p>
                   <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest">{(profile as any).workIntensity || 'Moderate'}</p>
                 </div>
               </div>
@@ -1858,9 +2005,9 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                 return (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className={`${isDark ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'} p-4 rounded-2xl border flex flex-col justify-center items-center text-center`}>
-                      <span className="text-[9px] font-black text-slate-500 uppercase mb-1">{lt.daily_target || "Daily Target"}</span>
+                      <span className="text-[9px] font-black text-slate-500 uppercase mb-1">{t.daily_target}</span>
                       <p className={`text-3xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{rec.suggestedCalories} <span className="text-xs text-slate-500">kcal</span></p>
-                      <p className="text-[8px] font-bold text-emerald-500/60 mt-1 uppercase">For {profile.workHoursPerDay || 8}h Labor</p>
+                      <p className="text-[8px] font-bold text-emerald-500/60 mt-1 uppercase">{t.for_labor.replace('{hours}', (profile.workHoursPerDay || 8).toString())}</p>
                     </div>
                     <div className="space-y-3">
                       <div className={`flex justify-between items-center text-[9px] font-black ${isDark ? 'text-slate-400' : 'text-slate-600'} uppercase tracking-tighter`}>
@@ -1896,7 +2043,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                       <Apple size={24} />
                     </div>
                     <div>
-                      <h3 className={`text-lg font-black uppercase tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{lt.dietary_preferences_title || "Dietary Strategy"}</h3>
+                      <h3 className={`text-lg font-black uppercase tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.dietary_strategy}</h3>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Profession-Aware & Disease-Specific</p>
                     </div>
                   </div>
@@ -1975,12 +2122,12 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
         <div className="bg-white p-6 rounded-[1.5rem] border border-slate-200 shadow-sm space-y-4 animate-in fade-in">
           <div className="flex items-center gap-2 mb-2">
             <div className="bg-emerald-100 p-2 rounded-lg text-emerald-700"><ShieldCheck size={18} /></div>
-            <h3 className="text-sm font-black text-slate-900 uppercase">Daily Deficiency Analysis</h3>
+            <h3 className="text-sm font-black text-slate-900 uppercase">{t.deficiency_analysis}</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-red-50 p-4 rounded-xl border border-red-100">
-              <span className="text-[9px] font-black text-red-400 uppercase tracking-widest block mb-2">Detected Gaps</span>
+              <span className="text-[9px] font-black text-red-400 uppercase tracking-widest block mb-2">{t.detected_gaps}</span>
               <ul className="list-disc list-inside space-y-1">
                 {deficiencyAnalysis.deficiencies?.map((d: string, i: number) => (
                   <li key={i} className="text-[11px] font-bold text-red-900 uppercase">{d}</li>
@@ -1989,7 +2136,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
               </ul>
             </div>
             <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-              <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest block mb-2">Remaining Needs</span>
+              <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest block mb-2">{t.remaining_needs}</span>
               <p className="text-[11px] font-bold text-blue-900 leading-relaxed">{deficiencyAnalysis.remainingNeeds}</p>
             </div>
           </div>
@@ -2001,7 +2148,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
           <div className="space-y-4 pt-2">
             {deficiencyAnalysis.recommendations?.vegetarian && deficiencyAnalysis.recommendations.vegetarian.length > 0 && (
               <div className="space-y-2">
-                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md">Vegetarian Power</span>
+                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md">{t.vegetarian_power}</span>
                 <div className="grid grid-cols-1 gap-2">
                   {deficiencyAnalysis.recommendations.vegetarian.map((s: any, i: number) => (
                     <div key={i} className="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm">
@@ -2015,7 +2162,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
 
             {deficiencyAnalysis.recommendations?.nonVegetarian && deficiencyAnalysis.recommendations.nonVegetarian.length > 0 && (
               <div className="space-y-2">
-                <span className="text-[9px] font-black text-orange-600 uppercase tracking-widest bg-orange-50 px-2 py-1 rounded-md">Non-Veg Options</span>
+                <span className="text-[9px] font-black text-orange-600 uppercase tracking-widest bg-orange-50 px-2 py-1 rounded-md">{t.non_veg_options}</span>
                 <div className="grid grid-cols-1 gap-2">
                   {deficiencyAnalysis.recommendations.nonVegetarian.map((s: any, i: number) => (
                     <div key={i} className="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm">
@@ -2029,7 +2176,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
 
             {deficiencyAnalysis.recommendations?.fruits && deficiencyAnalysis.recommendations.fruits.length > 0 && (
               <div className="space-y-2">
-                <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-md">Fruits & Nature</span>
+                <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-md">{t.fruits_nature}</span>
                 <div className="grid grid-cols-1 gap-2">
                   {deficiencyAnalysis.recommendations.fruits.map((s: any, i: number) => (
                     <div key={i} className="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm">
@@ -2061,10 +2208,10 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
       {/* 3. Charts Section */}
       <div className="bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-sm space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-sm font-black text-slate-900 uppercase">Micro Trends</h3>
+          <h3 className="text-sm font-black text-slate-900 uppercase">{t.micro_trends}</h3>
           <div className="flex bg-slate-50 p-1 rounded-xl">
             {(['day', 'week', 'month'] as const).map(m => (
-              <button key={m} onClick={() => setViewMode(m)} className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all ${viewMode === m ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400'}`}>{m}</button>
+              <button key={m} onClick={() => setViewMode(m)} className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all ${viewMode === m ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400'}`}>{t[m]}</button>
             ))}
           </div>
         </div>
@@ -2077,10 +2224,10 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
               <YAxis tick={{ fontSize: 9, fontWeight: 800, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <Tooltip cursor={{ fill: '#f1f5f9' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} labelStyle={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', color: '#64748b' }} />
               <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px', fontSize: '10px', fontWeight: '800', textTransform: 'uppercase' }} />
-              <Bar dataKey="calories" name="Cals" fill="#f97316" radius={[4, 4, 0, 0]} stackId="a" />
-              <Bar dataKey="protein" name="Prot" fill="#3b82f6" radius={[4, 4, 0, 0]} stackId="a" />
-              <Bar dataKey="fat" name="Fat" fill="#ef4444" radius={[4, 4, 0, 0]} stackId="a" />
-              <Bar dataKey="carbs" name="Carbs" fill="#10b981" radius={[4, 4, 0, 0]} stackId="a" />
+              <Bar dataKey="calories" name={t.cals} fill="#f97316" radius={[4, 4, 0, 0]} stackId="a" />
+              <Bar dataKey="protein" name={t.prot} fill="#3b82f6" radius={[4, 4, 0, 0]} stackId="a" />
+              <Bar dataKey="fat" name={t.fat} fill="#ef4444" radius={[4, 4, 0, 0]} stackId="a" />
+              <Bar dataKey="carbs" name={t.carbs} fill="#10b981" radius={[4, 4, 0, 0]} stackId="a" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -2242,13 +2389,13 @@ const MeditationLab: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
         {isActive ? (
           <div className="space-y-6 relative z-10">
             <div className="text-7xl font-black tabular-nums tracking-tighter text-emerald-400">{formatTime(timeLeft)}</div>
-            <button onClick={stopTimer} className="w-full py-5 bg-slate-100 hover:bg-slate-100 rounded-2xl font-black uppercase text-xs border border-slate-100 transition-all active:scale-95">Cancel Session</button>
+            <button onClick={stopTimer} className="w-full py-5 bg-slate-100 hover:bg-slate-100 rounded-2xl font-black uppercase text-xs border border-slate-100 transition-all active:scale-95">{t.cancel_session}</button>
           </div>
         ) : (
           <div className="space-y-6 relative z-10">
             <div className="flex flex-col items-center gap-2">
               <h3 className="text-xl font-black">{t.meditation_timer || "Meditation Timer"}</h3>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Select focus duration</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.select_duration}</p>
             </div>
 
             <div className="flex justify-center gap-4">
@@ -2271,7 +2418,7 @@ const MeditationLab: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
       </div>
 
       <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-1">Recent Sessions</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-1">{t.recent_sessions}</h3>
         <div className="space-y-3">
           {meditationLogs && meditationLogs.length > 0 ? (
             meditationLogs.slice(0, 5).map(m => (
@@ -2279,7 +2426,7 @@ const MeditationLab: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                 <div className="flex items-center gap-3">
                   <div className="bg-white p-2.5 rounded-xl text-emerald-600 shadow-sm"><Wind size={18} /></div>
                   <div>
-                    <p className="text-[11px] font-black uppercase text-slate-900">Focus Session</p>
+                    <p className="text-[11px] font-black uppercase text-slate-900">{t.focus_session}</p>
                     <p className="text-[8px] font-bold text-slate-400 uppercase">{new Date(m.timestamp).toLocaleDateString()} • {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                 </div>
@@ -2287,7 +2434,7 @@ const MeditationLab: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
               </div>
             ))
           ) : (
-            <p className="text-[9px] font-black text-slate-300 uppercase text-center py-4">No sessions logged yet.</p>
+            <p className="text-[9px] font-black text-slate-300 uppercase text-center py-4">{t.no_sessions_logged}</p>
           )}
         </div>
       </div>
@@ -2327,7 +2474,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
         <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
           <Heart size={28} className="text-emerald-500" />
         </div>
-        <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Check-In Logged!</h3>
+        <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">{t.session_complete}!</h3>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Your daily vitals & mood have been saved.</p>
         <button
           onClick={() => setSubmitted(false)}
@@ -2369,7 +2516,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
             <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{t.describe_day || "How was your day?"}</p>
             <textarea
               className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 resize-none h-24"
-              placeholder="Talk about your day..."
+              placeholder={t.talk_about_day}
               value={dayDoc}
               onChange={e => setDayDoc(e.target.value)}
             />
@@ -2405,7 +2552,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
             onClick={handleSubmit}
             className="w-full py-5 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-xs rounded-2xl shadow-xl active:scale-95 transition-all"
           >
-            {t.submit_checkin || "Log Daily Status"}
+            {t.log_daily_status}
           </button>
 
           {!embedded && (
@@ -2413,7 +2560,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
               onClick={onClose}
               className="w-full py-2 text-[10px] font-black uppercase text-slate-300 hover:text-slate-400 transition-colors"
             >
-              Dismiss for now
+              {t.dismiss_for_now}
             </button>
           )}
         </div>
@@ -2573,7 +2720,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
           onClick={() => { setResult(null); setMedicines(['']); setProblem(''); }}
           className="w-full py-3 rounded-xl bg-slate-50 border border-slate-100 text-slate-900/40 font-black text-[9px] uppercase tracking-widest hover:bg-slate-100 hover:text-slate-900/70 active:scale-95 transition-all"
         >
-          ↩ New Scan
+          ↩ {t.new_scan}
         </button>
       </div>
     );
@@ -2584,7 +2731,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
     <div className="space-y-4">
       {/* Medicine Inputs */}
       <div>
-        <p className="text-[8px] font-black text-slate-900/30 uppercase tracking-widest mb-2">Medicines to Analyze</p>
+        <p className="text-[8px] font-black text-slate-900/30 uppercase tracking-widest mb-2">{t.medicines_to_analyze}</p>
         <div className="space-y-2 max-h-[200px] overflow-y-auto pr-0.5">
           {medicines.map((med, idx) => (
             <div key={idx} className="flex gap-2 items-center">
@@ -2631,7 +2778,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
           onClick={addMedicine}
           className="w-full mt-2 py-2 rounded-xl bg-white/3 border border-dashed border-slate-100 text-slate-900/30 font-black text-[8px] uppercase hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/5 transition-all flex items-center justify-center gap-1.5"
         >
-          <Plus size={10} /> Add Medicine
+          <Plus size={10} /> {t.add_medicine}
         </button>
       </div>
 
@@ -2639,7 +2786,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
 
       {/* Chief Complaint */}
       <div>
-        <p className="text-[8px] font-black text-slate-900/30 uppercase tracking-widest mb-2">Chief Complaint / Condition</p>
+        <p className="text-[8px] font-black text-slate-900/30 uppercase tracking-widest mb-2">{t.chief_complaint_condition}</p>
         <div className="relative">
           <textarea
             className="w-full py-3 pl-3 pr-10 bg-slate-50 border border-slate-100 rounded-xl font-bold text-xs text-slate-900 outline-none focus:border-emerald-500/50 focus:bg-white/8 transition-all h-20 resize-none placeholder:text-slate-900/20 placeholder:text-[9px] placeholder:uppercase"
@@ -2684,7 +2831,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
           }}
           className="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-slate-50 border border-slate-100 text-slate-900/50 font-black text-[8px] uppercase hover:bg-slate-100 hover:text-slate-900 active:scale-95 transition-all"
         >
-          <Mic size={12} /> Speak
+          <Mic size={12} /> {t.speak}
         </button>
         <button
           onClick={handleCheck}
@@ -2692,7 +2839,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
           className="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-emerald-600 text-white font-black text-[8px] uppercase shadow-lg shadow-emerald-600/20 hover:bg-emerald-500 active:scale-95 transition-all disabled:opacity-40 disabled:scale-100"
         >
           {loading ? <RefreshCcw className="animate-spin" size={12} /> : <Sparkles size={12} />}
-          {loading ? 'Analyzing...' : 'Scan Safety'}
+          {loading ? t.scanning_safety : t.synthesize_risk}
         </button>
       </div>
     </div>
@@ -3081,19 +3228,19 @@ const StructuredSymptomChecker: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-1">
                         <p className="text-[11px] font-black uppercase text-slate-900 leading-none">
-                          {log.mood ? `Daily Check-In (${log.mood})` : (log.userInput?.substring(0, 30) + '...')}
+                          {log.mood ? `${t.daily_checkin_label} (${log.mood})` : (log.userInput?.substring(0, 30) + '...')}
                         </p>
                         <span className="text-[8px] font-bold text-slate-400 uppercase">{new Date(log.timestamp).toLocaleDateString()}</span>
                       </div>
                       <p className="text-[9px] font-bold text-slate-500 uppercase leading-relaxed line-clamp-2">
-                        {log.aiResponse || (log.symptoms?.length > 0 ? log.symptoms[0] : "General wellness log entry.")}
+                        {log.aiResponse || (log.symptoms?.length > 0 ? log.symptoms[0] : t.general_wellness_entry)}
                       </p>
                     </div>
                   </div>
                 ))}
               {[...(context.symptoms || []), ...(context.dailyCheckIns || [])].length === 0 && (
                 <div className="p-10 text-center border-2 border-dashed border-slate-100 rounded-[2rem]">
-                  <p className="text-[10px] font-black text-slate-300 uppercase italic">No history found.</p>
+                  <p className="text-[10px] font-black text-slate-300 uppercase italic">{t.no_history_found}</p>
                 </div>
               )}
             </div>
@@ -3114,7 +3261,7 @@ const StructuredSymptomChecker: React.FC = () => {
             <div className={`p-3 rounded-2xl relative z-10 backdrop-blur-sm ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`}><Bot size={24} /></div>
             <div className="relative z-10">
               <p className="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-400 mb-0.5">Clinical AI Orchestrator</p>
-              <p className="text-[12px] font-black uppercase tracking-tight">{t.follow_up_questions || 'Extracting bio-metric data points for inference...'}</p>
+              <p className="text-[12px] font-black uppercase tracking-tight">{t.follow_up_questions}</p>
             </div>
           </div>
           <div className="h-2 w-full bg-slate-200 rounded-full mb-6 overflow-hidden">
@@ -3174,7 +3321,7 @@ const StructuredSymptomChecker: React.FC = () => {
                       result.severity === 'High' ? (theme === 'dark' ? 'bg-red-950/50 text-red-400 border-red-900/50' : 'bg-red-100 text-red-700 border-red-200') :
                         result.severity === 'Moderate' ? (theme === 'dark' ? 'bg-amber-950/50 text-amber-400 border-amber-900/50' : 'bg-amber-100 text-amber-700 border-amber-200') :
                           (theme === 'dark' ? 'bg-green-950/50 text-green-400 border-green-900/50' : 'bg-green-100 text-green-700 border-green-200')
-                      }`}>Severity: {result.severity}</span>
+                      }`}>{t.severity}: {result.severity}</span>
                   )}
                 </div>
               </div>
@@ -3182,7 +3329,7 @@ const StructuredSymptomChecker: React.FC = () => {
 
             {/* Clinical Assessment */}
             <div className="mt-6 relative z-10">
-              <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] mb-3">Clinical Assessment</p>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] mb-3">{t.clinical_assessment}</p>
               <div className={`p-6 rounded-2xl border-l-4 border-emerald-500 font-bold text-sm leading-relaxed italic ${theme === 'dark' ? 'bg-slate-800 text-slate-200' : 'bg-slate-50 text-slate-700'}`}>
                 "{String(result.assessment || 'Assessment completed')}"
               </div>
@@ -3192,7 +3339,7 @@ const StructuredSymptomChecker: React.FC = () => {
           {/* ── Possible Diagnoses ── */}
           {result.possibleDiagnoses && result.possibleDiagnoses.length > 0 && (
             <div className={`p-6 rounded-3xl border shadow-sm transition-all duration-500 ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
-              <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">Possible Conditions</p>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">{t.possible_conditions}</p>
               <div className="space-y-3">
                 {result.possibleDiagnoses.map((d: any, i: number) => (
                   <div key={i} className={`flex items-center gap-4 py-2.5 border-b last:border-0 ${theme === 'dark' ? 'border-slate-800' : 'border-slate-50'}`}>
@@ -3217,13 +3364,13 @@ const StructuredSymptomChecker: React.FC = () => {
             {/* Specialist + Immediate Actions */}
             <div className="space-y-4">
               <div className={`border rounded-3xl p-5 ${theme === 'dark' ? 'bg-emerald-950/20 border-emerald-900/50' : 'bg-emerald-50 border-emerald-100'}`}>
-                <p className="text-[8px] font-black text-emerald-500 uppercase tracking-[0.3em] mb-2">Recommended Specialist</p>
+                <p className="text-[8px] font-black text-emerald-500 uppercase tracking-[0.3em] mb-2">{t.recommended_specialist}</p>
                 <p className={`text-lg font-black uppercase ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-900'}`}>{result.specialistSuggestion}</p>
               </div>
 
               {result.immediateActions && result.immediateActions.length > 0 && (
                 <div className={`border rounded-3xl p-5 ${theme === 'dark' ? 'bg-blue-950/20 border-blue-900/50' : 'bg-blue-50 border-blue-100'}`}>
-                  <p className="text-[8px] font-black text-blue-500 uppercase tracking-[0.3em] mb-3">Immediate Actions</p>
+                  <p className="text-[8px] font-black text-blue-500 uppercase tracking-[0.3em] mb-3">{t.immediate_actions}</p>
                   <div className="space-y-2">
                     {result.immediateActions.map((a: string, i: number) => (
                       <div key={i} className="flex items-start gap-2.5">
@@ -3242,7 +3389,7 @@ const StructuredSymptomChecker: React.FC = () => {
                 <div className={`border rounded-3xl p-5 ${theme === 'dark' ? 'bg-red-950/20 border-red-900/50' : 'bg-red-50 border-red-100'}`}>
                   <div className="flex items-center gap-2 mb-3">
                     <AlertTriangle size={14} className="text-red-500 shrink-0" />
-                    <p className="text-[8px] font-black text-red-500 uppercase tracking-[0.3em]">Red Flags — Seek Immediate Care If</p>
+                    <p className="text-[8px] font-black text-red-500 uppercase tracking-[0.3em]">{t.red_flags}</p>
                   </div>
                   <div className="space-y-1.5">
                     {result.redFlags.map((f: string, i: number) => (
@@ -3257,7 +3404,7 @@ const StructuredSymptomChecker: React.FC = () => {
 
               {result.preventiveMeasures && result.preventiveMeasures.length > 0 && (
                 <div className={`border rounded-3xl p-5 ${theme === 'dark' ? 'bg-teal-950/20 border-teal-900/50' : 'bg-teal-50 border-teal-100'}`}>
-                  <p className="text-[8px] font-black text-teal-500 uppercase tracking-[0.3em] mb-3">Preventive Measures</p>
+                  <p className="text-[8px] font-black text-teal-500 uppercase tracking-[0.3em] mb-3">{t.preventive_measures}</p>
                   <div className="space-y-1.5">
                     {result.preventiveMeasures.map((m: string, i: number) => (
                       <div key={i} className="flex items-start gap-2">
@@ -3281,12 +3428,12 @@ const StructuredSymptomChecker: React.FC = () => {
                     <div className="bg-emerald-500 p-3 rounded-2xl text-white shadow-xl"><Sparkles size={22} /></div>
                     <div>
                       <h3 className="text-base font-black uppercase tracking-tight">{t.personalized_strategy}</h3>
-                      <p className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.3em] mt-0.5">AYUSH Integrated Protocol</p>
+                      <p className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.3em] mt-0.5">{t.ayush_integrated_protocol}</p>
                     </div>
                   </div>
                   {result.ayush?.dosha_insight && (
                     <div className="bg-emerald-50 px-4 py-2 rounded-2xl border border-emerald-100 hidden sm:block">
-                      <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest block">Dosha Insight</span>
+                      <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest block">{t.dosha_insight_label}</span>
                       <span className="text-[10px] font-black text-emerald-800 uppercase">{result.ayush.dosha_insight}</span>
                     </div>
                   )}
@@ -3365,7 +3512,7 @@ const StructuredSymptomChecker: React.FC = () => {
                             <div className="bg-emerald-500 w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg"><Leaf size={20} /></div>
                             <div>
                               <span className="text-[8px] font-black text-emerald-500 uppercase tracking-[0.2em] block">Module 01</span>
-                              <h4 className="text-xs font-black uppercase text-slate-900">Herbal Chikitsa</h4>
+                              <h4 className="text-xs font-black uppercase text-slate-900">{t.herbal_chikitsa}</h4>
                             </div>
                           </div>
                           {renderValue(result.ayush?.chikitsa)}
@@ -3376,7 +3523,7 @@ const StructuredSymptomChecker: React.FC = () => {
                             <div className="bg-amber-500 w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg"><Apple size={20} /></div>
                             <div>
                               <span className="text-[8px] font-black text-amber-500 uppercase tracking-[0.2em] block">Module 02</span>
-                              <h4 className="text-xs font-black uppercase text-slate-900">Pathya Ahar</h4>
+                              <h4 className="text-xs font-black uppercase text-slate-900">{t.pathya_ahar}</h4>
                             </div>
                           </div>
                           {renderValue(result.ayush?.ahar)}
@@ -3387,7 +3534,7 @@ const StructuredSymptomChecker: React.FC = () => {
                             <div className="bg-blue-500 w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg"><Dumbbell size={20} /></div>
                             <div>
                               <span className="text-[8px] font-black text-blue-500 uppercase tracking-[0.2em] block">Module 03</span>
-                              <h4 className="text-xs font-black uppercase text-slate-900">Yoga & Vihaar</h4>
+                              <h4 className="text-xs font-black uppercase text-slate-900">{t.yoga_vihaar}</h4>
                             </div>
                           </div>
                           {renderValue(result.ayush?.vihaar)}
@@ -3398,7 +3545,7 @@ const StructuredSymptomChecker: React.FC = () => {
                             <div className="bg-purple-500 w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg"><Wind size={20} /></div>
                             <div>
                               <span className="text-[8px] font-black text-purple-500 uppercase tracking-[0.2em] block">Module 04</span>
-                              <h4 className="text-xs font-black uppercase text-slate-900">Pranayama & Mind</h4>
+                              <h4 className="text-xs font-black uppercase text-slate-900">{t.pranayama_mind}</h4>
                             </div>
                           </div>
                           {renderValue(result.ayush?.satwa)}
@@ -4274,7 +4421,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Profession (e.g. Farmer, Driver)"
+                  placeholder={t.profession_placeholder}
                   className="w-full bg-slate-50 border-2 border-slate-200 p-4 rounded-xl font-bold"
                   value={formData.profession || ''}
                   onChange={e => setFormData({ ...formData, profession: e.target.value })}
@@ -4861,7 +5008,7 @@ const AYUSHPublicHealth: React.FC<{ stats: any, loading: boolean }> = ({ stats, 
           <div className="max-w-md space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="bg-emerald-500/20 p-2 rounded-xl text-emerald-400"><MapPin size={16} /></div>
-              <h3 className="text-lg font-black uppercase tracking-tight">Geospatial Surveillance</h3>
+              <h3 className="text-lg font-black uppercase tracking-tight">{t.geospatial_surveillance}</h3>
             </div>
             <p className="text-sm font-medium text-slate-400 leading-relaxed">
               Detecting localized outbreaks in <span className="text-emerald-400 font-bold whitespace-nowrap">{(stats.totalUsers * 1.5).toFixed(0)}+ virtual segments</span>. AI is cross-referencing symptom density with regional climate patterns.
@@ -4872,7 +5019,7 @@ const AYUSHPublicHealth: React.FC<{ stats: any, loading: boolean }> = ({ stats, 
                   <p className="text-[11px] font-black text-slate-900 uppercase truncate">{loc.name}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <div className={`w-1.5 h-1.5 rounded-full ${loc.fever > 3 ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`}></div>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">{loc.fever} Reported Fever</p>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase">{loc.fever} {t.reported_fever}</p>
                   </div>
                 </div>
               ))}
@@ -4966,10 +5113,10 @@ const AYUSHOfficerPortal: React.FC<{ stats: any }> = ({ stats }) => {
               <table className="w-full text-left">
                 <thead className="bg-slate-50/50 border-b border-slate-100">
                   <tr>
-                    <th className="px-6 py-5 text-[10px] font-black uppercase text-slate-400">Territory Node</th>
-                    <th className="px-6 py-5 text-[10px] font-black uppercase text-slate-400">Adopted Load</th>
-                    <th className="px-6 py-5 text-[10px] font-black uppercase text-slate-400">Symptom Cluster</th>
-                    <th className="px-6 py-5 text-[10px] font-black uppercase text-slate-400">Bio-Risk</th>
+                    <th className="px-6 py-5 text-[10px] font-black uppercase text-slate-400">{t.territory_node}</th>
+                    <th className="px-6 py-5 text-[10px] font-black uppercase text-slate-400">{t.adopted_load}</th>
+                    <th className="px-6 py-5 text-[10px] font-black uppercase text-slate-400">{t.symptom_cluster}</th>
+                    <th className="px-6 py-5 text-[10px] font-black uppercase text-slate-400">{t.bio_risk}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -5016,7 +5163,7 @@ const AYUSHOfficerPortal: React.FC<{ stats: any }> = ({ stats }) => {
             <div className="space-y-4 pt-4">
               <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 flex items-center gap-2">
                 <UserCheck size={16} className="text-emerald-600" />
-                Surveillance Node Directory
+                {t.surveillance_node_directory}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {stats.rawUsers?.map((u: any, i: number) => (
@@ -5026,9 +5173,9 @@ const AYUSHOfficerPortal: React.FC<{ stats: any }> = ({ stats }) => {
                         {u.role === 'officer' ? <ShieldCheck size={18} /> : <Activity size={18} />}
                       </div>
                       <div>
-                        <p className="text-[11px] font-black text-slate-900 uppercase">{u.name || 'Anonymous Node'}</p>
+                        <p className="text-[11px] font-black text-slate-900 uppercase">{u.name || t.anonymous_node}</p>
                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-                          {u.role === 'officer' ? 'Strategic Officer' : 'Citizen Node'} • {u.location || 'Remote'}
+                          {u.role === 'officer' ? t.strategic_officer : t.citizen_node} • {u.location || 'Remote'}
                         </p>
                       </div>
                     </div>

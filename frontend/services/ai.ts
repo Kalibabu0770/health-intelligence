@@ -255,6 +255,7 @@ export const getComprehensiveHealthAnalysis = async (context: PatientContext): P
       "clinicalInsights": ["..."],
       "actionableSteps": ["..."]
     }
+    IMPORTANT: You MUST respond in ${getLanguageName(context.language)}. All values in the JSON must be in ${getLanguageName(context.language)}.
     IMPORTANT: Return ONLY valid JSON.
   `;
 
@@ -284,7 +285,7 @@ export const getAIHealthAdvice = async (profile: UserProfile, scores: RiskScores
     }
 };
 
-export const analyzeFoodImage = async (base64Image: string): Promise<Partial<FoodLog>> => {
+export const analyzeFoodImage = async (base64Image: string, language: Language = 'en'): Promise<Partial<FoodLog>> => {
     const isLocal = typeof window !== 'undefined' &&
         (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
@@ -299,6 +300,7 @@ export const analyzeFoodImage = async (base64Image: string): Promise<Partial<Foo
       "carbs": 30,
       "fat": 15
     }
+    IMPORTANT: You MUST respond in ${getLanguageName(language)}. The description must be in ${getLanguageName(language)}.
     Do not add markdown or conversational text.`;
 
     // Tier 1: Try local llava vision model (only works locally)
@@ -326,7 +328,8 @@ export const analyzeFoodImage = async (base64Image: string): Promise<Partial<Foo
         const result = await callAI([{ role: 'user', content: textPrompt }], { json: true });
         return extractJson(result) || { description: 'Food item', calories: 350, protein: 12, carbs: 45, fat: 10 };
     } catch (e: any) {
-        return { description: 'Food item (Manual entry recommended)', calories: 300, protein: 10, carbs: 40, fat: 8 };
+        const description = await translateText('Food item (Manual entry recommended)', language);
+        return { description, calories: 300, protein: 10, carbs: 40, fat: 8 };
     }
 };
 
@@ -412,7 +415,8 @@ export const analyzeTabletSafety = async (context: PatientContext, tablets: stri
     try {
         return await callAI([{ role: 'user', content: prompt }]);
     } catch (e) {
-        return "[CAUTION] Safety Check Unavailable. Consult a doctor.";
+        const fallback = "[CAUTION] Safety Check Unavailable. Consult a doctor.";
+        return await translateText(fallback, context.language);
     }
 };
 
@@ -446,7 +450,7 @@ export const getDiagnosticQuestions = async (context: PatientContext, complaint:
     } catch (e) {
         // Clinical fallback questions — always work without any AI
         console.info('[DiagnosticQ] Using clinical fallback questions for:', complaint);
-        return {
+        const fallback = {
             questions: [
                 { id: 'q1', question: `How long have you had "${complaint}"?`, options: ['Less than 24 hours', '1-3 days', '4-7 days', 'More than a week'] },
                 { id: 'q2', question: 'How would you rate the severity on a scale of 1-10?', options: ['Mild (1-3)', 'Moderate (4-6)', 'Severe (7-8)', 'Very Severe (9-10)'] },
@@ -457,6 +461,7 @@ export const getDiagnosticQuestions = async (context: PatientContext, complaint:
                 { id: 'q7', question: 'Do you have any of these conditions?', options: ['Diabetes', 'High Blood Pressure', 'Heart conditions', 'None of the above'] },
             ]
         };
+        return await translateQuestionsBatch(fallback.questions, context.language);
     }
 };
 
@@ -522,7 +527,7 @@ IMPORTANT: Respond in ${getLanguageName(context.language)}.`;
     } catch (e) {
         console.error("[AI] Diagnostic advice failed:", e);
         const riskNote = riskScores ? `ML health score: ${riskScores.healthScore}/100, heart risk: ${riskScores.heart}%, liver risk: ${riskScores.liver}%.` : '';
-        return {
+        const fallback = {
             assessment: `Your complaint of "${complaint}" combined with your health profile (${riskNote}) requires clinical evaluation. Pattern suggests possible inflammatory or infectious etiology.`,
             possibleDiagnoses: [
                 { condition: 'Viral / Infectious illness', likelihood: 'High', reasoning: 'Most common systemic cause' },
@@ -536,6 +541,7 @@ IMPORTANT: Respond in ${getLanguageName(context.language)}.`;
             redFlags: ['Fever above 104°F', 'Severe difficulty breathing', 'Confusion or fainting'],
             mlInsight: riskScores ? `Health score ${riskScores.healthScore}/100 indicates ${riskScores.healthScore > 70 ? 'good' : 'reduced'} baseline resilience.` : ''
         };
+        return await translateClinicalData(fallback, context.language);
     }
 };
 
@@ -709,7 +715,8 @@ export const getAIPersonalAssistantResponse = async (
     } catch (e) {
         // Ollama offline (production/Netlify) — use clinical rule engine
         console.info('[AI] Ollama unavailable — using clinical rule-based fallback');
-        return clinicalFallbackResponse(message, context);
+        const fallback = clinicalFallbackResponse(message, context);
+        return await translateText(fallback, context.language);
     }
 };
 
