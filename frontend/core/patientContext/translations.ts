@@ -375,6 +375,7 @@ export const translations: Record<Language, any> = {
         citizen_node: "Citizen Node",
         pin_code: "PIN Code",
         profession_placeholder: "Profession (e.g. Farmer, Driver)",
+        scan_prescription: "Scan Global Prescription",
     },
     te: {
         dashboard: "డ్యాష్‌బోర్డ్",
@@ -714,6 +715,7 @@ export const translations: Record<Language, any> = {
         citizen_node: "పౌర నోడ్",
         pin_code: "పిన్ కోడ్",
         profession_placeholder: "వృత్తి (ఉదా. రైతు, డ్రైవర్)",
+        scan_prescription: "గ్లోబల్ ప్రిస్క్రిప్షన్‌ను స్కాన్ చేయండి",
     },
     hi: {
         dashboard: "डैशबोर्ड",
@@ -1053,6 +1055,7 @@ export const translations: Record<Language, any> = {
         citizen_node: "नागरिक नोड",
         pin_code: "पिन कोड",
         profession_placeholder: "पेशा (जैसे किसान, ड्राइवर)",
+        scan_prescription: "ग्लोबल प्रिस्क्रिप्शन स्कैन करें",
     },
     ta: {
         dashboard: "டாஷ்போர்டு",

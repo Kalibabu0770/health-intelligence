@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
-import { Plus, Minus, ShieldAlert, ShieldCheck, Loader2, Pill, Activity, Heart, Info, ChevronRight, Stethoscope } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Plus, Minus, ShieldAlert, ShieldCheck, Loader2, Pill, Activity, Heart, Info, ChevronRight, Stethoscope, Camera, Mic } from 'lucide-react';
 import { usePatientContext } from '../core/patientContext/patientStore';
-import { analyzeTabletSafety } from '../services/ai';
+import { analyzeTabletSafety, identifyMedicineFromImage } from '../services/ai';
+import { startListening } from '../services/speech';
 
 const MedicationSafetyScanner: React.FC = () => {
     const { profile, t, language, riskScores, theme } = usePatientContext();
     const [meds, setMeds] = useState<string[]>(['']);
     const [problemContext, setProblemContext] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [isIdentifying, setIsIdentifying] = useState(false);
+    const [targetIdx, setTargetIdx] = useState<number | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const [result, setResult] = useState<{ status: 'SAFE' | 'CAUTION' | 'DANGER' | null; explanation: string }>({
         status: null,
         explanation: ''
@@ -22,6 +27,30 @@ const MedicationSafetyScanner: React.FC = () => {
     const removeMed = (index: number) => {
         if (meds.length > 1) {
             setMeds(meds.filter((_, i) => i !== index));
+        }
+    };
+
+    const handleIdentify = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || targetIdx === null) return;
+
+        setIsIdentifying(true);
+        try {
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const base64 = reader.result as string;
+                const data = await identifyMedicineFromImage(base64, language);
+                if (data && data.name) {
+                    updateMed(targetIdx, data.name);
+                }
+                setIsIdentifying(false);
+                setTargetIdx(null);
+            };
+            reader.readAsDataURL(file);
+        } catch (error) {
+            console.error("Identification error:", error);
+            setIsIdentifying(false);
+            setTargetIdx(null);
         }
     };
 
@@ -66,14 +95,23 @@ const MedicationSafetyScanner: React.FC = () => {
 
             {/* Header Section */}
             <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                    <div className="bg-emerald-600 text-white p-2.5 rounded-2xl shadow-lg">
-                        <Pill size={24} />
+                <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-emerald-600 text-white p-2.5 rounded-2xl shadow-lg">
+                            <Pill size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-black uppercase tracking-tight">{t.med_danger_predict || 'Medication Safety'} / {t.danger_analysis || 'Predictive Danger Analysis'}</h1>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Precision Bio-Constraint Synthesis</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 className="text-2xl font-black uppercase tracking-tight">{t.med_danger_predict || 'Medication Safety'}</h1>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">{t.danger_analysis || 'Predictive Danger Analysis'}</p>
-                    </div>
+                    <button
+                        onClick={() => { setTargetIdx(0); fileInputRef.current?.click(); }}
+                        className="p-3 bg-slate-100 hover:bg-emerald-500 hover:text-white transition-all rounded-2xl shadow-md active:scale-95"
+                        title="Global Medicine Scanner"
+                    >
+                        <Camera size={20} />
+                    </button>
                 </div>
             </div>
 
@@ -89,6 +127,8 @@ const MedicationSafetyScanner: React.FC = () => {
                                 <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Step 1: Clinical Inventory</h2>
                             </div>
 
+                            <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleIdentify} />
+
                             {/* Med List */}
                             <div className="space-y-4">
                                 {meds.map((med, idx) => (
@@ -99,13 +139,26 @@ const MedicationSafetyScanner: React.FC = () => {
                                                 value={med}
                                                 onChange={(e) => updateMed(idx, e.target.value)}
                                                 placeholder={t.med_placeholder || "Enter Medication Name..."}
-                                                className={`w-full px-6 py-4 rounded-2xl border transition-all text-sm font-bold ${isDark
+                                                className={`w-full px-6 py-4 pr-24 rounded-2xl border transition-all text-sm font-bold ${isDark
                                                     ? 'bg-slate-800 border-slate-700 text-white focus:border-emerald-500'
                                                     : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'
                                                     }`}
                                             />
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none group-focus-within:opacity-100 group-focus-within:text-emerald-500 transition-all">
-                                                <ChevronRight size={18} />
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-2">
+                                                <button
+                                                    onClick={() => { setTargetIdx(idx); fileInputRef.current?.click(); }}
+                                                    className="p-1.5 text-slate-900/20 hover:text-emerald-400 active:scale-90 transition-all rounded-lg hover:bg-emerald-500/10"
+                                                    title="Scan from photo"
+                                                >
+                                                    {isIdentifying && targetIdx === idx ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+                                                </button>
+                                                <button
+                                                    onClick={() => startListening(language, text => updateMed(idx, text))}
+                                                    className="p-1.5 text-slate-900/20 hover:text-emerald-400 active:scale-90 transition-all rounded-lg hover:bg-emerald-500/10"
+                                                    title="Voice input"
+                                                >
+                                                    <Mic size={16} />
+                                                </button>
                                             </div>
                                         </div>
                                         <button
@@ -128,6 +181,13 @@ const MedicationSafetyScanner: React.FC = () => {
                                     <Plus size={18} />
                                     {t.add_med || 'Add Another Medication'}
                                 </button>
+                                <button
+                                    onClick={() => { setTargetIdx(0); fileInputRef.current?.click(); }}
+                                    className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-dashed font-black uppercase text-xs tracking-widest transition-all hover:border-blue-500/50 hover:bg-blue-50/5 ${isDark ? 'border-slate-800 text-slate-500 hover:text-blue-400' : 'border-slate-200 text-slate-400 hover:text-blue-600'}`}
+                                >
+                                    <Camera size={18} />
+                                    {t.scan_prescription || 'Scan Global Prescription'}
+                                </button>
                             </div>
 
                             <hr className={isDark ? 'border-slate-800' : 'border-slate-50'} />
@@ -137,15 +197,24 @@ const MedicationSafetyScanner: React.FC = () => {
                                     <Activity size={16} className="text-emerald-500" />
                                     <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Step 2: Contextual Indication</h2>
                                 </div>
-                                <textarea
-                                    value={problemContext}
-                                    onChange={(e) => setProblemContext(e.target.value)}
-                                    placeholder={t.chief_complaint_placeholder || "What symptoms or health problem are you treating? (Optional)"}
-                                    className={`w-full px-6 py-4 rounded-2xl border transition-all text-sm font-bold resize-none h-32 ${isDark
-                                        ? 'bg-slate-800 border-slate-700 text-white focus:border-emerald-500'
-                                        : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'
-                                        }`}
-                                />
+                                <div className="relative">
+                                    <textarea
+                                        value={problemContext}
+                                        onChange={(e) => setProblemContext(e.target.value)}
+                                        placeholder={t.chief_complaint_placeholder || "What symptoms or health problem are you treating? (Optional)"}
+                                        className={`w-full px-6 py-4 pr-12 rounded-2xl border transition-all text-sm font-bold resize-none h-32 ${isDark
+                                            ? 'bg-slate-800 border-slate-700 text-white focus:border-emerald-500'
+                                            : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-emerald-500'
+                                            }`}
+                                    />
+                                    <button
+                                        onClick={() => startListening(language, text => setProblemContext(text))}
+                                        className="absolute right-4 top-4 text-slate-900/20 hover:text-emerald-400 active:scale-90 transition-all rounded-lg hover:bg-emerald-500/10 p-1.5"
+                                        title="Voice input"
+                                    >
+                                        <Mic size={20} />
+                                    </button>
+                                </div>
                             </div>
 
                             <button
