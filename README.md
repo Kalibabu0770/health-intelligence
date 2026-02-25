@@ -63,10 +63,16 @@ Ensures clinical continuity even in offline or low-resource settings.
 | **Tier 2** | **Groq Cloud** | Production | Ultimate 70B parameter clinical synthesis (Llama 3.3) |
 | **Tier 3** | **Rules Engine** | Everywhere | Deterministic fallback for immediate clinical guidance |
 
-### ML Processing Node
-Quantitative risk assessment using trained biological datasets.
-- **Models**: Ensemble classifiers (Random Forest/Gradient Boosting).
-- **Metrics**: Vitality Score (0-100), 7-Day Risk Projections, Longevity Gain calculation.
+### ML Processing Node (Proprietary Engine)
+Quantitative risk assessment using a high-fidelity **Random Forest Ensemble** model.
+- **Model**: Random Forest Classifier (Scikit-Learn).
+- **Inference Node**: `backend/ml_engine.py` (Local Clinical-ML Fusion).
+- **Features**: Age, Gender, BMI, General Health Index (GenHlth), and Chronic Comorbidities.
+- **Metrics**: 
+    - **Risk Probability**: 0.05 - 0.95 (computed via forest voting).
+    - **Vitality Score**: 0-100 (inverse risk index).
+    - **7-Day Risk Projections**: Time-series forecasting of biological stability.
+    - **Longevity Gain**: Statistical calculation of life expectancy impact based on current protocols.
 
 ---
 

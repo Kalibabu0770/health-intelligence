@@ -11,6 +11,7 @@ from models import (
     UnifiedRequest, UnifiedResponse, BioRiskResponse,
     MedSafetyResponse, TriageResponse, NutritionResponse, VisionResponse, OrganStress
 )
+from ml_engine import HealthRiskModel
 
 # ── Config ────────────────────────────────────────────────────────────────────
 GROQ_API_KEY    = os.getenv("GROQ_API_KEY", "")
@@ -21,7 +22,7 @@ ML_BACKEND_URL  = os.getenv("ML_BACKEND_URL", "https://health-intelligence-backe
 
 class HealthIntelligenceOrchestrator:
     def __init__(self):
-        pass
+        self.ml_engine = HealthRiskModel()
 
     def get_language_name(self, code: str) -> str:
         mapping = {
@@ -75,10 +76,7 @@ class HealthIntelligenceOrchestrator:
     async def run_bio_risk(self, request: UnifiedRequest) -> BioRiskResponse:
         p = request.profile
 
-        # Compute BMI
-        avg_height = 1.58 if p.gender == "female" else 1.70
-        bmi = round(p.weight / (avg_height ** 2), 1) if p.weight > 0 else 22.0
-
+        # Feature Mapping for ML Engine
         # Derive genhlth from conditions
         condition_count = (
             len(p.conditions) +
@@ -89,55 +87,38 @@ class HealthIntelligenceOrchestrator:
             (1 if p.hasHeartDisease else 0)
         )
         genhlth = min(5, max(1, 1 + condition_count))
+        
+        # Calculate BMI
+        avg_height = 1.58 if p.gender == "female" else 1.70
+        bmi = round(p.weight / (avg_height ** 2), 1) if p.weight > 0 else 22.0
 
         ml_features = {
-            "features": {
-                "age": max(1, min(120, p.age)),
-                "gender": 1 if p.gender == "male" else 0,
-                "bmi": max(10, min(60, bmi)),
-                "genhlth": genhlth,
-                "smoker": 0,
-                "income": 50000,
-                "physhlth": 0,
-                "menthlth": 0
-            }
+            "age": p.age,
+            "gender": p.gender,
+            "bmi": bmi,
+            "genhlth": genhlth,
+            "hasDiabetes": p.hasDiabetes,
+            "hasHighBP": p.hasHighBP,
+            "hasHeartDisease": p.hasHeartDisease
         }
 
-        # Step 1: Call ML backend for quantitative risk
-        risk_prob   = 0.5
-        risk_level  = "Moderate"
-        vitality    = 65
+        # Step 1: Execute Local ML Inference
+        risk_prob, risk_level, vitality = self.ml_engine.predict_risk(ml_features)
 
-        async with httpx.AsyncClient() as client:
-            try:
-                ml_res = await client.post(ML_BACKEND_URL, json=ml_features, timeout=30.0)
-                if ml_res.status_code == 200:
-                    ml_data   = ml_res.json()
-                    risk_prob = ml_data.get("risk_probability", 0.5)
-                    risk_level = ml_data.get("risk_level", "Moderate")
-                    vitality  = ml_data.get("vitality_score", 65)
-            except Exception as e:
-                print(f"[ML] Backend unavailable: {e}. Using rule-based fallback.")
-                # Rule-based fallback
-                if condition_count >= 4:
-                    risk_prob, risk_level, vitality = 0.80, "High", 35
-                elif condition_count >= 2:
-                    risk_prob, risk_level, vitality = 0.55, "Moderate", 58
-                else:
-                    risk_prob, risk_level, vitality = 0.25, "Low", 82
-
-        # Step 2: Compute organ stress from conditions + ML risk
+        # Step 2: Compute Organ Stress fused with risk probability
+        stress_data = self.ml_engine.get_organ_stress(p, risk_prob)
+        
         organ_stress = OrganStress(
-            cardio      = min(1.0, 0.2 + (0.4 if p.hasHeartDisease else 0) + (0.2 if p.hasHighBP else 0) + risk_prob * 0.2),
-            liver       = min(1.0, 0.1 + (0.6 if p.hasLiverDisease else 0) + (0.1 if p.hasDiabetes else 0)),
-            kidney      = min(1.0, 0.1 + (0.6 if p.hasKidneyDisease else 0) + (0.1 if p.hasDiabetes else 0)),
-            respiratory = min(1.0, 0.1 + (0.5 if getattr(p, 'hasAsthma', False) else 0) + risk_prob * 0.1)
+            cardio=stress_data["cardio"],
+            liver=stress_data["liver"],
+            kidney=stress_data["kidney"],
+            respiratory=stress_data["respiratory"]
         )
 
         return BioRiskResponse(
             risk_probability=risk_prob,
             risk_level=risk_level,
-            vitality_score=int(vitality),
+            vitality_score=vitality,
             organ_stress=organ_stress
         )
 
