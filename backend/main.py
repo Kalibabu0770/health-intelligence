@@ -16,9 +16,7 @@ app = FastAPI(
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
 ALLOWED_ORIGINS = [
-    "https://health-intelligence-hi.netlify.app",   # ← Actual Netlify URL
-    "https://health-intelligence.netlify.app",
-    "https://health-intelligence-ai.netlify.app",
+    "https://kalibabu0770.github.io",   # GitHub Pages
     "http://localhost:3001",
     "http://localhost:3002",
     "http://localhost:5173",
