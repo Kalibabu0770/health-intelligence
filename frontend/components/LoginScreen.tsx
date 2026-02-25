@@ -287,35 +287,87 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
                                     {/* Step 2: Chronic Conditions */}
                                     {regStep === 2 && (
-                                        <div className="space-y-3">
-                                            {[
-                                                { id: 'hasDiabetes', label: 'Diabetes', icon: Droplets, color: 'text-blue-500' },
-                                                { id: 'hasHighBP', label: 'Hypertension', icon: Activity, color: 'text-rose-500' },
-                                                { id: 'hasHeartDisease', label: 'Heart', icon: Heart, color: 'text-rose-600' },
-                                                { id: 'hasAsthma', label: 'Respiratory', icon: Wind, color: 'text-cyan-500' },
-                                                { id: 'hasThyroid', label: 'Thyroid', icon: Sparkles, color: 'text-purple-500' },
-                                                { id: 'hasGastric', label: 'Gastric', icon: Box, color: 'text-orange-500' },
-                                            ].map(c => (
-                                                <div key={c.id} className="space-y-2">
-                                                    <button onClick={() => setRegData({ ...regData, [c.id]: !(regData as any)[c.id] })}
-                                                        className={`w-full p-4 rounded-xl flex items-center justify-between border-2 transition-all ${(regData as any)[c.id] ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-50 hover:border-slate-100'}`}>
-                                                        <div className="flex items-center gap-4">
-                                                            <c.icon size={18} className={c.color} />
-                                                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 text-left">{c.label}</span>
-                                                        </div>
-                                                        {(regData as any)[c.id] && <Check className="text-emerald-500" size={16} />}
-                                                    </button>
-                                                    {(regData as any)[c.id] && (
-                                                        <input
-                                                            type="text"
-                                                            className="w-full bg-slate-50 border-b-2 border-emerald-200 p-3 text-[10px] font-bold outline-none uppercase tracking-widest"
-                                                            placeholder={`Details for ${c.label}...`}
-                                                            value={(regData as any)[c.id + 'Details'] || ''}
-                                                            onChange={e => setRegData({ ...regData, [c.id + 'Details']: e.target.value })}
-                                                        />
-                                                    )}
+                                        <div className="space-y-4">
+                                            <div className="space-y-3">
+                                                {[
+                                                    { id: 'hasDiabetes', label: 'Diabetes', icon: Droplets, color: 'text-blue-500' },
+                                                    { id: 'hasHighBP', label: 'Hypertension', icon: Activity, color: 'text-rose-500' },
+                                                    { id: 'hasHeartDisease', label: 'Heart', icon: Heart, color: 'text-rose-600' },
+                                                    { id: 'hasAsthma', label: 'Respiratory', icon: Wind, color: 'text-cyan-500' },
+                                                    { id: 'hasThyroid', label: 'Thyroid', icon: Sparkles, color: 'text-purple-500' },
+                                                    { id: 'hasGastric', label: 'Gastric', icon: Box, color: 'text-orange-500' },
+                                                ].map(c => (
+                                                    <div key={c.id} className="space-y-2">
+                                                        <button onClick={() => setRegData({ ...regData, [c.id]: !(regData as any)[c.id] })}
+                                                            className={`w-full p-4 rounded-xl flex items-center justify-between border-2 transition-all ${(regData as any)[c.id] ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-50 hover:border-slate-100'}`}>
+                                                            <div className="flex items-center gap-4">
+                                                                <c.icon size={18} className={c.color} />
+                                                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 text-left">{c.label}</span>
+                                                            </div>
+                                                            {(regData as any)[c.id] && <Check className="text-emerald-500" size={16} />}
+                                                        </button>
+                                                        {(regData as any)[c.id] && (
+                                                            <input
+                                                                type="text"
+                                                                className="w-full bg-slate-50 border-b-2 border-emerald-200 p-3 text-[10px] font-bold outline-none uppercase tracking-widest"
+                                                                placeholder={`Details for ${c.label}...`}
+                                                                value={(regData as any)[c.id + 'Details'] || ''}
+                                                                onChange={e => setRegData({ ...regData, [c.id + 'Details']: e.target.value })}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Custom Entry for Other Conditions */}
+                                            <div className="pt-2 space-y-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex-1 h-[1px] bg-slate-100" />
+                                                    <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Other Conditions</span>
+                                                    <div className="flex-1 h-[1px] bg-slate-100" />
                                                 </div>
-                                            ))}
+
+                                                <div className="relative group">
+                                                    <input
+                                                        type="text"
+                                                        id="custom-condition-input"
+                                                        placeholder="Enter other condition (e.g. Arthritis)"
+                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl font-bold text-[10px] uppercase focus:bg-white focus:border-blue-400 outline-none transition-all pr-12"
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                const val = (e.target as HTMLInputElement).value.trim();
+                                                                if (val) {
+                                                                    setRegData({ ...regData, customConditions: [...(regData.customConditions as any), val] as any });
+                                                                    (e.target as HTMLInputElement).value = '';
+                                                                }
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button
+                                                        onClick={() => {
+                                                            const input = document.getElementById('custom-condition-input') as HTMLInputElement;
+                                                            if (input && input.value.trim()) {
+                                                                setRegData({ ...regData, customConditions: [...(regData.customConditions as any), input.value.trim()] as any });
+                                                                input.value = '';
+                                                            }
+                                                        }}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
+                                                </div>
+
+                                                <div className="flex flex-wrap gap-2">
+                                                    {(regData.customConditions as any).map((cond: string, idx: number) => (
+                                                        <div key={idx} className="bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg flex items-center gap-2 animate-in zoom-in-95">
+                                                            <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">{cond}</span>
+                                                            <button onClick={() => setRegData({ ...regData, customConditions: (regData.customConditions as any).filter((_: any, i: number) => i !== idx) })} className="text-blue-300 hover:text-blue-600">
+                                                                <X size={10} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
 
