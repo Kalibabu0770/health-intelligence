@@ -373,21 +373,99 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
                                     {/* Step 3: Medical History */}
                                     {regStep === 3 && (
-                                        <div className="space-y-8">
+                                        <div className="space-y-8 pb-4">
+                                            {/* Surgical History */}
                                             <div className="space-y-4">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Surgical History</p>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Surgical History</p>
                                                 <div className="flex flex-wrap gap-2">
                                                     {['Heart', 'Appendix', 'Hernia', 'Gallbladder', 'Knee'].map(s => (
                                                         <button key={s} onClick={() => toggleTag('surgeries', s)} className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${regData.surgeries.includes(s) ? 'bg-slate-900 border-slate-900 text-white shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{s}</button>
                                                     ))}
+                                                    {/* Render custom surgeries that aren't in the preset list */}
+                                                    {regData.surgeries.filter(s => !['Heart', 'Appendix', 'Hernia', 'Gallbladder', 'Knee'].includes(s)).map(s => (
+                                                        <button key={s} onClick={() => toggleTag('surgeries', s)} className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 bg-slate-900 border-slate-900 text-white shadow-md flex items-center gap-2">
+                                                            {s} <X size={10} className="text-slate-400 hover:text-white" />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <div className="relative group mt-2">
+                                                    <input
+                                                        type="text"
+                                                        id="custom-surgery-input"
+                                                        placeholder="Add other surgery..."
+                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl font-bold text-[10px] uppercase focus:bg-white focus:border-emerald-400 outline-none transition-all pr-12"
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                const val = (e.target as HTMLInputElement).value.trim();
+                                                                if (val && !regData.surgeries.includes(val)) {
+                                                                    setRegData({ ...regData, surgeries: [...regData.surgeries, val] });
+                                                                    (e.target as HTMLInputElement).value = '';
+                                                                }
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button
+                                                        onClick={() => {
+                                                            const input = document.getElementById('custom-surgery-input') as HTMLInputElement;
+                                                            if (input && input.value.trim() && !regData.surgeries.includes(input.value.trim())) {
+                                                                setRegData({ ...regData, surgeries: [...regData.surgeries, input.value.trim()] });
+                                                                input.value = '';
+                                                            }
+                                                        }}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
                                                 </div>
                                             </div>
+
+                                            {/* Genetic Markers */}
                                             <div className="space-y-4">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Genetic Markers</p>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Genetic Markers</p>
                                                 <div className="grid grid-cols-2 gap-2">
                                                     {['Diabetes', 'Cancer', 'Stroke', 'Cardiac'].map(f => (
                                                         <button key={f} onClick={() => toggleTag('familyHistory', f)} className={`p-4 rounded-xl text-[10px] font-black uppercase border-2 text-center transition-all ${regData.familyHistory.includes(f) ? 'bg-rose-500 border-rose-500 text-white shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{f}</button>
                                                     ))}
+                                                </div>
+                                                {/* Render custom family history items */}
+                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                    {regData.familyHistory.filter(f => !['Diabetes', 'Cancer', 'Stroke', 'Cardiac'].includes(f)).map(f => (
+                                                        <div key={f} className="bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-lg flex items-center gap-2 animate-in zoom-in-95">
+                                                            <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest">{f}</span>
+                                                            <button onClick={() => setRegData({ ...regData, familyHistory: regData.familyHistory.filter(item => item !== f) })} className="text-rose-300 hover:text-rose-600">
+                                                                <X size={10} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="relative group mt-2">
+                                                    <input
+                                                        type="text"
+                                                        id="custom-genetic-input"
+                                                        placeholder="Add other genetic risk..."
+                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl font-bold text-[10px] uppercase focus:bg-white focus:border-rose-400 outline-none transition-all pr-12"
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                const val = (e.target as HTMLInputElement).value.trim();
+                                                                if (val && !regData.familyHistory.includes(val)) {
+                                                                    setRegData({ ...regData, familyHistory: [...regData.familyHistory, val] });
+                                                                    (e.target as HTMLInputElement).value = '';
+                                                                }
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button
+                                                        onClick={() => {
+                                                            const input = document.getElementById('custom-genetic-input') as HTMLInputElement;
+                                                            if (input && input.value.trim() && !regData.familyHistory.includes(input.value.trim())) {
+                                                                setRegData({ ...regData, familyHistory: [...regData.familyHistory, input.value.trim()] });
+                                                                input.value = '';
+                                                            }
+                                                        }}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
