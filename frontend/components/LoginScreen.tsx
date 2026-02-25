@@ -118,7 +118,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
             </div>
 
             {/* Authentication Card */}
-            <div className="relative z-10 w-full max-w-[1200px] h-[850px] flex px-6">
+            <div className="relative z-10 w-full max-w-[1020px] h-[720px] flex px-6">
 
                 {/* Visual Side (LHS) */}
                 <div className="hidden lg:flex flex-[0.7] bg-slate-900 rounded-l-[4rem] relative overflow-hidden group shadow-2xl">

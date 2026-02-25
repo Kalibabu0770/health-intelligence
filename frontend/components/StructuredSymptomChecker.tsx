@@ -13,7 +13,8 @@ import {
     Layers,
     Sparkles,
     MessageSquare,
-    ArrowRight
+    ArrowRight,
+    Plus
 } from 'lucide-react';
 import { usePatientContext } from '../core/patientContext/patientStore';
 import {
@@ -60,6 +61,11 @@ const StructuredSymptomChecker: React.FC = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+    const [showManual, setShowManual] = useState(false);
+
+    useEffect(() => {
+        setShowManual(false);
+    }, [currentQuestionIndex]);
 
     const handleStartTriage = async () => {
         if (!input.trim()) return;
@@ -87,6 +93,7 @@ const StructuredSymptomChecker: React.FC = () => {
         if (!currentQ) return;
 
         setAnswers(prev => ({ ...prev, [currentQ.id]: answer }));
+        setShowManual(false);
 
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
@@ -299,36 +306,64 @@ const StructuredSymptomChecker: React.FC = () => {
                     </h3>
 
                     <div className="grid grid-cols-1 gap-4">
-                        {currentQ.options && currentQ.options.length > 0 ? (
-                            currentQ.options.map((option, idx) => (
+                        {currentQ.options && currentQ.options.length > 0 && !showManual ? (
+                            <>
+                                {currentQ.options.map((option, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleAnswer(option)}
+                                        className="bg-white hover:bg-blue-50 border border-slate-200 p-6 rounded-[2rem] text-left text-lg font-bold text-slate-700 transition-all duration-300 hover:border-blue-300 hover:scale-[1.01] shadow-sm hover:shadow-xl hover:shadow-blue-100 flex items-center justify-between group"
+                                    >
+                                        {option}
+                                        <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                            <ArrowRight size={18} />
+                                        </div>
+                                    </button>
+                                ))}
                                 <button
-                                    key={idx}
-                                    onClick={() => handleAnswer(option)}
-                                    className="bg-white hover:bg-blue-50 border border-slate-200 p-6 rounded-[2rem] text-left text-lg font-bold text-slate-700 transition-all duration-300 hover:border-blue-300 hover:scale-[1.01] shadow-sm hover:shadow-xl hover:shadow-blue-100 flex items-center justify-between group"
+                                    onClick={() => setShowManual(true)}
+                                    className="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-colors flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-100 rounded-[2rem] hover:border-blue-200"
                                 >
-                                    {option}
-                                    <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                        <ArrowRight size={18} />
-                                    </div>
+                                    <Plus size={14} /> {t.advanced_context || 'Custom Entry'}
                                 </button>
-                            ))
+                            </>
                         ) : (
-                            <div className="space-y-4">
-                                <textarea
-                                    id="manual-answer"
-                                    className="w-full bg-white border border-slate-200 rounded-[2rem] p-6 text-lg font-medium text-slate-800 min-h-[140px] focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all outline-none"
-                                    placeholder={t.advanced_context}
-                                    autoFocus
-                                />
-                                <button
-                                    onClick={() => {
-                                        const textarea = document.getElementById('manual-answer') as HTMLTextAreaElement;
-                                        if (textarea) handleAnswer(textarea.value);
-                                    }}
-                                    className="w-full bg-slate-900 text-white h-16 rounded-[1.5rem] font-black tracking-widest uppercase text-xs hover:bg-blue-600 transition-colors shadow-xl"
-                                >
-                                    {t.next_step || 'Continue Capture'}
-                                </button>
+                            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                                <div className="relative">
+                                    <textarea
+                                        id="manual-answer"
+                                        className="w-full bg-white border-2 border-slate-100 rounded-[2rem] p-8 text-lg font-bold text-slate-800 min-h-[180px] focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all outline-none shadow-inner"
+                                        placeholder={t.advanced_context || "Enter manual clinical context..."}
+                                        autoFocus
+                                    />
+                                    <div className="absolute top-4 right-4 opacity-20">
+                                        <MessageSquare size={20} />
+                                    </div>
+                                </div>
+                                <div className="flex gap-4">
+                                    {showManual && currentQ.options && currentQ.options.length > 0 && (
+                                        <button
+                                            onClick={() => setShowManual(false)}
+                                            className="flex-1 bg-white border-2 border-slate-100 text-slate-400 h-16 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all"
+                                        >
+                                            {t.go_back || 'Back'}
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => {
+                                            const textarea = document.getElementById('manual-answer') as HTMLTextAreaElement;
+                                            if (textarea && textarea.value.trim()) {
+                                                handleAnswer(textarea.value);
+                                            } else if (!showManual) {
+                                                handleAnswer("No specific detail provided.");
+                                            }
+                                        }}
+                                        className="flex-[2] bg-slate-900 text-white h-16 rounded-[1.5rem] font-black tracking-[0.2em] uppercase text-[10px] hover:bg-blue-600 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
+                                    >
+                                        {t.next_step || 'Continue Capture'}
+                                        <ArrowRight size={14} />
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
