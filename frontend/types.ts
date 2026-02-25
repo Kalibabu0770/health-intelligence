@@ -12,7 +12,7 @@ export interface HealthCondition {
 
 export interface UserHabit {
   name: string;
-  frequency: 'daily' | 'occasionally' | 'none';
+  frequency: 'none' | 'occasionally' | 'daily';
 }
 
 export interface UserProfile {
@@ -27,9 +27,9 @@ export interface UserProfile {
   customConditions: string[];
   surgeries: string[];
   familyHistory: string[];
-  alcoholUsage: 'none' | 'occasional' | 'regular';
+  alcoholUsage: string;
   smoking: boolean;
-  habits?: UserHabit[];
+  habits: UserHabit[];
   currentMedications: string[];
   allergies: string[];
   hasLiverDisease: boolean;
@@ -38,13 +38,35 @@ export interface UserProfile {
   hasHighBP: boolean;
   hasHeartDisease: boolean;
   hasAsthma: boolean;
+  hasThyroid: boolean;
+  hasGastric: boolean;
+  hasBonePain: boolean;
+  hasVisionIssues: boolean;
+  isTribal: boolean;
   isPregnant: boolean;
-  location?: string;
-  foodPreferences?: string[];
-  profession?: string;
-  workHoursPerDay?: number;
-  workIntensity?: 'low' | 'moderate' | 'high' | 'very_high';
-  role?: 'citizen' | 'officer';
+  location: string;
+  foodPreferences: string[];
+  profession: string;
+  workHoursPerDay: number;
+  workIntensity: 'low' | 'moderate' | 'high' | 'very_high';
+  // Follow-up specific data
+  diabetesDetails?: string;
+  hypertensionDetails?: string;
+  heartDetails?: string;
+  asthmaDetails?: string;
+  thyroidDetails?: string;
+  gastricDetails?: string;
+  boneDetails?: string;
+  // Lifestyle & Environment
+  sleepHours?: number;
+  stressLevel?: 'low' | 'moderate' | 'high';
+  waterSource?: 'tap' | 'well' | 'bottled' | 'river';
+  tobaccoFrequency?: string;
+  alcoholFrequency?: string;
+  role: 'citizen' | 'officer';
+  district?: string;
+  mandal?: string;
+  village?: string;
 }
 
 export interface MedicationReminder {
@@ -102,10 +124,23 @@ export interface SymptomSession {
   recommendation?: string;
 }
 
+export interface Drug {
+  id: string;
+  name: string;
+  maxDailyDoseMg: number;
+  liverWarning: string;
+  kidneyWarning: string;
+  alcoholInteraction: boolean;
+  elderlyCaution: boolean;
+  longTermRiskFlag: boolean;
+  class: string;
+}
+
 export interface RiskScores {
   liver: number;
   kidney: number;
   heart: number;
+  stomach: number;
   breathing: number;
   addiction: number;
   overall: RiskLevel;

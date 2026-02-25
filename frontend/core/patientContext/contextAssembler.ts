@@ -9,7 +9,7 @@ export const assemblePatientContext = (context: PatientContext): string => {
   const riskAnalysis = calculateComprehensiveRisk(profile, medications, symptoms, nutritionLogs, activityLogs);
 
   const medList = medications.map(m => `- ${m.drugName} (${m.dosage}) @ ${m.times.join(', ')}`).join('\n');
-  const symptomHistory = symptoms.slice(-5).map(s => `- [${new Date(s.timestamp).toLocaleDateString()}] "${s.userInput}"`).join('\n');
+  const symptomHistory = symptoms.slice(-5).map(s => `- [${new Date(s.timestamp).toLocaleDateString()}] "${s.complaint}"`).join('\n');
   const nutritionSummary = nutritionLogs.slice(-5).map(f => `- ${f.description} (${f.calories}kcal)`).join('\n');
   // Activity summary
   const activitySummary = activityLogs.slice(-5).map(w => `- ${w.type} (${w.durationMinutes}m)`).join('\n');

@@ -35,6 +35,8 @@ interface PatientStoreMethods {
     setLanguage: (lang: Language) => void;
     setTheme: (theme: 'light' | 'dark') => void;
     toggleTheme: () => void;
+    triggerAlert: (type: 'info' | 'warning' | 'danger', message: string) => void;
+    acknowledgeAlert: (id: string) => void;
     t: any;
 }
 
@@ -87,8 +89,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const dailyCheckIns = savedCheckIns ? JSON.parse(savedCheckIns) : [];
             const clinicalVault = savedDocs ? JSON.parse(savedDocs) : [];
             const language = (savedLang as Language) || 'en';
-            const savedTheme = localStorage.getItem('hi_theme');
-            const theme = (savedTheme as 'light' | 'dark') || 'light';
+            const theme = 'light';
 
             // Calculate initial risk
             const riskAnalysis = calculateComprehensiveRisk(profile, medications, symptoms, nutritionLogs, activityLogs);
@@ -97,6 +98,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 liver: riskAnalysis.liver.score,
                 kidney: riskAnalysis.kidney.score,
                 heart: riskAnalysis.heart.score,
+                stomach: riskAnalysis.stomach.score,
                 breathing: riskAnalysis.breathing.score,
                 addiction: 0,
                 overall: riskAnalysis.overall,
@@ -142,7 +144,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
         localStorage.setItem('hi_checkins', JSON.stringify(context.dailyCheckIns));
         localStorage.setItem('hi_docs', JSON.stringify(context.clinicalVault));
         localStorage.setItem('hi_lang', context.language);
-        localStorage.setItem('hi_theme', context.theme);
+        localStorage.setItem('hi_theme', 'light');
 
     }, [context, isInitialized]);
 
@@ -150,6 +152,19 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const updateProfile = useCallback((p: UserProfile) => {
         setContext(prev => {
             const risk = calculateComprehensiveRisk(p, prev.medications, prev.symptoms, prev.nutritionLogs, prev.activityLogs);
+
+            if (p) {
+                // Sync multiple accounts for the login screen
+                const currentAccounts = JSON.parse(localStorage.getItem('hi_accounts') || '[]');
+                const existingIdx = currentAccounts.findIndex((a: any) => a.name === p.name);
+                if (existingIdx >= 0) {
+                    currentAccounts[existingIdx] = p;
+                } else {
+                    currentAccounts.push(p);
+                }
+                localStorage.setItem('hi_accounts', JSON.stringify(currentAccounts));
+            }
+
             return {
                 ...prev,
                 profile: p,
@@ -157,6 +172,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     liver: risk.liver.score,
                     kidney: risk.kidney.score,
                     heart: risk.heart.score,
+                    stomach: risk.stomach.score,
                     breathing: risk.breathing.score,
                     addiction: 0,
                     overall: risk.overall,
@@ -183,6 +199,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     liver: risk.liver.score,
                     kidney: risk.kidney.score,
                     heart: risk.heart.score,
+                    stomach: risk.stomach.score,
                     breathing: risk.breathing.score,
                     overall: risk.overall,
                     healthScore: risk.healthScore,
@@ -208,6 +225,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     liver: risk.liver.score,
                     kidney: risk.kidney.score,
                     heart: risk.heart.score,
+                    stomach: risk.stomach.score,
                     breathing: risk.breathing.score,
                     overall: risk.overall,
                     healthScore: risk.healthScore,
@@ -233,6 +251,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     liver: risk.liver.score,
                     kidney: risk.kidney.score,
                     heart: risk.heart.score,
+                    stomach: risk.stomach.score,
                     breathing: risk.breathing.score,
                     overall: risk.overall,
                     healthScore: risk.healthScore,
@@ -258,6 +277,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     liver: risk.liver.score,
                     kidney: risk.kidney.score,
                     heart: risk.heart.score,
+                    stomach: risk.stomach.score,
                     breathing: risk.breathing.score,
                     overall: risk.overall,
                     healthScore: risk.healthScore,
@@ -283,9 +303,13 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     liver: risk.liver.score,
                     kidney: risk.kidney.score,
                     heart: risk.heart.score,
+                    stomach: risk.stomach.score,
                     breathing: risk.breathing.score,
                     overall: risk.overall,
                     healthScore: risk.healthScore,
+                    projection7Day: risk.projection7Day,
+                    longevityAge: risk.longevityAge,
+                    stressContributors: risk.stressContributors,
                     trends: generateTrends(risk.healthScore),
                     environment: prev.riskScores?.environment || MOCK_ENVIRONMENT
                 } as RiskScores
@@ -323,11 +347,34 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }, []);
 
     const setTheme = useCallback((theme: 'light' | 'dark') => {
-        setContext(prev => ({ ...prev, theme }));
+        setContext(prev => ({ ...prev, theme: 'light' }));
     }, []);
 
     const toggleTheme = useCallback(() => {
-        setContext(prev => ({ ...prev, theme: prev.theme === 'light' ? 'dark' : 'light' }));
+        setContext(prev => {
+            const nextTheme = prev.theme === 'light' ? 'dark' : 'light';
+            return { ...prev, theme: 'light' }; // Force light for now as per design
+        });
+    }, []);
+
+    const triggerAlert = useCallback((type: 'info' | 'warning' | 'danger', message: string) => {
+        setContext(prev => ({
+            ...prev,
+            alerts: [{
+                id: Math.random().toString(36).substr(2, 9),
+                type,
+                message,
+                timestamp: Date.now(),
+                acknowledged: false
+            }, ...prev.alerts].slice(0, 10) // Keep last 10
+        }));
+    }, []);
+
+    const acknowledgeAlert = useCallback((id: string) => {
+        setContext(prev => ({
+            ...prev,
+            alerts: prev.alerts.map(a => a.id === id ? { ...a, acknowledged: true } : a)
+        }));
     }, []);
 
     return (
@@ -347,6 +394,8 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setLanguage,
             setTheme,
             toggleTheme,
+            triggerAlert,
+            acknowledgeAlert,
             t: { ...translations['en'], ...translations[context.language] }
         }}>
             {children}
