@@ -39,7 +39,7 @@ CRITICAL SAFETY POLICIES:
 5. LOCALIZATION: All advice must be culturally relevant and use ingredients available in the patient's region.
 `;
 
-// ── Tier 2: Groq Cloud AI (FREE — works on Netlify without any server) ────
+// ── Tier 2: Groq Cloud AI (FREE — cloud-native AI running Llama 3.3) ────
 const callGroq = async (messages: any[], options: any = {}): Promise<string> => {
     if (!GROQ_API_KEY || GROQ_API_KEY === 'your_groq_api_key_here') {
         throw new Error('Groq API key not configured');
@@ -98,7 +98,7 @@ const callGroq = async (messages: any[], options: any = {}): Promise<string> => 
 
 // ── Smart AI Router — tries each tier in order ────────────────────────────
 // Tier 1: Ollama (local dev, requires ollama running on machine)
-// Tier 2: Groq  (cloud, FREE, requires VITE_GROQ_API_KEY on Netlify)
+// Tier 2: Groq  (cloud, FREE, requires VITE_GROQ_API_KEY in production)
 // Tier 3: Rule-based clinical engine (always works, no API needed)
 const callAI = async (
     messages: any[],
@@ -136,7 +136,7 @@ const callAI = async (
         }
     }
 
-    // Tier 2: Try Groq (cloud, free, works on Netlify)
+    // Tier 2: Try Groq (cloud, free, works in any production env)
     if (GROQ_API_KEY && GROQ_API_KEY !== 'your_groq_api_key_here') {
         try {
             // For JSON requests, add explicit JSON instruction to system message
