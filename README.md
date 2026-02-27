@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧠 LifeShield: SENTINEL AI
+# 🧠 Health Intelligence: SENTINEL AI
 ### National Health Intelligence Node • Bio-Governance V4.9
 *Democratizing specialist healthcare through Clinical Intelligence & Real-time ML Fusion*
 

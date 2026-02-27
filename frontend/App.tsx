@@ -66,7 +66,7 @@ const App: React.FC = () => {
 
           // Optional: Browser Notification if permitted
           if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("LifeShield: Medication Scheduled", {
+            new Notification("Health Intelligence: Medication Scheduled", {
               body: `${med.drugName} - ${med.dosage} is due now.`,
               icon: "/favicon.ico"
             });

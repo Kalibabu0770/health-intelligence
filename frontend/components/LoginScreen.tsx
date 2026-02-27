@@ -189,7 +189,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
             <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg mb-4">
                 <ShieldCheck size={28} />
             </div>
-            <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">LifeShield <span className="text-emerald-500">AI</span></h1>
+            <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">Health Intelligence <span className="text-emerald-500">AI</span></h1>
             <div className="h-1 w-8 bg-emerald-100 rounded-full mt-2" />
         </div>
     );
@@ -227,7 +227,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                 <div className="space-y-6 animate-in fade-in duration-500">
                                     <div className="text-center mb-8">
                                         <h2 className="text-lg font-black text-slate-800 uppercase tracking-tight">Select Access Gateway</h2>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{t.node_telemetry_registry || 'LifeShield Protocol Portal'}</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{t.node_telemetry_registry || 'Health Intelligence Protocol Portal'}</p>
                                     </div>
 
                                     <div className="grid grid-cols-1 gap-4">

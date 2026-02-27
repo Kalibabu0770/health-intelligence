@@ -4,7 +4,7 @@ import os
 
 class HealthRiskModel:
     """
-    LifeShield ML Engine
+    Health Intelligence ML Engine
     Core: Random Forest Ensemble for biological risk prediction.
     Features: Age, Gender, BMI, GenHlth, Conditions, Habits.
     """

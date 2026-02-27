@@ -65,7 +65,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
               <ShieldCheck size={24} />
             </div>
             <div className="min-w-0">
-              <h1 className={`font-black text-[16px] uppercase tracking-tight leading-none text-slate-900 italic`}>LifeShield</h1>
+              <h1 className={`font-black text-[16px] uppercase tracking-tight leading-none text-slate-900 italic`}>Health Intelligence</h1>
               <p className="text-[8px] font-black text-emerald-600 uppercase tracking-widest mt-1">Bio-Sentinel v2.8</p>
             </div>
           </header>
