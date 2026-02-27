@@ -110,7 +110,7 @@ const CommandHub: React.FC<{
                     </div>
                     <button
                         onClick={onRefresh}
-                        className="w-14 h-14 rounded-2xl transition-all duration-300 active:scale-95 bg-slate-900 text-white shadow-2xl shadow-slate-200 flex items-center justify-center hover:bg-black group"
+                        className="w-14 h-14 rounded-2xl transition-all duration-300 active:scale-95 bg-emerald-600 text-white shadow-2xl shadow-slate-200 flex items-center justify-center hover:bg-emerald-700 group"
                     >
                         <RefreshCcw size={22} className={`${isOrchestrating ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-700'}`} strokeWidth={2.5} />
                     </button>
@@ -241,7 +241,7 @@ const CommandHub: React.FC<{
                                 </div>
                                 <button
                                     onClick={() => onOpenAnalysis('meds')}
-                                    className="w-full py-4.5 bg-slate-900 text-white rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 hover:bg-black transition-all shadow-xl"
+                                    className="w-full py-4.5 bg-emerald-600 text-white rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 hover:bg-emerald-700 transition-all shadow-xl"
                                 >
                                     Full Adherence Schedule
                                 </button>

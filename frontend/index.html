@@ -19,14 +19,174 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Google-style Dots Animation */
+        /* ChatGPT-style AI Aura Animation */
+        .ai-aura-container {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 20px 40px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            pointer-events: none;
+            scale: 0.8;
+            max-width: 90vw;
+            min-width: 300px;
+        }
+
+        .ai-aura-container.active {
+            opacity: 1;
+            pointer-events: all;
+            scale: 1;
+            bottom: 100px;
+        }
+
+        .aura-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .aura-transcript-area {
+            width: 100%;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.6;
+            max-height: 120px;
+            overflow-y: auto;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .aura-transcript-area:empty::before {
+            content: "Please speak clearly...";
+            opacity: 0.4;
+        }
+
+        .aura-actions {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .aura-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .aura-btn-confirm {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.5);
+        }
+
+        .aura-btn-confirm:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .aura-btn-cancel {
+            background: rgba(244, 63, 94, 0.1);
+            color: #f43f5e;
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+
+        .aura-btn-cancel:hover {
+            background: rgba(244, 63, 94, 0.2);
+        }
+
+        .orb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            filter: blur(2px);
+            animation: orb-pulse 2s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            background: #10b981;
+            animation-delay: 0s;
+            box-shadow: 0 0 30px #10b981;
+        }
+
+        .orb-2 {
+            background: #3b82f6;
+            animation-delay: 0.2s;
+            box-shadow: 0 0 30px #3b82f6;
+        }
+
+        .orb-3 {
+            background: #8b5cf6;
+            animation-delay: 0.4s;
+            box-shadow: 0 0 30px #8b5cf6;
+        }
+
+        .orb-4 {
+            background: #f43f5e;
+            animation-delay: 0.6s;
+            box-shadow: 0 0 30px #f43f5e;
+        }
+
+        @keyframes orb-pulse {
+
+            0%,
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.6) translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        .listening-text {
+            color: white;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        /* Legacy Button Injection override */
         .mic-listening {
-            position: relative;
+            position: relative !important;
+        }
+
+        .mic-dots-container {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+            justify-content: center;
         }
 
         .google-dot {
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
             border-radius: 50%;
             animation: google-bounce 1s infinite;
         }
@@ -59,17 +219,8 @@
             }
 
             50% {
-                transform: translateY(-8px);
+                transform: translateY(-4px);
             }
-        }
-
-        /* Container for dots when mic is active */
-        .mic-dots-container {
-            display: inline-flex;
-            gap: 4px;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
         }
     </style>
     <script type="importmap">

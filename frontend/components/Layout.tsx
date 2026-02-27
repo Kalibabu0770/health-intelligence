@@ -28,12 +28,13 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
 
   const menuItems = [
     { id: 'hub', icon: Home, label: t.dashboard || 'DASHBOARD', desc: t.central_intelligence || 'CENTRAL INTELLIGENCE' },
-    { id: 'audit', icon: Activity, label: t.vitals_trend || 'LIFE AUDIT', desc: t.vitals_trend_monitor || 'WELLNESS TRACKING SUITE' },
+    { id: 'analysis', icon: ShieldAlert, label: t.safety_adherence || 'SAFETY & ADHERENCE', desc: 'MEDICATION SAFETY SCANNER' },
+    { id: 'audit', icon: Activity, label: t.vitals_trend || 'VITALS TREND', desc: t.vitals_trend_monitor || 'LIFETREND MONITOR' },
     { id: 'ayush', icon: Leaf, label: t.ayush_ai || 'AYUSH AI', desc: t.ancient_wisdom || 'ANCIENT WISDOM HUB' },
     { id: 'meds', icon: ClipboardList, label: t.pharmacy || 'MEDICATION REMINDER', desc: t.safety_adherence || 'SAFETY & ADHERENCE' },
     { id: 'symptoms', icon: Stethoscope, label: t.triage_hub || 'DISEASE FINDER', desc: t.clinical_analysis || 'CLINICAL ANALYSIS' },
-    { id: 'reports', icon: FileText, label: t.bio_hub || 'HEALTH FILES', desc: t.vault_registry || 'HEALTH RECORD SYNTHESIS' },
-    { id: 'profile', icon: UserCircle, label: t.identity || 'IDENTITY', desc: t.vault_registry || 'PROFILE REGISTRY' },
+    { id: 'reports', icon: FileText, label: t.bio_hub || 'HEALTH FILES', desc: t.vault_registry || 'HEALTH FILE REGISTRY' },
+    { id: 'profile', icon: UserCircle, label: t.identity || 'IDENTITY', desc: t.vault_registry || 'HEALTH FILE REGISTRY' },
   ];
 
   const activeModule = menuItems.find(i => i.id === activeScreen);
@@ -52,7 +53,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-indigo-500 z-[100]" />
 
         {/* Global Loading / Status Node */}
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 px-4 h-5 rounded-full bg-slate-900/90 text-white z-[100] flex items-center justify-center gap-2 shadow-lg">
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 px-4 h-5 rounded-full bg-slate-50/90 text-white z-[100] flex items-center justify-center gap-2 shadow-lg">
           <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-[7.5px] font-black uppercase tracking-[0.2em]">{t.network_stable || 'Neural Link Secure'}</span>
         </div>
@@ -79,7 +80,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
                   key={item.id}
                   onClick={() => setActiveScreen(item.id)}
                   className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 text-left group relative ${isActive
-                    ? 'bg-slate-900 text-white shadow-xl'
+                    ? 'bg-emerald-600 text-white shadow-xl'
                     : 'hover:bg-slate-50 text-slate-500'}`}
                 >
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-500 ${isActive
@@ -123,7 +124,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
           {/* Global Alert Overlay */}
           <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[500] w-full max-w-md pointer-events-none flex flex-col items-center gap-2">
             {(alerts || []).filter(a => !a.acknowledged).map(alert => (
-              <div key={alert.id} className={`w-full pointer-events-auto p-4 rounded-2xl shadow-2xl border flex items-center justify-between gap-4 animate-in slide-in-from-top-4 duration-500 backdrop-blur-3xl ${alert.type === 'danger' ? 'bg-rose-900/90 text-white border-rose-800' : alert.type === 'warning' ? 'bg-slate-900/90 text-white border-slate-800' : 'bg-emerald-900/90 text-white border-emerald-800'}`}>
+              <div key={alert.id} className={`w-full pointer-events-auto p-4 rounded-2xl shadow-2xl border flex items-center justify-between gap-4 animate-in slide-in-from-top-4 duration-500 backdrop-blur-3xl ${alert.type === 'danger' ? 'bg-rose-50/90 text-white border-rose-800' : alert.type === 'warning' ? 'bg-slate-50/90 text-white border-slate-100' : 'bg-emerald-50/90 text-white border-emerald-800'}`}>
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${alert.type === 'danger' ? 'bg-rose-500 text-white' : alert.type === 'warning' ? 'bg-amber-500 text-white' : 'bg-blue-500 text-white'}`}>
                     <ShieldAlert size={20} />
@@ -133,7 +134,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
                     <p className="text-[12px] font-bold leading-tight">{alert.message}</p>
                   </div>
                 </div>
-                <button onClick={() => acknowledgeAlert(alert.id)} className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center shrink-0 border border-white/10 active:scale-90">
+                <button onClick={() => acknowledgeAlert(alert.id)} className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center shrink-0 border border-slate-100 active:scale-90">
                   <Check size={18} />
                 </button>
               </div>
@@ -142,7 +143,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
 
           <header className={`h-20 flex items-center justify-between px-10 z-20 shrink-0 border-b border-slate-100 transition-all duration-500 bg-white/60 backdrop-blur-md`}>
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0">
                 {(() => { const mod = menuItems.find(i => i.id === activeScreen); if (mod) { const IC = mod.icon; return <IC size={20} />; } return <Home size={20} />; })()}
               </div>
               <div>

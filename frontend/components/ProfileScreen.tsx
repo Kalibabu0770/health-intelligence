@@ -7,6 +7,7 @@ import { UserProfile } from '../types';
 const ProfileScreen: React.FC = () => {
     const { profile, updateProfile, resetVault, language, t } = usePatientContext();
     const [isEditing, setIsEditing] = useState(false);
+    const [isListening, setIsListening] = useState(false);
     const [edited, setEdited] = useState<UserProfile | null>(profile);
 
     if (!profile || !edited) return null;
@@ -37,8 +38,14 @@ const ProfileScreen: React.FC = () => {
                         <div className="relative">
                             <input className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-lg outline-none" value={edited.name} onChange={e => setEdited({ ...edited, name: e.target.value })} placeholder="Identity" />
                             <button
-                                onClick={() => startListening(language, text => setEdited(p => p ? { ...p, name: text } : null))}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-600 p-2 active:scale-90"
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (isListening) return;
+                                    setIsListening(true);
+                                    startListening(language, text => setEdited(p => p ? { ...p, name: text } : null), () => setIsListening(false));
+                                }}
+                                className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
                             >
                                 <Mic size={20} />
                             </button>
@@ -47,11 +54,33 @@ const ProfileScreen: React.FC = () => {
                         <div className="flex gap-3">
                             <div className="relative w-1/2">
                                 <input type="number" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none pr-10" value={edited.age || ''} onChange={e => setEdited({ ...edited, age: Number(e.target.value) })} placeholder={t.age} />
-                                <button onClick={() => startListening(language, text => setEdited(p => p ? { ...p, age: parseInt(text.replace(/\D/g, '')) } : null))} className="absolute right-2 top-1/2 -translate-y-1/2 text-emerald-600 active:scale-90"><Mic size={14} /></button>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (isListening) return;
+                                        setIsListening(true);
+                                        startListening(language, text => setEdited(p => p ? { ...p, age: parseInt(text.replace(/\D/g, '')) || p.age } : null), () => setIsListening(false));
+                                    }}
+                                    className={`absolute right-2 top-1/2 -translate-y-1/2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                >
+                                    <Mic size={14} />
+                                </button>
                             </div>
                             <div className="relative w-1/2">
                                 <input type="number" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none pr-10" value={edited.weight || ''} onChange={e => setEdited({ ...edited, weight: Number(e.target.value) })} placeholder={t.weight} />
-                                <button onClick={() => startListening(language, text => setEdited(p => p ? { ...p, weight: parseInt(text.replace(/\D/g, '')) } : null))} className="absolute right-2 top-1/2 -translate-y-1/2 text-emerald-600 active:scale-90"><Mic size={14} /></button>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (isListening) return;
+                                        setIsListening(true);
+                                        startListening(language, text => setEdited(p => p ? { ...p, weight: parseInt(text.replace(/\D/g, '')) || p.weight } : null), () => setIsListening(false));
+                                    }}
+                                    className={`absolute right-2 top-1/2 -translate-y-1/2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                >
+                                    <Mic size={14} />
+                                </button>
                             </div>
                         </div>
 
@@ -64,8 +93,14 @@ const ProfileScreen: React.FC = () => {
                         <div className="relative">
                             <input className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none" value={edited.location || ''} onChange={e => setEdited({ ...edited, location: e.target.value })} placeholder={t.region_placeholder} />
                             <button
-                                onClick={() => startListening(language, text => setEdited(p => p ? { ...p, location: text } : null))}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-600 p-2 active:scale-90"
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (isListening) return;
+                                    setIsListening(true);
+                                    startListening(language, text => setEdited(p => p ? { ...p, location: text } : null), () => setIsListening(false));
+                                }}
+                                className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
                             >
                                 <Mic size={20} />
                             </button>
@@ -74,7 +109,18 @@ const ProfileScreen: React.FC = () => {
                         <div className="pt-4 space-y-4 border-t border-slate-50 mt-4">
                             <div className="relative">
                                 <input className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none" value={edited.profession || ''} onChange={e => setEdited({ ...edited, profession: e.target.value })} placeholder="Profession" />
-                                <button onClick={() => startListening(language, text => setEdited(p => p ? { ...p, profession: text } : null))} className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-600 p-2 active:scale-90"><Mic size={20} /></button>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (isListening) return;
+                                        setIsListening(true);
+                                        startListening(language, text => setEdited(p => p ? { ...p, profession: text } : null), () => setIsListening(false));
+                                    }}
+                                    className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                >
+                                    <Mic size={20} />
+                                </button>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-[9px] font-black uppercase text-slate-400">Work Hours: {edited.workHoursPerDay}</p>

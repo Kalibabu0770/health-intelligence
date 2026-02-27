@@ -49,6 +49,15 @@ async def orchestrate(request: UnifiedRequest):
         print(f"[Engine] Orchestration Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/ehr")
+async def generate_ehr(request: UnifiedRequest):
+    try:
+        response = await orchestrator.run_ehr_analysis(request)
+        return response
+    except Exception as e:
+        print(f"[EHR] Synthesis Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/health")
 async def health():
     groq_key_set = bool(os.getenv("GROQ_API_KEY", ""))

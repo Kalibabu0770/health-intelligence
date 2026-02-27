@@ -62,13 +62,27 @@ const WorkoutLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = (
             <div className="bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-sm space-y-4">
                 <div className="relative">
                     <input className="w-full p-4 pr-12 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-blue-500" placeholder={t.activity_placeholder} value={type} onChange={e => setType(e.target.value)} />
-                    <button onClick={() => startListening(language, setType)} className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-blue-600 bg-white shadow-sm rounded-lg active:scale-90 transition-all">
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            startListening(language, setType);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-blue-600 bg-white shadow-sm rounded-lg active:scale-90 transition-all"
+                    >
                         <Mic size={18} />
                     </button>
                 </div>
                 <div className="relative">
                     <input type="number" className="w-full p-4 pr-12 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-blue-500" placeholder={t.duration_placeholder} value={mins} onChange={e => setMins(e.target.value)} />
-                    <button onClick={() => startListening(language, setMins)} className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-blue-600 bg-white shadow-sm rounded-lg active:scale-90 transition-all">
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            startListening(language, setMins);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-blue-600 bg-white shadow-sm rounded-lg active:scale-90 transition-all"
+                    >
                         <Mic size={18} />
                     </button>
                 </div>

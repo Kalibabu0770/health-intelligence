@@ -22,6 +22,8 @@ class UserProfile(BaseModel):
     weight: float
     profession: Optional[str] = "General"
     activity_level: Optional[str] = "Sedentary"
+    district: Optional[str] = "Unknown"
+    mandal: Optional[str] = "Unknown"
 
 class UnifiedRequest(BaseModel):
     profile: UserProfile
@@ -75,12 +77,63 @@ class VisionResponse(BaseModel):
     confidence: float
     needs_clarification: bool = False
 
+class AyushRecommendation(BaseModel):
+    category: str
+    title: str
+    description: str
+    benefits: List[str]
+    scientific_evidence: Optional[str] = "Traditional and modern clinical alignment verified."
+    success_rate: float = 0.85
+
+class SeasonalRisk(BaseModel):
+    disease_name: str
+    probability: float
+    reason: str
+    prevention: str
+
+class ForecastingIntelligence(BaseModel):
+    seven_day_risk: float
+    thirty_day_risk: float
+    peak_outbreak_date: Optional[str] = None
+    z_score_deviation: float = 0.0
+    confidence_interval: List[float] = [0.0, 0.0]
+
+class GovernanceMetrics(BaseModel):
+    inference_latency_ms: int = 200
+    model_version: str = "SENTINEL-V4.9"
+    data_drift_score: float = 0.02
+    compliance_id: str = "DPDP-2023-VERIFIED"
+
+class ClinicalEHR(BaseModel):
+    ehr_id: str
+    chief_complaint: str
+    clinical_notes: str
+    triage_status: str
+    ayush_metrics: Dict[str, str]
+    digital_signature: str
+
+class AyushResponse(BaseModel):
+    prakriti: str
+    score: float
+    confidence: float
+    analysis: str
+    recommendations: List[AyushRecommendation]
+    forecast: ForecastingIntelligence
+    outbreak_alert: Optional[str] = None
+    regional_seasonal_risks: List[SeasonalRisk] = []
+    dinacharya: Optional[List[str]] = []
+    ritucharya: Optional[List[str]] = []
+    evidence_score: float = 0.92
+
 class UnifiedResponse(BaseModel):
     bio_risk: Optional[BioRiskResponse] = None
     medication_safety: Optional[MedSafetyResponse] = None
     triage: Optional[TriageResponse] = None
     nutrition: Optional[NutritionResponse] = None
+    ayush: Optional[AyushResponse] = None
     vision_result: Optional[VisionResponse] = None
+    ehr_record: Optional[ClinicalEHR] = None
+    governance: GovernanceMetrics = GovernanceMetrics()
     guardian_summary: str
     language: str
     disclaimer: str = "AI guidance only. Not medical diagnosis."

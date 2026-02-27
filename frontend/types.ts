@@ -63,10 +63,11 @@ export interface UserProfile {
   waterSource?: 'tap' | 'well' | 'bottled' | 'river';
   tobaccoFrequency?: string;
   alcoholFrequency?: string;
-  role: 'citizen' | 'officer';
+  role: 'citizen' | 'officer' | 'doctor';
   district?: string;
   mandal?: string;
   village?: string;
+  patientId?: string;
 }
 
 export interface MedicationReminder {

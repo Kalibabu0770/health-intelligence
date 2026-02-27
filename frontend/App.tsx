@@ -121,19 +121,6 @@ const App: React.FC = () => {
   const renderScreen = () => {
     switch (activeScreen) {
       case 'hub':
-        return (
-          <Dashboard
-            unifiedData={analysis}
-            isOrchestrating={isOrchestrating}
-            onRefresh={handleRefresh}
-            onOpenFoodLog={() => setActiveScreen('food')}
-            onOpenWorkoutLog={() => setActiveScreen('workout')}
-            onOpenMeditationLog={() => setActiveScreen('meditation')}
-            onOpenCheckIn={() => setShowCheckIn(true)}
-            onOpenMeds={() => setActiveScreen('meds')}
-            theme={theme}
-          />
-        );
       case 'dashboard':
         return (
           <Dashboard
@@ -145,6 +132,7 @@ const App: React.FC = () => {
             onOpenMeditationLog={() => setActiveScreen('meditation')}
             onOpenCheckIn={() => setShowCheckIn(true)}
             onOpenMeds={() => setActiveScreen('meds')}
+            onSetScreen={(s) => setActiveScreen(s)}
             theme={theme}
           />
         );
@@ -215,7 +203,7 @@ const App: React.FC = () => {
         <div className="fixed bottom-32 right-8 z-40 lg:hidden focus-within:hidden">
           <button
             onClick={() => setActiveScreen('meds')}
-            className="w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl flex items-center justify-center"
+            className="w-14 h-14 bg-emerald-600 text-white rounded-full shadow-2xl flex items-center justify-center"
           >
             <span className="text-xl">💊</span>
           </button>

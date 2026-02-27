@@ -106,7 +106,7 @@ const ReportsScreen: React.FC<{ analysis?: any, isAnalyzing?: boolean, onRefresh
 
                 <div className="flex gap-4">
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*,application/pdf" onChange={handleReportUpload} />
-                    <button onClick={() => fileInputRef.current?.click()} className="bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-xl active:scale-95 text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
+                    <button onClick={() => fileInputRef.current?.click()} className="bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-xl active:scale-95 text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
                         {localIsAnalyzing ? <Loader2 className="animate-spin" size={16} /> : <FilePlus size={16} />} Ingest Node
                     </button>
                     <button onClick={handleRefresh} className="bg-white text-slate-900 border border-slate-200 px-6 py-4 rounded-2xl shadow-lg active:scale-95 text-[10px] font-black uppercase tracking-widest flex items-center gap-3">

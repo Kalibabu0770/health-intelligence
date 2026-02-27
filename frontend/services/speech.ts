@@ -5,12 +5,11 @@ let currentRecognition: any = null;
 export const startListening = (
     language: string,
     onTranscript: (text: string) => void,
-    onInterim?: (text: string) => void
+    onEnd?: () => void
 ) => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        const speechAlert = (translations[language as Language] || translations['en']).speech_not_supported;
-        alert(speechAlert);
+        console.error("Speech Recognition NOT supported in this browser.");
         return;
     }
 
@@ -31,22 +30,60 @@ export const startListening = (
     recognition.continuous = true;
     recognition.interimResults = true;
 
+    // ChatGPT-style Global Overlay Management
+    let aura = document.getElementById('ai-aura') as HTMLElement;
+    if (!aura) {
+        aura = document.createElement('div');
+        aura.id = 'ai-aura';
+        aura.className = 'ai-aura-container';
+        document.body.appendChild(aura);
+    }
+
+    aura.innerHTML = `
+        <div class="aura-header">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+            <div class="orb orb-4"></div>
+            <span class="listening-text">AI Guardian Listening...</span>
+        </div>
+        <div id="aura-transcript" class="aura-transcript-area">Please speak clearly...</div>
+        <div class="aura-actions">
+            <button id="aura-done" class="aura-btn aura-btn-confirm">DONE / USE TEXT</button>
+            <button id="aura-cancel" class="aura-btn aura-btn-cancel">CANCEL</button>
+        </div>
+    `;
+
+    const transcriptEl = aura.querySelector('#aura-transcript') as HTMLElement;
+    const doneBtn = aura.querySelector('#aura-done') as HTMLButtonElement;
+    const cancelBtn = aura.querySelector('#aura-cancel') as HTMLButtonElement;
+
+    aura.classList.add('active');
+
     let finalTranscript = '';
     let silenceTimer: any = null;
 
-    const activeBtn = document.activeElement as HTMLElement;
-    if (activeBtn && !activeBtn.classList.contains('mic-listening')) {
-        activeBtn.dataset.originalContent = activeBtn.innerHTML;
-        activeBtn.classList.add('mic-listening');
-        activeBtn.innerHTML = `
-      <div class="mic-dots-container">
-        <div class="google-dot dot-1"></div>
-        <div class="google-dot dot-2"></div>
-        <div class="google-dot dot-3"></div>
-        <div class="google-dot dot-4"></div>
-      </div>
-    `;
-    }
+    const finalize = () => {
+        const text = transcriptEl.textContent?.trim() || finalTranscript.trim();
+        if (text && text !== "Please speak clearly...") {
+            onTranscript(text);
+        }
+    };
+
+    doneBtn.onclick = (e) => {
+        e.preventDefault();
+        finalize();
+        recognition.stop();
+    };
+
+    cancelBtn.onclick = (e) => {
+        e.preventDefault();
+        recognition.abort();
+    };
+
+    recognition.onstart = () => {
+        if (transcriptEl) transcriptEl.textContent = "Listening...";
+    };
 
     recognition.onresult = (event: any) => {
         let interimTranscript = '';
@@ -54,25 +91,32 @@ export const startListening = (
             if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
             else interimTranscript += event.results[i][0].transcript;
         }
-        if (onInterim) onInterim(interimTranscript);
+
         const liveText = (finalTranscript + interimTranscript).trim();
-        if (liveText) onTranscript(liveText);
+        if (liveText) {
+            if (transcriptEl) transcriptEl.textContent = liveText;
+            // Real-time preview in the overlay, but we wait for 'DONE' to call onTranscript
+            // This provides the 'confirmation mechanism' requested by the user.
+        }
+
         clearTimeout(silenceTimer);
-        silenceTimer = setTimeout(() => recognition.stop(), 4000);
+        silenceTimer = setTimeout(() => recognition.stop(), 8000);
+    };
+
+    recognition.onerror = (event: any) => {
+        console.error("Speech Recognition Error:", event.error);
+        if (transcriptEl) transcriptEl.textContent = "Error: " + event.error + ". Please check microphone permissions.";
+        setTimeout(() => recognition.stop(), 3000);
     };
 
     recognition.onend = () => {
         currentRecognition = null;
+        aura.classList.remove('active');
         clearTimeout(silenceTimer);
-        if (finalTranscript.trim()) onTranscript(finalTranscript.trim());
-        if (activeBtn) {
-            activeBtn.classList.remove('mic-listening');
-            if (activeBtn.dataset.originalContent) {
-                activeBtn.innerHTML = activeBtn.dataset.originalContent;
-                delete activeBtn.dataset.originalContent;
-            }
-        }
+        if (onEnd) onEnd();
     };
 
-    try { recognition.start(); } catch (e: any) { }
+    try { recognition.start(); } catch (e: any) {
+        console.error("Start failed:", e);
+    }
 };

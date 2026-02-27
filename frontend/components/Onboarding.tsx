@@ -31,6 +31,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
     const [step, setStep] = useState(profile?.name ? 1.5 : 1);
     const [formData, setFormData] = useState<UserProfile>(profile || INITIAL_PROFILE);
     const [isFinishing, setIsFinishing] = useState(false);
+    const [isListening, setIsListening] = useState(false);
 
     useEffect(() => {
         if (profile) {
@@ -59,8 +60,14 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                             />
                             <button
-                                onClick={() => startListening(language, text => setFormData(p => ({ ...p, name: text })))}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-600 p-2 active:scale-90"
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (isListening) return;
+                                    setIsListening(true);
+                                    startListening(language, text => setFormData(p => ({ ...p, name: text })), () => setIsListening(false));
+                                }}
+                                className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
                             >
                                 <Mic size={20} />
                             </button>
@@ -75,7 +82,18 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                     value={formData.age || ''}
                                     onChange={e => setFormData({ ...formData, age: parseInt(e.target.value) })}
                                 />
-                                <button onClick={() => startListening(language, text => setFormData(p => ({ ...p, age: parseInt(text.replace(/\D/g, '')) })))} className="absolute right-2 top-1/2 -translate-y-1/2 text-emerald-600 active:scale-90"><Mic size={14} /></button>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (isListening) return;
+                                        setIsListening(true);
+                                        startListening(language, text => setFormData(p => ({ ...p, age: parseInt(text.replace(/\D/g, '')) || p.age })), () => setIsListening(false));
+                                    }}
+                                    className={`absolute right-2 top-1/2 -translate-y-1/2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                >
+                                    <Mic size={14} />
+                                </button>
                             </div>
                             <div className="relative">
                                 <input
@@ -85,7 +103,18 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                     value={formData.weight || ''}
                                     onChange={e => setFormData({ ...formData, weight: parseInt(e.target.value) })}
                                 />
-                                <button onClick={() => startListening(language, text => setFormData(p => ({ ...p, weight: parseInt(text.replace(/\D/g, '')) })))} className="absolute right-2 top-1/2 -translate-y-1/2 text-emerald-600 active:scale-90"><Mic size={14} /></button>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (isListening) return;
+                                        setIsListening(true);
+                                        startListening(language, text => setFormData(p => ({ ...p, weight: parseInt(text.replace(/\D/g, '')) || p.weight })), () => setIsListening(false));
+                                    }}
+                                    className={`absolute right-2 top-1/2 -translate-y-1/2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                >
+                                    <Mic size={14} />
+                                </button>
                             </div>
                         </div>
 
@@ -129,7 +158,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                 if (!formData.location) return alert("Enter Jurisdiction Pincode");
                                 setStep(1.5);
                             }}
-                            className="w-full bg-slate-900 text-white py-6 rounded-2xl font-black uppercase text-[11px] tracking-[0.3em] shadow-xl active:scale-95 transition-all text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] tracking-[0.3em] shadow-xl active:scale-95 transition-all text-center"
                         >
                             Establish Basic Link
                         </button>
@@ -468,8 +497,14 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                     onChange={e => setFormData({ ...formData, profession: e.target.value })}
                                 />
                                 <button
-                                    onClick={() => startListening(language, text => setFormData(p => ({ ...p, profession: text })))}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 p-2 active:scale-90"
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (isListening) return;
+                                        setIsListening(true);
+                                        startListening(language, text => setFormData(p => ({ ...p, profession: text })), () => setIsListening(false));
+                                    }}
+                                    className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
                                 >
                                     <Mic size={18} />
                                 </button>

@@ -210,12 +210,11 @@ const StructuredSymptomChecker: React.FC = () => {
         setResultPage(0);
     };
 
-    const handleVoiceInput = () => {
+    const handleVoiceInput = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (isListening) return;
         setIsListening(true);
-        startListening(language, (text) => {
-            setInput(text);
-            setIsListening(false);
-        }, () => setIsListening(false));
+        startListening(language, (text) => setInput(text), () => setIsListening(false));
     };
 
     const renderInputStage = () => (
@@ -244,6 +243,7 @@ const StructuredSymptomChecker: React.FC = () => {
 
                         <div className="flex items-center justify-between p-4 bg-slate-50/80 rounded-[1.8rem] border border-slate-100">
                             <button
+                                type="button"
                                 onClick={handleVoiceInput}
                                 className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${isListening ? 'bg-rose-500 text-white animate-pulse shadow-lg shadow-rose-200' : 'bg-white text-slate-400 hover:text-blue-600 hover:shadow-md border border-slate-200'}`}
                             >
@@ -253,7 +253,7 @@ const StructuredSymptomChecker: React.FC = () => {
                             <button
                                 onClick={handleStartTriage}
                                 disabled={!input.trim()}
-                                className="bg-slate-900 hover:bg-blue-600 disabled:opacity-20 disabled:hover:bg-slate-900 text-white px-8 h-12 rounded-2xl font-black flex items-center gap-3 transition-all duration-500 hover:gap-5 group"
+                                className="bg-emerald-600 hover:bg-blue-600 disabled:opacity-20 disabled:hover:bg-emerald-600 text-white px-8 h-12 rounded-2xl font-black flex items-center gap-3 transition-all duration-500 hover:gap-5 group"
                             >
                                 {t.initialize_protocol}
                                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -339,6 +339,21 @@ const StructuredSymptomChecker: React.FC = () => {
                                     <div className="absolute top-4 right-4 opacity-20">
                                         <MessageSquare size={20} />
                                     </div>
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (isListening) return;
+                                            setIsListening(true);
+                                            const textarea = document.getElementById('manual-answer') as HTMLTextAreaElement;
+                                            startListening(language, (text) => {
+                                                if (textarea) textarea.value = text;
+                                            }, () => setIsListening(false));
+                                        }}
+                                        className={`absolute right-6 bottom-6 w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-50 text-slate-400 hover:text-blue-600 border border-slate-100 shadow-sm'}`}
+                                    >
+                                        <Mic size={20} />
+                                    </button>
                                 </div>
                                 <div className="flex gap-4">
                                     {showManual && currentQ.options && currentQ.options.length > 0 && (
@@ -358,7 +373,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                                 handleAnswer("No specific detail provided.");
                                             }
                                         }}
-                                        className="flex-[2] bg-slate-900 text-white h-16 rounded-[1.5rem] font-black tracking-[0.2em] uppercase text-[10px] hover:bg-blue-600 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
+                                        className="flex-[2] bg-emerald-600 text-white h-16 rounded-[1.5rem] font-black tracking-[0.2em] uppercase text-[10px] hover:bg-blue-600 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
                                     >
                                         {t.next_step || 'Continue Capture'}
                                         <ArrowRight size={14} />
@@ -413,7 +428,7 @@ const StructuredSymptomChecker: React.FC = () => {
                     </button>
                     <button
                         onClick={executeSynthesis}
-                        className="flex-[2] bg-slate-900 hover:bg-blue-600 text-white h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 transition-all duration-500 shadow-2xl shadow-slate-200"
+                        className="flex-[2] bg-emerald-600 hover:bg-blue-600 text-white h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 transition-all duration-500 shadow-2xl shadow-slate-200"
                     >
                         {t.submit_analysis || 'Execute Synthesis'}
                         <Sparkles size={16} />
@@ -524,7 +539,7 @@ const StructuredSymptomChecker: React.FC = () => {
                         <div className="flex-1 p-10 flex flex-col justify-center animate-in slide-in-from-right-8 duration-700">
                             <div className="max-w-4xl mx-auto w-full">
                                 <h2 className="text-4xl font-black text-slate-900 mb-10 flex items-center gap-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center text-white">
                                         <Layers size={24} />
                                     </div>
                                     {t.differential_diagnosis_path}
@@ -611,7 +626,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                     ))}
                                 </div>
 
-                                <div className="bg-slate-900 rounded-[1.5rem] p-4 flex items-center justify-between shadow-xl shrink-0">
+                                <div className="bg-emerald-600 rounded-[1.5rem] p-4 flex items-center justify-between shadow-xl shrink-0">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-emerald-400"><ShieldCheck size={16} /></div>
                                         <div>
@@ -650,7 +665,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                 if (resultPage < 2) setResultPage(prev => prev + 1);
                                 else resetTriage();
                             }}
-                            className="h-14 px-10 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-widest text-[9px] hover:bg-blue-600 transition-all flex items-center gap-3 shadow-2xl shadow-slate-200"
+                            className="h-14 px-10 rounded-2xl bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] hover:bg-blue-600 transition-all flex items-center gap-3 shadow-2xl shadow-slate-200"
                         >
                             {resultPage < 2 ? (t.next_step || 'Next') : (t.start_new_triage || 'Exit')}
                             {resultPage < 2 && <ArrowRight size={16} />}
@@ -658,7 +673,7 @@ const StructuredSymptomChecker: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="bg-slate-900 py-2.5 text-center">
+                <div className="bg-emerald-600 py-2.5 text-center">
                     <p className="text-[8px] font-bold text-slate-500 uppercase tracking-[0.3em]">
                         {t.ai_disclaimer}
                     </p>

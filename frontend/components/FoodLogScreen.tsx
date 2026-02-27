@@ -154,10 +154,14 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                 id="manualFoodInput"
                             />
                             <button
-                                onClick={() => startListening(language, text => {
-                                    const input = document.getElementById('manualFoodInput') as HTMLInputElement;
-                                    if (input) input.value = text;
-                                })}
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    startListening(language, text => {
+                                        const input = document.getElementById('manualFoodInput') as HTMLInputElement;
+                                        if (input) input.value = text;
+                                    });
+                                }}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 p-3 text-orange-600 active:scale-90 hover:bg-orange-50 rounded-xl transition-all"
                             >
                                 <Mic size={22} />
@@ -171,7 +175,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                     input.value = '';
                                 }
                             }}
-                            className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-[11px] shadow-xl flex justify-center items-center gap-4 active:scale-95 hover:bg-black transition-all"
+                            className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black uppercase text-[11px] shadow-xl flex justify-center items-center gap-4 active:scale-95 hover:bg-emerald-700 transition-all"
                         >
                             <Plus size={20} />
                             Execute Intake Log

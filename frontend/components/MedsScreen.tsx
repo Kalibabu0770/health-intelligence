@@ -60,11 +60,11 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                 </div>
 
                 <div className="flex gap-3">
-                    <button onClick={() => setShowAdd(true)} className="bg-slate-900 text-white px-6 py-3 rounded-xl shadow-lg active:scale-95 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-colors">
+                    <button onClick={() => setShowAdd(true)} className="bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-lg active:scale-95 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-colors">
                         <Plus size={14} /> {t.register_protocol || 'Register Protocol'}
                     </button>
                     {onBack && (
-                        <button onClick={onBack} className="w-11 h-11 border border-slate-100 text-slate-400 hover:text-slate-900 hover:border-slate-900 rounded-xl flex items-center justify-center transition-all">
+                        <button onClick={onBack} className="w-11 h-11 border border-slate-100 text-slate-400 hover:text-slate-900 hover:border-slate-200 rounded-xl flex items-center justify-center transition-all">
                             <X size={20} />
                         </button>
                     )}
@@ -154,7 +154,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                             </div>
                         </div>
 
-                        <div className="bg-slate-900 text-white rounded-[2.5rem] p-6 shadow-xl relative overflow-hidden group flex flex-col justify-between">
+                        <div className="bg-emerald-600 text-white rounded-[2.5rem] p-6 shadow-xl relative overflow-hidden group flex flex-col justify-between">
                             <div className="absolute -right-2 -bottom-2 opacity-5 scale-90">
                                 <ShieldCheck size={100} />
                             </div>
@@ -251,7 +251,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                                 setShowAdd(false);
                                 if (onBack) onBack();
                             }}
-                            className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-slate-100 active:scale-[0.98] transition-all"
+                            className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-slate-100 active:scale-[0.98] transition-all"
                         >
                             EXECUTE PROTOCOL
                         </button>

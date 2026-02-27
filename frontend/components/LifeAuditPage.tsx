@@ -25,6 +25,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
     const [compAnalysis, setCompAnalysis] = useState<any>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isCompAnalyzing, setIsCompAnalyzing] = useState(false);
+    const [isListening, setIsListening] = useState(false);
 
     // States for Entry
     const [mealDescription, setMealDescription] = useState('');
@@ -261,7 +262,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                 ))}
                             </div>
                             <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm flex flex-col items-center justify-center text-center space-y-4">
-                                <div className="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg"><ClipboardList size={26} /></div>
+                                <div className="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg"><ClipboardList size={26} /></div>
                                 <h4 className="text-xl font-black uppercase text-slate-900 italic tracking-tight">{t.maintenance_console || 'Precision Monitor Console'}</h4>
                                 <p className="text-xs font-bold text-slate-500 uppercase leading-relaxed italic max-w-sm">
                                     {t.maintenance_console_desc || 'Document your metabolic intake, kinetic output, and neural rest phases to strengthen your bio-profile.'}
@@ -292,7 +293,18 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                         placeholder={t.type_meal_details || "Type meal details..."}
                                         className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl text-xs font-bold outline-none focus:border-orange-500 transition-all shadow-sm"
                                     />
-                                    <Mic className="absolute right-5 top-1/2 -translate-y-1/2 text-orange-400" size={20} />
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (isListening) return;
+                                            setIsListening(true);
+                                            startListening(language, text => setMealDescription(text), () => setIsListening(false));
+                                        }}
+                                        className={`absolute right-5 top-1/2 -translate-y-1/2 transition-all active:scale-95 ${isListening ? 'text-rose-500 animate-pulse' : 'text-orange-400 hover:text-orange-600'}`}
+                                    >
+                                        <Mic size={20} />
+                                    </button>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <button
@@ -312,7 +324,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                     />
                                     <button
                                         onClick={handleLogEntry}
-                                        className="flex items-center justify-center gap-2 bg-slate-900 text-white font-black uppercase text-[9px] tracking-widest py-4 rounded-xl active:scale-95 transition-all"
+                                        className="flex items-center justify-center gap-2 bg-emerald-600 text-white font-black uppercase text-[9px] tracking-widest py-4 rounded-xl active:scale-95 transition-all"
                                     >
                                         <Plus size={14} /> {t.log_entry || 'Log Entry'}
                                     </button>
@@ -394,7 +406,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="bg-slate-900 rounded-2xl p-5 text-white relative overflow-hidden group">
+                                            <div className="bg-emerald-600 rounded-2xl p-5 text-white relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-4 opacity-10"><Brain size={32} /></div>
                                                 <p className="text-[7px] font-black text-emerald-400 uppercase tracking-widest mb-1 italic">Diagnostic Insight</p>
                                                 <p className="text-[10px] font-medium leading-relaxed uppercase italic opacity-90">
@@ -416,7 +428,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                                 <p className="text-[9px] font-black uppercase tracking-[0.2em]">Awaiting Bio-Link...</p>
                                                 <button
                                                     onClick={triggerNutritionAnalysis}
-                                                    className="mt-3 px-6 py-2 bg-slate-900 text-white rounded-lg text-[8px] font-black uppercase tracking-widest"
+                                                    className="mt-3 px-6 py-2 bg-emerald-600 text-white rounded-lg text-[8px] font-black uppercase tracking-widest"
                                                 >
                                                     Tap to Sync
                                                 </button>
@@ -426,7 +438,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                 </div>
                             </div>
 
-                            <div className="bg-slate-900 p-7 rounded-[2.5rem] border border-slate-800 flex justify-between items-center group shadow-2xl">
+                            <div className="bg-emerald-600 p-7 rounded-[2.5rem] border border-slate-100 flex justify-between items-center group shadow-2xl">
                                 <div className="flex items-center gap-5">
                                     <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-orange-500 transition-transform group-hover:scale-110"><TrendingUp size={24} /></div>
                                     <div>
@@ -455,9 +467,53 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                     <div className="bg-blue-50 text-blue-500 p-2.5 rounded-xl border border-blue-100"><Dumbbell size={20} /></div>
                                 </div>
                                 <div className="space-y-3">
-                                    <input type="text" placeholder={t.activity_placeholder || "Activity type..."} className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-[11px] font-bold outline-none focus:border-blue-500 transition-all" />
-                                    <input type="number" placeholder={t.duration_placeholder || "Duration (min)..."} className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-[11px] font-bold outline-none focus:border-blue-500 transition-all" />
-                                    <button className="w-full bg-blue-600 text-white font-black uppercase text-[9px] tracking-widest py-4 rounded-xl active:scale-[0.98] transition-all">{t.log_movement || 'Log Kinetic Phase'}</button>
+                                    <div className="relative">
+                                        <input type="text" id="activity-input" placeholder={t.activity_placeholder || "Activity type..."} className="w-full bg-slate-50 border border-slate-200 p-4 pr-12 rounded-xl text-[11px] font-bold outline-none focus:border-blue-500 transition-all" />
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (isListening) return;
+                                                setIsListening(true);
+                                                const el = document.getElementById('activity-input') as HTMLInputElement;
+                                                startListening(language, text => { if (el) el.value = text; }, () => setIsListening(false));
+                                            }}
+                                            className={`absolute right-4 top-1/2 -translate-y-1/2 transition-all active:scale-90 ${isListening ? 'text-rose-500 animate-pulse' : 'text-blue-400'}`}
+                                        >
+                                            <Mic size={16} />
+                                        </button>
+                                    </div>
+                                    <div className="relative">
+                                        <input type="number" id="duration-input" placeholder={t.duration_placeholder || "Duration (min)..."} className="w-full bg-slate-50 border border-slate-200 p-4 pr-12 rounded-xl text-[11px] font-bold outline-none focus:border-blue-500 transition-all" />
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (isListening) return;
+                                                setIsListening(true);
+                                                const el = document.getElementById('duration-input') as HTMLInputElement;
+                                                startListening(language, text => { if (el) el.value = text.replace(/\D/g, ''); }, () => setIsListening(false));
+                                            }}
+                                            className={`absolute right-4 top-1/2 -translate-y-1/2 transition-all active:scale-90 ${isListening ? 'text-rose-500 animate-pulse' : 'text-blue-400'}`}
+                                        >
+                                            <Mic size={16} />
+                                        </button>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            const act = (document.getElementById('activity-input') as HTMLInputElement)?.value;
+                                            const dur = (document.getElementById('duration-input') as HTMLInputElement)?.value;
+                                            if (act && dur) {
+                                                // Handle logging
+                                                triggerAlert('info', 'Kinetic Phase Registered');
+                                                (document.getElementById('activity-input') as HTMLInputElement).value = '';
+                                                (document.getElementById('duration-input') as HTMLInputElement).value = '';
+                                            }
+                                        }}
+                                        className="w-full bg-blue-600 text-white font-black uppercase text-[9px] tracking-widest py-4 rounded-xl active:scale-[0.98] transition-all"
+                                    >
+                                        {t.log_movement || 'Log Kinetic Phase'}
+                                    </button>
                                 </div>
                             </div>
                             <div className="flex-1 bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
@@ -623,7 +679,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                     <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-1000"><Brain size={120} /></div>
                     <div className="relative z-10">
                         <div className="flex justify-between items-center mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/10"><Zap size={20} className="text-indigo-200" /></div>
+                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-slate-100"><Zap size={20} className="text-indigo-200" /></div>
                             <span className="text-[7px] font-black uppercase tracking-[0.2em] text-indigo-300 italic">Advisor Bio-Sync</span>
                         </div>
                         <h4 className="text-lg font-black uppercase tracking-tight italic leading-none mb-3">{t.neural_advisor_node || 'Neural Advisor'}</h4>

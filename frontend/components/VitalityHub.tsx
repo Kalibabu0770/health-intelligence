@@ -45,7 +45,7 @@ const QuickActionCard: React.FC<{
                     <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest italic">{stats || 'Action Required'}</p>
                     <p className="text-[8px] font-bold text-slate-300 uppercase mt-1 tracking-widest">Protocol Node Confirmed</p>
                 </div>
-                <div className={`w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 shadow-xl`}>
+                <div className={`w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 shadow-xl`}>
                     <ChevronRight size={20} />
                 </div>
             </div>

@@ -1,414 +1,626 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Globe, Brain, Activity, Zap, FileText, MapPin,
-    UserCircle, TrendingUp, ShieldCheck, AlertTriangle, Shield, Loader2,
-    ChevronRight, CheckCircle2, Fingerprint, Leaf, Navigation, Crosshair, Radar
+    Activity, Brain, ShieldCheck, MapPin, Mic, Zap, Search,
+    Link, Share2, Globe, Database, Cpu, Layers, Radar, Loader2,
+    Lock, ChevronRight, AlertCircle, Sparkles, Send, Fingerprint,
+    Info, TrendingUp, Shield, RefreshCcw, Layout, User,
+    MessageSquare, FileText, ClipboardList, Thermometer, Droplets
 } from 'lucide-react';
-import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    PieChart, Pie, Cell
-} from 'recharts';
 import { usePatientContext } from '../core/patientContext/patientStore';
-import { AP_GOVT_HIERARCHY } from '../core/patientContext/apHierarchy';
-import { db } from '../services/firebase';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { orchestrateHealth, getDiagnosticAdvice, getComprehensiveHealthAnalysis } from '../services/ai';
+import { startListening } from '../services/speech';
 
 const AYUSHHealthSystem: React.FC = () => {
     const context = usePatientContext();
-    const { profile, t, language } = context;
-    const [mainTab, setMainTab] = useState<'wisdom' | 'surveillance'>('wisdom');
-    const [activeTab, setActiveTab] = useState<'public' | 'officer'>(profile?.role === 'officer' ? 'officer' : 'public');
-    const [globalStats, setGlobalStats] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const { profile, language, t } = context;
+    const [step, setStep] = useState<1 | 2 | 3>(1); // 1: Personal Safety, 2: Global Surveillance, 3: Doctor Hub
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [ayushResult, setAyushResult] = useState<any>(null);
+    const [isListening, setIsListening] = useState(false);
+    const [transcript, setTranscript] = useState('');
+    const [clinicalAnalysis, setClinicalAnalysis] = useState<any>(null);
+    const [patientIdSearch, setPatientIdSearch] = useState('');
+    const [selectedPatient, setSelectedPatient] = useState<any>(null);
+    const [patientBrief, setPatientBrief] = useState<any>(null);
 
-    const [fDistrict, setFDistrict] = useState('All');
-    const [fMandal, setFMandal] = useState('All');
+    // Patient ID for the current user
+    const currentPatientId = profile.patientId || `LS-${profile.name?.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    const userLocation = profile?.location || 'Unknown Sector';
-    const localSafety = globalStats?.riskZones?.find((z: any) => z.name.toLowerCase().includes(userLocation.toLowerCase()));
-
+    // Initial load and role-based redirect
     useEffect(() => {
-        const fetchGlobalData = async () => {
-            setLoading(true);
-            try {
-                const q = query(collection(db, 'users'));
-                const snap = await getDocs(q);
-                let users = snap.docs.map(d => d.data());
+        // Set initial step based on role
+        if (profile?.role === 'officer') setStep(2);
+        else if (profile?.role === 'doctor') setStep(3);
+        else setStep(1);
 
-                if (fDistrict !== 'All') {
-                    users = users.filter((u: any) => u.location?.includes(fDistrict));
-                }
+        if (step === 1 && !ayushResult) {
+            handleSafetyScan();
+        }
+    }, [profile?.role]);
 
-                const total = users.length;
-                const healthy = users.filter((u: any) =>
-                    !u.hasDiabetes && !u.hasHighBP && !u.hasLiverDisease &&
-                    !u.hasKidneyDisease && !u.hasHeartDisease && !u.hasAsthma
-                ).length;
+    const handleSafetyScan = async () => {
+        setIsAnalyzing(true);
+        try {
+            const res = await orchestrateHealth(context as any, {
+                query: "Analyze my safety in this area. Is it safe? Any spreading diseases?",
+                problem_context: `Safety check for ${profile.district}, ${profile.mandal}`
+            });
+            if (res?.ayush) setAyushResult(res.ayush);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
 
-                const ageDist = [
-                    { name: 'U25', value: users.filter((u: any) => u.age < 25).length },
-                    { name: '25-50', value: users.filter((u: any) => u.age >= 25 && u.age < 50).length },
-                    { name: '50+', value: users.filter((u: any) => u.age >= 50).length },
-                ];
+    const handleDoctorConsultation = async () => {
+        if (!transcript) return;
+        setIsAnalyzing(true);
+        try {
+            const res = await getDiagnosticAdvice(context as any, transcript, []);
+            setClinicalAnalysis(res);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
 
-                const locMap: Record<string, any> = {};
-                users.forEach((u: any) => {
-                    const loc = u.location || 'Remote Sector';
-                    if (!locMap[loc]) locMap[loc] = { name: loc, fever: 0, chronic: 0, total: 0 };
-                    locMap[loc].total++;
-                    if (u.hasAsthma || (u.conditions?.some((c: any) => c.name.toLowerCase().includes('fever')))) locMap[loc].fever++;
-                    if (u.hasDiabetes || u.hasHeartDisease || u.hasHighBP || u.hasLiverDisease) locMap[loc].chronic++;
-                });
+    const handlePatientSearch = async () => {
+        if (!patientIdSearch) return;
+        setIsAnalyzing(true);
 
-                const riskZones = Object.values(locMap).map((l: any) => {
-                    const acuteRisk = (l.fever / l.total) * 100;
-                    const chronicRisk = (l.chronic / l.total) * 100;
-                    const combinedRisk = (acuteRisk * 0.6) + (chronicRisk * 0.4);
+        // Real search logic from localStorage
+        const accounts = JSON.parse(localStorage.getItem('hi_accounts') || '[]');
+        const found = accounts.find((acc: any) => acc.patientId?.toUpperCase() === patientIdSearch.toUpperCase() || acc.patientId === patientIdSearch);
 
-                    let status = t.status_stable || 'SAFE';
-                    let color = 'emerald';
-                    let advice = t.optimal_stability || '✓ OPTIMAL STABILITY';
+        if (found) {
+            // In a real app, we'd fetch the full context for this patient. 
+            // For now, we'll synthesize a brief from the available profile data.
+            const symptoms = found.conditions?.map((c: any) => c.name).join(', ') || 'No chronic conditions';
+            const history = [...(found.surgeries || []), ...(found.familyHistory || [])].join(', ') || 'Clean history';
 
-                    if (combinedRisk > 35) {
-                        status = t.critical_sector || 'CRITICAL SECTOR';
-                        color = 'rose';
-                        advice = t.extreme_burden || '✖ EXTREME HEALTH BURDEN';
-                    }
-                    else if (combinedRisk > 15) {
-                        status = t.sensitive_area || 'SENSITIVE AREA';
-                        color = 'amber';
-                        advice = t.monitor_biometrics || '! MONITOR BIOMETRICS';
-                    }
-                    return { ...l, risk: combinedRisk, acuteRisk, chronicRisk, status, color, advice };
-                });
+            setPatientBrief({
+                summary: `${found.name} presents with a history of ${symptoms}. Previous clinical interventions include ${history}. Recent biometric patterns suggest ${found.stressLevel || 'moderate'} metabolic stress.`,
+                conditions: found.conditions || [],
+                recentSymptoms: found.customConditions || [],
+                medications: found.currentMedications || []
+            });
+            setSelectedPatient(found);
+        } else {
+            alert("Protocol Error: Patient ID not found in National Registry.");
+            setSelectedPatient(null);
+        }
+        setIsAnalyzing(false);
+    };
 
-                setGlobalStats({
-                    totalUsers: total,
-                    healthyRatio: total > 0 ? (healthy / total) * 100 : 0,
-                    ageGroups: ageDist,
-                    locationTrends: riskZones.sort((a, b) => b.total - a.total).slice(0, 5),
-                    riskZones: riskZones.sort((a, b) => b.risk - a.risk),
-                    rawUsers: users.slice(0, 10)
-                });
-            } catch (err) {
-                console.error("AYUSH Data Error:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchGlobalData();
-    }, [fDistrict, fMandal, t]);
+    const renderNav = () => {
+        const role = profile?.role || 'citizen';
+        const steps = [];
 
-    const renderWisdom = () => (
-        <div className="h-full w-full grid grid-cols-12 gap-5 animate-in fade-in duration-500 pb-6">
-            <div className="col-span-12 lg:col-span-8 flex flex-col gap-5">
-                <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-lg relative overflow-hidden group">
-                    <div className="absolute -top-10 -right-10 p-4 opacity-[0.03] group-hover:scale-110 transition-transform duration-1000"><Leaf size={140} className="text-emerald-600" /></div>
-                    <div className="relative z-10 space-y-4">
-                        <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center border border-emerald-100"><Leaf size={20} /></div>
-                        <h2 className="text-xl font-black uppercase tracking-tight text-slate-900 italic">{t.ancient_wisdom || 'Heritage Wisdom Matrix'}</h2>
-                        <p className="text-[11px] font-bold leading-relaxed text-slate-400 uppercase italic max-w-xl">
-                            {t.ayush_desc || 'Century-old AYUSH protocols synchronized with IndiaAI. Botanical deployments and lifestyle alignments for homeostasis.'}
-                        </p>
-                        <div className="flex gap-3">
-                            <button className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-50 hover:bg-emerald-700 transition-all">{t.pharmacopoeia || 'Pharmacopoeia'}</button>
-                            <button className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-black transition-all">{t.ai_alignment || 'AI Alignment'}</button>
-                        </div>
-                    </div>
-                </div>
+        // Define which roles see which steps
+        // Officer sees EVERYTHING
+        if (role === 'officer') {
+            steps.push({ id: 1, label: 'SAFETY ALERT', icon: ShieldCheck });
+            steps.push({ id: 2, label: 'GLOBAL SENTINEL', icon: Globe });
+            steps.push({ id: 3, label: 'DOCTOR WORKSPACE', icon: User });
+        } else if (role === 'doctor') {
+            steps.push({ id: 1, label: 'SAFETY ALERT', icon: ShieldCheck });
+            steps.push({ id: 3, label: 'DOCTOR WORKSPACE', icon: User });
+        } else {
+            steps.push({ id: 1, label: 'SAFETY ALERT', icon: ShieldCheck });
+        }
 
-                <div className="grid grid-cols-2 gap-5">
-                    {[
-                        { title: t.dinacharya || 'Dinacharya', desc: t.daily_rhythm || 'Daily Bio-Rhythm', icon: Activity, color: 'blue', grad: 'from-blue-500/10 to-transparent' },
-                        { title: t.ritucharya || 'Ritucharya', desc: t.seasonal_protocols || 'Seasonal Protocols', icon: Globe, color: 'emerald', grad: 'from-emerald-500/10 to-transparent' }
-                    ].map((card, i) => (
-                        <div key={i} className={`bg-white p-6 rounded-[2rem] border border-slate-100 shadow-md hover:shadow-lg transition-all cursor-pointer group relative overflow-hidden`}>
-                            <div className={`absolute inset-0 bg-gradient-to-br ${card.grad} opacity-0 group-hover:opacity-100 transition-opacity`} />
-                            <div className={`w-10 h-10 rounded-xl bg-${card.color}-50 text-${card.color}-600 flex items-center justify-center mb-4 border border-${card.color}-100 group-hover:scale-110 transition-transform`}><card.icon size={20} /></div>
-                            <h4 className="text-base font-black uppercase text-slate-900 leading-none">{card.title}</h4>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2">{card.desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
+        if (steps.length <= 1) return null; // No need for nav if only one step
 
-            <div className="col-span-12 lg:col-span-4 flex flex-col gap-5">
-                {/* LOCAL SAFETY SHIELD ANALYSIS */}
-                <div className={`rounded-[2rem] p-8 text-white shadow-xl space-y-6 relative overflow-hidden flex-1 flex flex-col justify-between transition-all duration-700 ${localSafety?.color === 'rose' ? 'bg-rose-600' : localSafety?.color === 'amber' ? 'bg-amber-600' : 'bg-emerald-600'}`}>
-                    <div className="absolute -top-5 -right-5 p-4 opacity-10"><Brain size={100} /></div>
-
-                    <div className="space-y-6 relative z-10">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <Radar className="animate-pulse" size={18} />
-                                <h3 className="text-sm font-black uppercase tracking-widest italic">{t.sattva_intel || 'Local Safety Shield'}</h3>
-                            </div>
-                            <div className="bg-white/10 px-3 py-1 rounded-full border border-white/20">
-                                <p className="text-[8px] font-black uppercase tracking-widest">{t.live_intel || 'Live'}</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <p className="text-[10px] font-black uppercase tracking-widest opacity-60 italic">{t.current_location || 'Current Sector'}</p>
-                            <h4 className="text-2xl font-black uppercase tracking-tight italic leading-none">{userLocation}</h4>
-                        </div>
-
-                        <div className="pt-6 border-t border-white/10 space-y-4">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
-                                    <ShieldCheck size={20} />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest">{localSafety?.status || t.stable_node || 'STABLE NODE'}</p>
-                                    <p className="text-[8px] font-bold uppercase opacity-70 tracking-tight">{localSafety?.advice || t.location_safe || 'Regional biometrics optimal'}</p>
-                                </div>
-                            </div>
-
-                            <p className="text-[11px] font-bold leading-relaxed opacity-90 uppercase italic">
-                                {localSafety?.color === 'rose'
-                                    ? `"${t.high_risk_advice || 'Atmospheric bio-load in focal sector is extreme. Avoid congregant zones and initialize Sattvic shield.'}"`
-                                    : `"${t.sattva_intelligence_note || 'Molecular density stable. Tulsi-Ginger titration recommended for preemptive bio-shielding.'}"`
-                                }
-                            </p>
-                        </div>
-                    </div>
-
-                    <button className="w-full bg-white text-slate-900 font-black py-4 rounded-xl text-[10px] uppercase tracking-widest mt-6 hover:scale-[1.02] active:scale-95 transition-all shadow-lg relative z-10">
-                        {t.deploy_ai_protocol || 'Analyze Safety Protocol'}
+        return (
+            <div className="flex bg-white/80 backdrop-blur-xl border border-slate-200 p-1.5 rounded-[2rem] shadow-xl shadow-slate-200/50 mb-8 w-fit mx-auto sticky top-0 z-50">
+                {steps.map((s) => (
+                    <button
+                        key={s.id}
+                        onClick={() => setStep(s.id as any)}
+                        className={`px-8 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 flex items-center gap-3 ${step === s.id ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20 scale-105' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
+                    >
+                        <s.icon size={14} />
+                        {s.label}
                     </button>
-                </div>
+                ))}
             </div>
-        </div>
-    );
-
-    const renderSurveillance = () => (
-        <div className="h-full w-full flex flex-col gap-5 animate-in slide-in-from-bottom-5 duration-700 pb-6">
-            {activeTab === 'public' ? (
-                <div className="grid grid-cols-12 gap-5">
-                    {/* RISK ZONE RADAR SECTION */}
-                    <div className="col-span-12 lg:col-span-7 flex flex-col gap-5">
-                        <div className="bg-white rounded-[2rem] border border-slate-100 p-8 flex flex-col shadow-xl relative overflow-hidden">
-                            <div className="flex justify-between items-center mb-6">
-                                <div>
-                                    <h2 className="text-lg font-black uppercase tracking-tight text-slate-900 italic flex items-center gap-3">
-                                        <Navigation size={20} className="text-emerald-600" />
-                                        {t.biometric_safety_zones || 'Biometric Safety Zones'}
-                                    </h2>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1 italic">{t.geospatial_risk_triage || 'Real-time Geospatial Risk Triage'}</p>
-                                </div>
-                                <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
-                                    <Crosshair size={12} className="text-emerald-500 animate-pulse" />
-                                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">{t.live_scanning || 'Live Scanning'}</span>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                {(globalStats?.riskZones || []).slice(0, 4).map((zone: any, i: number) => (
-                                    <div key={i} className={`p-4 rounded-2xl border flex flex-col gap-3 group transition-all hover:scale-[1.02] ${zone.color === 'emerald' ? 'bg-emerald-50/30 border-emerald-100' :
-                                        zone.color === 'amber' ? 'bg-amber-50/30 border-amber-100' : 'bg-rose-50/30 border-rose-100'
-                                        }`}>
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <p className="text-[11px] font-black text-slate-900 uppercase truncate max-w-[120px]">{zone.name}</p>
-                                                <p className={`text-[8px] font-black uppercase tracking-[0.2em] mt-1 text-${zone.color}-600`}>{zone.status}</p>
-                                            </div>
-                                            <div className={`p-1.5 rounded-lg bg-${zone.color}-500/10 text-${zone.color}-600`}><MapPin size={14} /></div>
-                                        </div>
-                                        <div className="h-1 bg-white/50 rounded-full overflow-hidden">
-                                            <div className={`h-full bg-${zone.color}-500 transition-all duration-1000`} style={{ width: `${Math.max(5, (100 - zone.risk))}%` }} />
-                                        </div>
-                                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
-                                            {zone.advice}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-lg flex-1">
-                            <h3 className="text-[10px] font-black uppercase text-slate-400 mb-6 tracking-widest">{t.regional_analytics || 'Regional Symptom Load Analytics'}</h3>
-                            <div className="h-[180px]">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={globalStats?.locationTrends || []}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.3} />
-                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 8, fontWeight: 900, fill: '#94a3b8' }} />
-                                        <YAxis hide />
-                                        <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '9px', fontWeight: '900', textTransform: 'uppercase' }} />
-                                        <Bar dataKey="fever" name={t.risk_load || "Risk Load"} fill="#f43f5e" radius={[4, 4, 0, 0]} />
-                                        <Bar dataKey="chronic" name={t.density || "Density"} fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="col-span-12 lg:col-span-5 flex flex-col gap-5">
-                        <div className="grid grid-cols-2 gap-4">
-                            {[
-                                { label: t.population || 'Population', val: globalStats?.totalUsers || 0, color: 'blue', icon: Activity },
-                                { label: t.stability || 'Stability', val: globalStats?.healthyRatio.toFixed(1) || 0, color: 'emerald', icon: ShieldCheck }
-                            ].map((kpi, i) => (
-                                <div key={i} className="bg-white p-5 rounded-[1.8rem] border border-slate-100 shadow-md flex flex-col gap-3">
-                                    <div className={`w-8 h-8 rounded-lg bg-${kpi.color}-500/10 text-${kpi.color}-500 flex items-center justify-center`}><kpi.icon size={16} /></div>
-                                    <div>
-                                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">{kpi.label}</p>
-                                        <p className="text-xl font-black text-slate-900 leading-none">{kpi.val}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-lg flex-1 flex flex-col items-center justify-center text-center">
-                            <h4 className="text-[9px] font-black uppercase text-slate-400 mb-6 tracking-widest w-full text-left">{t.bio_demographics || 'Bio-Demographics'}</h4>
-                            <div className="h-40 w-full relative">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie data={globalStats?.ageGroups || []} cx="50%" cy="50%" innerRadius={40} outerRadius={55} paddingAngle={8} dataKey="value" stroke="none">
-                                            {globalStats?.ageGroups?.map((entry: any, i: number) => <Cell key={i} fill={['#10b981', '#3b82f6', '#f59e0b'][i % 3]} />)}
-                                        </Pie>
-                                        <Tooltip />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <div className="flex gap-4 mt-4">
-                                {['U25', '25-50', '50+'].map((l, i) => (
-                                    <div key={i} className="flex items-center gap-1.5">
-                                        <div className={`w-2 h-2 rounded-full ${['bg-emerald-500', 'bg-blue-500', 'bg-amber-500'][i]}`} />
-                                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{l}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div className="grid grid-cols-12 gap-5">
-                    <div className="col-span-12 lg:col-span-8 bg-white rounded-[2rem] border border-slate-100 p-6 flex flex-col shadow-xl overflow-hidden">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xs font-black uppercase tracking-tight text-slate-900 flex items-center gap-2">
-                                <Fingerprint size={16} className="text-emerald-600" />
-                                {t.node_telemetry_registry || 'Node Telemetry Registry'}
-                            </h3>
-                            <div className="bg-slate-50 px-3 py-1.5 rounded-lg text-[8px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest">{t.live_sync || 'LIVE SYNC'}</div>
-                        </div>
-                        <div className="overflow-y-auto custom-scrollbar max-h-[350px]">
-                            <table className="w-full text-left">
-                                <thead className="sticky top-0 bg-white z-10 border-b border-slate-50">
-                                    <tr>
-                                        <th className="py-3 text-[8px] font-black uppercase text-slate-400 tracking-widest px-3">{t.identity_mapping || 'Identity Mapping'}</th>
-                                        <th className="py-3 text-[8px] font-black uppercase text-slate-400 tracking-widest px-3 text-center">{t.risk_level || 'Risk Level'}</th>
-                                        <th className="py-3 text-[8px] font-black uppercase text-slate-400 tracking-widest px-3 text-center">{t.status || 'Status'}</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-50">
-                                    {(globalStats?.rawUsers || []).map((user: any, i: number) => (
-                                        <tr key={i} className="group hover:bg-slate-50 transition-all cursor-pointer">
-                                            <td className="py-4 px-3">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                                                        <UserCircle size={14} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[10px] font-black uppercase text-slate-900 leading-none mb-1">{user.name || t.anon_node || 'ANON_NODE'}</p>
-                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-tighter">{user.location || t.remote_sector || 'REMOTE SECTOR'}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="py-4 px-3 text-center">
-                                                <span className={`text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest ${user.role === 'officer' ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600'}`}>
-                                                    {t.stable || 'STABLE'}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-3 text-center">
-                                                <div className="w-1.5 h-1.5 mx-auto rounded-full bg-emerald-500 animate-pulse" />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div className="col-span-12 lg:col-span-4">
-                        <div className="bg-white border border-slate-100 rounded-[2rem] p-8 space-y-5 shadow-lg relative overflow-hidden group h-full">
-                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform duration-1000"><Zap size={120} /></div>
-                            <div className="space-y-4 relative z-10">
-                                <div className="bg-emerald-600 p-3 rounded-2xl w-fit shadow-lg shadow-emerald-500/20"><Zap size={20} className="text-white" /></div>
-                                <h4 className="text-lg font-black uppercase tracking-tight text-slate-900 italic">{t.rapid_response_protocol || 'Rapid Response Protocol'}</h4>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase leading-relaxed italic">
-                                    {t.cluster_alert || `Detected cluster variations in ${fDistrict}. Deployment of sattvic kits authorized.`}
-                                </p>
-                                <button className="w-full bg-emerald-600 text-white font-black py-3 rounded-xl shadow-lg uppercase text-[9px] tracking-widest hover:bg-emerald-700 transition-all">{t.initiate_deployment || 'Initiate Deployment'}</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
+        );
+    };
 
     return (
-        <div className={`h-full w-full flex flex-col overflow-hidden bg-slate-100/30 font-sans p-6 gap-5 animate-in fade-in duration-500`}>
-            {/* ═══ GOVERNMENT HEADER ═══ */}
-            <div className="bg-white rounded-[2rem] border border-slate-200 p-5 flex flex-col lg:flex-row justify-between items-center shadow-lg shrink-0 gap-5">
-                <div className="flex items-center gap-6">
-                    <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-600/20"><Globe size={24} /></div>
+        <div className="h-full w-full bg-[#f0f2f5] text-slate-900 flex flex-col p-4 overflow-hidden font-inter selection:bg-emerald-500/20">
+            {/* Header */}
+            <header className="flex justify-between items-center mb-3 shrink-0 bg-white/40 backdrop-blur-md p-3 rounded-2xl border border-white/60 shadow-sm">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg transform rotate-3">
+                        <Cpu className="text-white" size={20} />
+                    </div>
                     <div>
-                        <div className="flex items-center gap-2.5 mb-1">
-                            <span className="bg-emerald-600 text-white px-2.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest">{t.ap_govt_node || 'AP STATE GOVT'}</span>
-                            <span className="bg-blue-500 text-white px-2.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest">{t.bio_sentinel || 'BIO-SENTINEL'}</span>
+                        <h1 className="text-lg font-black italic tracking-tighter uppercase leading-none text-slate-900">SENTINEL AI <span className="text-emerald-600">AYUSH</span></h1>
+                        <p className="text-[7px] uppercase font-black tracking-[0.4em] text-slate-400 mt-1">National Health Intelligence Node • Bio-Governance V4.9</p>
+                    </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-2 bg-slate-900/5 px-3 py-1.5 rounded-xl border border-white/20">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-600">ID: LS-SAI-2101</span>
+                    </div>
+                    <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest italic">{new Date().toLocaleTimeString('en-US', { hour12: true })} • AP_NODE_CORE</p>
+                </div>
+            </header>
+
+            {renderNav()}
+
+            <main className="flex-1 min-h-0 relative mt-3">
+                {/* STEP 1: PERSONAL SAFETY ALERT - REDESIGNED 3-COLUMN LAYOUT */}
+                {step === 1 && (
+                    <div className="h-full w-full grid grid-cols-12 gap-3 animate-in fade-in slide-in-from-bottom-5 duration-700">
+                        {/* Column 1: Safety Verdict & Node Info */}
+                        <div className="col-span-12 lg:col-span-3 flex flex-col h-full gap-3">
+                            <div className="flex-1 bg-white rounded-[1.5rem] border border-slate-200 p-5 flex flex-col items-center justify-center text-center shadow-lg shadow-slate-200/40 relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                                <div className={`w-28 h-28 rounded-full flex items-center justify-center transition-all duration-1000 transform group-hover:ring-8 ring-emerald-50 mb-6 z-10 ${ayushResult?.forecast?.z_score_deviation < 1.0 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                                    {ayushResult?.forecast?.z_score_deviation < 1.0 ? <ShieldCheck size={44} className="animate-in zoom-in-50 duration-500" /> : <AlertCircle size={44} className="animate-bounce" />}
+                                </div>
+                                <div className="z-10 space-y-2">
+                                    <h2 className="text-xl font-black italic uppercase text-slate-900 tracking-tighter leading-none">
+                                        {ayushResult?.forecast?.z_score_deviation < 1.0 ? 'AREA RATED SAFE' : 'CAUTION ADVISED'}
+                                    </h2>
+                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">REGIONAL BIO-STABILITY: {ayushResult?.forecast?.z_score_deviation < 1.0 ? 'OPTIMAL' : 'FLUCTUATING'}</p>
+                                    <div className="inline-block px-4 py-2 bg-slate-900 text-white rounded-xl text-[8px] font-black uppercase tracking-widest shadow-lg">
+                                        CURRENT NODE: {profile.district || 'HUB'}
+                                    </div>
+                                </div>
+                                <p className="mt-6 text-[10px] font-black text-slate-400 uppercase italic px-4 leading-relaxed z-10">
+                                    "{ayushResult?.outbreak_alert || 'NO ACTIVE DISEASE OUTBREAKS DETECTED IN YOUR IMMEDIATE VICINITY. ENVIRONMENTAL NODES REMAIN STABLE.'}"
+                                </p>
+                            </div>
                         </div>
-                        <h1 className="text-xl font-black uppercase tracking-tight text-slate-900 leading-none">{t.pop_surveillance || 'Population Surveillance'}</h1>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1 italic">{t.innovation_stack || 'IndiaAI Innovation Stack • V4.8'}</p>
+
+                        {/* Column 2: Neural Risk Probabilities */}
+                        <div className="col-span-12 lg:col-span-5 flex flex-col h-full">
+                            <div className="flex-1 bg-white rounded-[1.5rem] border border-slate-200 p-5 flex flex-col shadow-lg shadow-slate-200/40 min-h-0">
+                                <div className="flex justify-between items-center mb-3 shrink-0 border-b border-slate-100 pb-3">
+                                    <div>
+                                        <h3 className="text-sm font-black uppercase italic tracking-tight flex items-center gap-2 text-slate-900">
+                                            <Radar className="text-emerald-600" size={16} /> Neural Risk Probabilities
+                                        </h3>
+                                        <p className="text-[7px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1">AI Projection for Sector</p>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 bg-emerald-50 px-2 py-1 rounded-lg">
+                                        <Zap size={10} className="text-emerald-600 animate-pulse" />
+                                        <span className="text-[7px] font-black uppercase tracking-widest text-emerald-600">LIVE SCAN ACTIVE</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 space-y-2">
+                                    {ayushResult?.regional_seasonal_risks?.map((risk: any, i: number) => (
+                                        <div key={i} className="bg-slate-50/50 border border-slate-100 p-3 rounded-2xl flex items-center gap-4 hover:bg-white hover:border-emerald-200 transition-all group cursor-default">
+                                            <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex flex-col items-center justify-center gap-0.5 shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
+                                                <span className="text-[10px] font-black text-slate-900">{Math.round(risk.probability * 100)}%</span>
+                                                <div className={`w-full h-1 mt-1 ${risk.probability > 0.5 ? 'bg-amber-100' : 'bg-emerald-100'} rounded-full overflow-hidden`}>
+                                                    <div className={`h-full ${risk.probability > 0.5 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${risk.probability * 100}%` }} />
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-0.5">
+                                                    <h4 className="text-[11px] font-black italic uppercase text-slate-900 truncate">{risk.disease_name}</h4>
+                                                    <span className={`px-1 rounded text-[6px] font-black uppercase tracking-tighter shrink-0 ${risk.probability > 0.5 ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                                                        {risk.probability > 0.5 ? 'CAUTION' : 'PRIMARY RISK'}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase italic truncate mb-1">"{risk.reason}"</p>
+                                                <div className="flex items-center gap-1">
+                                                    <ShieldCheck size={8} className="text-emerald-500" />
+                                                    <span className="text-[7px] font-black uppercase tracking-widest text-emerald-600">{risk.prevention}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Column 3: Ancient Wisdom Hub */}
+                        <div className="col-span-12 lg:col-span-4 flex flex-col h-full gap-3">
+                            <div className="flex-1 bg-slate-900 rounded-[1.5rem] p-5 text-white shadow-2xl relative overflow-hidden group min-h-0 border border-slate-800">
+                                <div className="absolute top-0 right-0 p-6 opacity-[0.03] rotate-12 transform group-hover:rotate-45 transition-transform duration-1000">
+                                    <Sparkles size={120} />
+                                </div>
+                                <div className="relative z-10 h-full flex flex-col">
+                                    <div className="flex items-center gap-2 mb-3 shrink-0 border-b border-white/5 pb-3">
+                                        <Brain className="text-emerald-400" size={16} />
+                                        <h3 className="text-sm font-black uppercase italic tracking-tighter">Ancient Wisdom Hub</h3>
+                                    </div>
+
+                                    <div className="space-y-4 flex-1 overflow-y-auto custom-scrollbar-light pr-2">
+                                        <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+                                            <p className="text-[7px] font-black text-emerald-400 uppercase tracking-[0.3em] mb-2 font-black italic">RITUCHARYA (SEASONAL)</p>
+                                            <div className="flex flex-col gap-1.5">
+                                                {ayushResult?.ritucharya?.map((item: string, i: number) => (
+                                                    <div key={i} className="flex items-center gap-2">
+                                                        <div className="w-1 h-1 rounded-full bg-emerald-400 shrink-0" />
+                                                        <span className="text-[9px] font-bold uppercase tracking-tight text-white/80">{item}</span>
+                                                    </div>
+                                                )) || <span className="text-[8px] opacity-40">Syncing Node...</span>}
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+                                            <p className="text-[7px] font-black text-blue-400 uppercase tracking-[0.3em] mb-2 font-black italic">DINACHARYA (DAILY)</p>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {ayushResult?.dinacharya?.map((item: string, i: number) => (
+                                                    <div key={i} className="bg-white/5 border border-white/10 px-2 py-1.5 rounded-lg text-[8px] font-black uppercase italic tracking-widest text-center">
+                                                        {item}
+                                                    </div>
+                                                )) || <span className="text-[8px] opacity-40">Scanning...</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 p-4 flex flex-col items-center justify-center text-center shrink-0">
+                                        <p className="text-[7px] font-black text-emerald-400 uppercase tracking-widest mb-1">PRAKRITI</p>
+                                        <div className="text-xl font-black italic uppercase mb-1 text-emerald-400">{ayushResult?.prakriti || 'VATA-PITTA'}</div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                            <p className="text-[7px] font-black text-white/40 uppercase tracking-widest italic">REAL-TIME AYUSH SCAN...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* STEP 2: GLOBAL SURVEILLANCE (OFFICER VIEW) */}
+                {step === 2 && (
+                    <div className="h-full w-full flex flex-col gap-5 animate-in slide-in-from-right-5 duration-700">
+                        <div className="grid grid-cols-12 gap-5 flex-1 min-h-0">
+                            {/* Aggregated Map View / Stats */}
+                            <div className="col-span-12 lg:col-span-8 bg-white rounded-[2rem] border border-slate-200 p-8 flex flex-col shadow-xl shadow-slate-200/50 min-h-0">
+                                <div className="flex justify-between items-center mb-6 shrink-0">
+                                    <div>
+                                        <h3 className="text-xl font-black uppercase italic tracking-tight flex items-center gap-3 text-slate-900">
+                                            <Globe className="text-emerald-600" size={24} /> National Sentinel Hub
+                                        </h3>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2 italic">Multi-Sector Population Risk Registry</p>
+                                    </div>
+                                    <div className="bg-slate-900 text-white px-5 py-2.5 rounded-2xl text-[10px] font-black flex items-center gap-3">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                        FEDERATED SYNC ACTIVE
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto custom-scrollbar pr-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-[2rem]">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Total Portal Access Nodes</p>
+                                            <div className="text-4xl font-black text-slate-900 italic tracking-tighter">
+                                                {JSON.parse(localStorage.getItem('hi_accounts') || '[]').length}
+                                            </div>
+                                        </div>
+                                        <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-[2rem]">
+                                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-4">System Uptime Node</p>
+                                            <div className="text-4xl font-black text-emerald-900 italic tracking-tighter">99.98%</div>
+                                        </div>
+                                    </div>
+
+                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 px-2 italic">National Population Registry (Master Access)</h4>
+                                    <table className="w-full text-left border-separate border-spacing-y-3">
+                                        <thead>
+                                            <tr className="text-[9px] font-black uppercase text-slate-400 tracking-widest">
+                                                <th className="px-6 pb-2">Individual Profile</th>
+                                                <th className="px-6 pb-2 text-center">Location Node</th>
+                                                <th className="px-6 pb-2 text-right">Registry Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {JSON.parse(localStorage.getItem('hi_accounts') || '[]').map((acc: any, i: number) => (
+                                                <tr key={i} className="bg-slate-50 hover:bg-white border border-slate-100 group transition-all duration-300">
+                                                    <td className="px-6 py-4 rounded-l-2xl border-l-[4px] border-emerald-500/10 group-hover:border-emerald-500 transition-all">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${acc.role === 'officer' ? 'bg-blue-600' : acc.role === 'doctor' ? 'bg-indigo-600' : 'bg-emerald-600'} text-white`}>
+                                                                {acc.name?.charAt(0).toUpperCase()}
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-xs font-black uppercase text-slate-900 leading-none mb-1">{acc.name}</p>
+                                                                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">ID: {acc.patientId} • ROLE: {acc.role || 'CITIZEN'}</p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center">
+                                                        <p className="text-[10px] font-black text-slate-700 uppercase">{acc.location || 'GLOBAL'}</p>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right rounded-r-2xl">
+                                                        <span className="px-3 py-1.5 bg-emerald-100 text-emerald-600 rounded-lg text-[8px] font-black uppercase tracking-widest">
+                                                            SYNC_ACTIVE
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {/* Population Insights Dashboard */}
+                            <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
+                                <div className="flex-1 bg-slate-900 border border-slate-800 rounded-[2.5rem] p-10 flex flex-col shadow-2xl relative overflow-hidden group min-h-[500px]">
+                                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:scale-125 transition-transform duration-1000 rotate-12"><Globe size={200} className="text-white" /></div>
+                                    <div className="relative z-10 space-y-8 h-full flex flex-col">
+                                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10"><TrendingUp size={28} className="text-emerald-500" /></div>
+                                        <h4 className="text-2xl font-black italic uppercase text-white tracking-tighter leading-none">Global Sector Insights</h4>
+                                        <div className="space-y-6 flex-1">
+                                            <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Monitored Nodes</p>
+                                                <p className="text-3xl font-black text-white italic">PROD_NODES_LIVE <span className="text-[10px] text-emerald-500 ml-2">↑ 0.4%</span></p>
+                                            </div>
+                                            <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">System Stability Score</p>
+                                                <p className="text-3xl font-black text-white italic">84.2% <span className="text-[10px] text-emerald-500 ml-2">VERIFIED</span></p>
+                                            </div>
+                                            <div className="pt-4 border-t border-white/10">
+                                                <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-4 italic">Critical Bio-Governance Action</p>
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm("THREAT DETECTED: ARE YOU SURE YOU WANT TO DELETE ALL PATIENT, DOCTOR, AND OFFICER DATA IN THE NATIONAL REGISTRY? THIS ACTION CANNOT BE REVERSED.")) {
+                                                            localStorage.clear();
+                                                            alert("PROTOCOL EXECUTED: ALL REGISTRY DATA PURGED. SYSTEM RESETTING...");
+                                                            window.location.reload();
+                                                        }
+                                                    }}
+                                                    className="w-full bg-rose-600/20 border border-rose-500/50 text-rose-500 font-black py-4 rounded-xl text-[10px] uppercase tracking-[0.2em] hover:bg-rose-600 hover:text-white transition-all shadow-lg flex items-center justify-center gap-3"
+                                                >
+                                                    <RefreshCcw size={14} /> PURGE NATIONAL REGISTRY
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* STEP 3: DOCTOR'S WORKSPACE (CHATBOT + ID SEARCH + PLAN) */}
+                {step === 3 && (
+                    <div className="h-full w-full grid grid-cols-12 gap-5 animate-in zoom-in-95 duration-700">
+                        {/* Patient ID Search & History Profile */}
+                        <div className="col-span-12 lg:col-span-4 flex flex-col h-full">
+                            <div className="bg-white rounded-[2rem] border border-slate-200 p-6 flex flex-col shadow-xl shadow-slate-200/50 flex-1 min-h-0">
+                                <div className="flex items-center gap-4 mb-6 shrink-0">
+                                    <div className="w-10 h-10 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg"><User size={20} /></div>
+                                    <div>
+                                        <h3 className="text-sm font-black uppercase tracking-tight text-slate-900 leading-none">Patient Intelligence Hub</h3>
+                                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1.5">Access Centralized Patient IDs</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6 mb-8">
+                                    <div className="relative group">
+                                        <input
+                                            type="text"
+                                            value={patientIdSearch}
+                                            onChange={(e) => setPatientIdSearch(e.target.value)}
+                                            placeholder="ENTER PATIENT ID (e.g. LS-KAL-042)"
+                                            className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-black text-[11px] uppercase placeholder:text-slate-300 focus:bg-white focus:border-emerald-500 outline-none transition-all shadow-sm"
+                                        />
+                                        <button
+                                            onClick={handlePatientSearch}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-all"
+                                        >
+                                            {isAnalyzing ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+                                        </button>
+                                    </div>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center italic">Your current Patient ID: <span className="text-emerald-600 underline font-bold">{currentPatientId}</span></p>
+                                </div>
+
+                                {selectedPatient ? (
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6 animate-in slide-in-from-top-2 duration-500">
+                                        <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Authenticated Identity</p>
+                                                    <h4 className="text-xl font-black italic uppercase text-slate-900">{selectedPatient.name}</h4>
+                                                </div>
+                                                <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center"><Fingerprint size={18} className="text-emerald-300" /></div>
+                                            </div>
+                                            <div className="flex gap-4">
+                                                <span className="px-3 py-1 bg-white rounded-lg text-[9px] font-black border border-slate-200">AGE: {selectedPatient.age}</span>
+                                                <span className="px-3 py-1 bg-white rounded-lg text-[9px] font-black border border-slate-200">ID: {selectedPatient.id}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-emerald-50/50 p-6 rounded-[2rem] border border-emerald-100 shadow-sm relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 p-4 opacity-10"><FileText size={48} className="text-emerald-600" /></div>
+                                            <h5 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-4 flex items-center gap-2 italic">
+                                                <Sparkles size={12} /> CONSOLIDATED BIOMETRIC BRIEF
+                                            </h5>
+                                            <p className="text-[13px] font-bold text-slate-700 uppercase italic leading-loose mb-6">
+                                                "{patientBrief?.summary}"
+                                            </p>
+
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-2">Primary Conditions</p>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {patientBrief?.conditions?.map((c: any, i: number) => (
+                                                            <span key={i} className="px-2 py-1 bg-white border border-emerald-100 rounded-md text-[9px] font-black text-emerald-700">{c.name}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-2">Recent Clinical Observations</p>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {patientBrief?.recentSymptoms?.map((s: string, i: number) => (
+                                                            <span key={i} className="px-2 py-1 bg-white border border-amber-100 rounded-md text-[9px] font-black text-amber-700">{s}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-2">Active Medications</p>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {patientBrief?.medications?.map((m: string, i: number) => (
+                                                            <span key={i} className="px-2 py-1 bg-white border border-blue-100 rounded-md text-[9px] font-black text-blue-700">{m}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex-1 flex flex-col items-center justify-center opacity-30 text-center px-6">
+                                        <Fingerprint size={64} className="text-slate-200 mb-6" />
+                                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Awaiting ID Handshake</p>
+                                        <p className="text-[9px] font-bold text-slate-300 uppercase mt-2">Enter an ID to pull encrypted patient telemetry</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Doctor-Patient Voice Chatbot & Analysis */}
+                        <div className="col-span-12 lg:col-span-8 flex flex-col h-full min-h-0">
+                            <div className="flex-1 bg-white rounded-[2rem] border border-slate-200 p-8 flex flex-col shadow-xl shadow-slate-200/50 min-h-0">
+                                <div className="flex justify-between items-center mb-6 shrink-0">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg"><MessageSquare size={20} /></div>
+                                        <div>
+                                            <h3 className="text-lg font-black uppercase italic tracking-tight text-slate-900">Dr-Patient Voice Synapse</h3>
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 italic">Real-Time Transcription & Diagnostic Analysis</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <button className="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:bg-emerald-600 hover:text-white transition-all shadow-sm flex items-center gap-2">
+                                            <Link size={14} /> CONNECT TO HIS
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Chat / Voice Area */}
+                                <div className="flex-1 overflow-hidden flex flex-col bg-slate-50/50 rounded-[2rem] border border-slate-100 relative">
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-6">
+                                        {clinicalAnalysis ? (
+                                            <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl animate-in fade-in zoom-in-95 duration-700">
+                                                <div className="flex items-center gap-4 mb-8">
+                                                    <div className="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-2xl shadow-emerald-500/20"><Brain size={32} /></div>
+                                                    <div>
+                                                        <h4 className="text-xl font-black uppercase italic text-slate-900">CLINICAL TREATMENT PLAN</h4>
+                                                        <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mt-1">Severity Assessment: <span className="text-slate-900 underline font-black">{clinicalAnalysis.severity}</span></p>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    <div className="bg-emerald-50/50 border border-emerald-100 p-6 rounded-[2rem]">
+                                                        <p className="text-[14px] font-bold text-slate-700 uppercase italic leading-relaxed">"{clinicalAnalysis.assessment}"</p>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="p-6 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4 italic">Actionable Protocol</p>
+                                                            <ul className="space-y-3">
+                                                                {clinicalAnalysis.immediateActions?.slice(0, 3).map((a: string, i: number) => (
+                                                                    <li key={i} className="text-[10px] font-black text-slate-900 uppercase flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {a}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                        <div className="p-6 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4 italic">Medication Suggestions</p>
+                                                            <p className="text-[11px] font-bold text-slate-600 uppercase italic leading-relaxed">{clinicalAnalysis.mlInsight}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="h-full flex flex-col items-center justify-center opacity-30 text-center">
+                                                <Mic size={56} className="text-slate-300 mb-6 animate-pulse" />
+                                                <h4 className="text-xl font-black uppercase tracking-widest text-slate-400 italic">Conversation Registry Open</h4>
+                                                <p className="text-[10px] font-bold text-slate-300 uppercase mt-2">Voice-to-Record Active • Listening for Diagnostic Signal</p>
+                                            </div>
+                                        )}
+                                        {transcript && !clinicalAnalysis && (
+                                            <div className="bg-white/80 p-6 rounded-2xl border border-emerald-200 shadow-lg max-w-lg mx-auto border-dashed animate-in slide-in-from-bottom-5">
+                                                <p className="text-[14px] font-black uppercase text-emerald-600 italic leading-relaxed">"{transcript}"</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Mic & Controls */}
+                                    <div className="p-8 bg-white border-t border-slate-100 shrink-0 flex items-center gap-6">
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (isListening) return;
+                                                setIsListening(true);
+                                                startListening(language, setTranscript, () => setIsListening(false));
+                                            }}
+                                            className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-95 ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
+                                        >
+                                            <Mic size={28} />
+                                        </button>
+                                        <div className="flex-1 bg-white border-2 border-slate-100 rounded-[1.5rem] p-4 flex items-center group focus-within:border-emerald-500 transition-all">
+                                            <textarea
+                                                value={transcript}
+                                                onChange={(e) => setTranscript(e.target.value)}
+                                                placeholder="Dr: Describe symptoms | Patent: Respond..."
+                                                className="w-full bg-transparent border-none outline-none text-[12px] font-black uppercase tracking-tight text-slate-900 resize-none h-12 pt-2 custom-scrollbar placeholder:text-slate-200"
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={handleDoctorConsultation}
+                                            disabled={!transcript || isAnalyzing}
+                                            className="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-2xl hover:bg-emerald-600 transition-all active:scale-95 disabled:opacity-30 disabled:grayscale"
+                                        >
+                                            {isAnalyzing ? <Loader2 className="animate-spin" size={24} /> : <Send size={24} />}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </main>
+
+            {/* Footer / Unified Status */}
+            <footer className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center shrink-0">
+                <div className="flex gap-6">
+                    <div className="flex items-center gap-2">
+                        <Layers size={10} className="text-slate-400" />
+                        <span className="text-[6px] font-black uppercase tracking-[0.3em] text-slate-400">SENTINEL-NATIONAL-V4.9-PROD</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Database size={10} className="text-emerald-600/40" />
+                        <span className="text-[6px] font-black uppercase tracking-[0.3em] text-emerald-600/40">AHIMS GATEWAY: CONNECTED_V4</span>
                     </div>
                 </div>
-
-                {/* MAIN MODE SWITCHER */}
-                <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-                    <button onClick={() => setMainTab('wisdom')} className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${mainTab === 'wisdom' ? `bg-white shadow-md text-emerald-600` : 'text-slate-400'}`}>
-                        <Leaf size={12} /> <span>{t.wisdom_hub || 'Wisdom Hub'}</span>
-                    </button>
-                    <button onClick={() => setMainTab('surveillance')} className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${mainTab === 'surveillance' ? `bg-white shadow-md text-indigo-600` : 'text-slate-400'}`}>
-                        <Zap size={12} /> <span>{t.surveillance || 'Surveillance'}</span>
-                    </button>
-                </div>
-
                 <div className="flex items-center gap-3">
-                    {mainTab === 'surveillance' && (
-                        <>
-                            <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
-                                {['public', 'officer'].map(tab => (
-                                    <button key={tab} onClick={() => setActiveTab(tab as any)} className={`px-4 py-1.5 rounded-md text-[8px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400'}`}>{t[tab] || tab}</button>
-                                ))}
-                            </div>
-                            <div className="flex items-center gap-2 bg-white border border-slate-200 p-2 rounded-lg shadow-md">
-                                <MapPin size={12} className="text-emerald-500" />
-                                <select className="bg-transparent border-none outline-none text-[8px] font-black uppercase tracking-widest text-slate-900" value={fDistrict} onChange={(e) => setFDistrict(e.target.value)}>
-                                    <option value="All">{t.districts || 'Districts'}</option>
-                                    {Object.keys(AP_GOVT_HIERARCHY).map(d => <option key={d} value={d}>{d}</option>)}
-                                </select>
-                            </div>
-                        </>
-                    )}
+                    <p className="text-[6px] font-black text-slate-400 uppercase tracking-widest italic opacity-50">© 2026 INDIAAI INNOVATION HUB • SENTINEL PROTECT™</p>
+                    <Activity size={12} className="text-emerald-600 opacity-50" />
                 </div>
-            </div>
+            </footer>
 
-            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
-                {loading ? (
-                    <div className="h-full w-full flex flex-col items-center justify-center gap-4">
-                        <Loader2 className="animate-spin text-emerald-600" size={32} />
-                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{t.syncing_matrix || 'Syncing Matrix...'}</p>
-                    </div>
-                ) : mainTab === 'wisdom' ? renderWisdom() : renderSurveillance()}
-            </div>
-
-            <div className="shrink-0 h-10 bg-white border-t border-slate-200 px-6 flex justify-between items-center rounded-b-xl">
-                <div className="flex items-center gap-1.5">
-                    <div className="p-1 bg-emerald-500/10 text-emerald-500 rounded-md"><CheckCircle2 size={10} /></div>
-                    <p className="text-[7px] font-black uppercase text-slate-400 tracking-widest leading-none">{t.g20_secured || 'G20 Health Stack Secured'}</p>
-                </div>
-                <p className="text-[7px] font-black text-slate-300 uppercase tracking-[0.4em] italic leading-none">{t.security_protocol_active || 'Security Protocol 992-B Active'}</p>
-            </div>
-            <style>{`.custom-scrollbar::-webkit-scrollbar { width: 3px; } .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.05); border-radius: 10px; }`}</style>
+            <style>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(16, 185, 129, 0.1);
+                    border-radius: 10px;
+                }
+                .custom-scrollbar-light::-webkit-scrollbar {
+                    height: 2px;
+                }
+                .custom-scrollbar-light::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar-light::-webkit-scrollbar-thumb {
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 10px;
+                }
+            `}</style>
         </div>
     );
 };

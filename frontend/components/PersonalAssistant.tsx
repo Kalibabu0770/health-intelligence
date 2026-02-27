@@ -15,6 +15,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isListening, setIsListening] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const handleSend = async () => {
@@ -40,7 +41,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
         <div className="fixed bottom-6 right-6 w-[95vw] sm:w-[420px] h-[600px] max-h-[85vh] z-[1000] bg-white flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-500 shadow-[0_40px_100px_-15px_rgba(15,23,42,0.25)] rounded-[2.5rem] overflow-hidden border border-slate-100 ring-4 ring-slate-50/50">
 
             {/* Header: Mission Control Aesthetic */}
-            <div className="bg-slate-900 px-8 py-6 flex justify-between items-center shrink-0">
+            <div className="bg-emerald-600 px-8 py-6 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20">
                         <Bot size={24} strokeWidth={2.5} />
@@ -71,7 +72,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                             </div>
                         )}
                         <div className={`max-w-[85%] p-5 rounded-[1.8rem] text-[12px] font-bold leading-relaxed shadow-sm ${m.role === 'user'
-                            ? 'bg-slate-900 text-white rounded-tr-none'
+                            ? 'bg-emerald-600 text-white rounded-tr-none'
                             : 'bg-white text-slate-800 rounded-tl-none border border-slate-100'
                             }`}>
                             {m.text}
@@ -103,8 +104,14 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                     />
                     <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
                         <button
-                            onClick={() => startListening(language, setInput)}
-                            className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-emerald-600 active:scale-95 transition-all bg-white rounded-xl border border-slate-100 shadow-sm"
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (isListening) return;
+                                setIsListening(true);
+                                startListening(language, (text) => setInput(text), () => setIsListening(false));
+                            }}
+                            className={`w-10 h-10 flex items-center justify-center rounded-xl border border-slate-100 shadow-sm transition-all active:scale-95 ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-white text-slate-400 hover:text-emerald-600'}`}
                         >
                             <Mic size={18} />
                         </button>
