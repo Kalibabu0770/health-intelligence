@@ -5,6 +5,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     // 100vh NO SCROLLING layout
     const [activePanel, setActivePanel] = useState<'queue' | 'ehr' | 'treatment' | 'surveillance' | 'evidence'>('queue');
     const [isRecording, setIsRecording] = useState(false);
+    const [ehrText, setEhrText] = useState("");
 
     // Seeded Dummy Data as requested by the prompt
     const patientQueue = [
@@ -78,7 +79,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                                             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Diagnosis Alert</p>
                                             <p className="text-xs font-black uppercase text-slate-700">{p.disease}</p>
                                         </div>
-                                        <button className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors">
+                                        <button onClick={() => setActivePanel('ehr')} className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors">
                                             <ArrowRight size={18} />
                                         </button>
                                     </div>
@@ -103,27 +104,33 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                         <div className="flex-1 grid grid-cols-2 gap-8">
                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col">
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Live Transcription (English / Regional)</h3>
-                                <div className="flex-1 overflow-auto text-sm text-slate-700 font-medium leading-relaxed italic content-start">
-                                    {isRecording ? "Patient presents with sharp colicky pain in the left flank radiating to the groin. Nausea present. Suspecting nephrolithiasis based on prior history. Vitals normal. Recommend USG abdomen..." : "Awaiting transmission..."}
-                                </div>
+                                <textarea
+                                    value={ehrText}
+                                    onChange={(e) => setEhrText(e.target.value)}
+                                    placeholder="Click the mic icon above to start speaking. Transcribed text will securely paste here..."
+                                    className="flex-1 w-full h-full bg-transparent border-none resize-none focus:ring-0 outline-none text-sm text-slate-700 font-medium leading-relaxed italic content-start custom-scrollbar"
+                                />
                             </div>
                             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 flex flex-col">
                                 <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-4">Structured AHMIS Schema</h3>
-                                {isRecording ? (
-                                    <div className="space-y-4 animate-in fade-in duration-500 w-full h-full">
-                                        <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs">
-                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Chief Complaint</span>
-                                            Left flank colicky pain, radiating to groin, nausea.
+                                {ehrText.length > 10 ? (
+                                    <div className="space-y-4 animate-in fade-in duration-500 w-full h-full flex flex-col">
+                                        <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs shadow-sm">
+                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Chief Complaint & History</span>
+                                            {ehrText.substring(0, 100)}{ehrText.length > 100 ? '...' : ''}
                                         </div>
-                                        <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs">
+                                        <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs shadow-sm">
+                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Extracted Symptoms</span>
+                                            <div className="flex gap-2 mt-1 flex-wrap">
+                                                <span className="px-2 py-1 bg-rose-50 text-rose-600 rounded text-[9px] font-black uppercase">Pain</span>
+                                                <span className="px-2 py-1 bg-amber-50 text-amber-600 rounded text-[9px] font-black uppercase">Discomfort</span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs shadow-sm mt-auto">
                                             <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Diagnosis Candidate</span>
-                                            <span className="font-black text-emerald-700 uppercase">Nephrolithiasis</span>
+                                            <span className="font-black text-emerald-700 uppercase">Under Review</span>
                                         </div>
-                                        <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs">
-                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">AYUSH Assessment</span>
-                                            Vata-Pitta provocation in Mutravaha Srotas.
-                                        </div>
-                                        <button className="w-full mt-auto bg-emerald-600 text-white font-black text-[10px] uppercase py-3 rounded-lg hover:bg-emerald-700 tracking-widest">
+                                        <button className="w-full mt-4 bg-emerald-600 text-white font-black text-[10px] uppercase py-3 rounded-lg hover:bg-emerald-700 tracking-widest shadow-md active:scale-95 transition-all">
                                             Commit to AHMIS Registry
                                         </button>
                                     </div>
