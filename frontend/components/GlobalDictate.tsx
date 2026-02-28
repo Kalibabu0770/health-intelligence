@@ -11,7 +11,7 @@ const GlobalDictate: React.FC = () => {
     const [lastFocusedInput, setLastFocusedInput] = useState<HTMLInputElement | HTMLTextAreaElement | null>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
-    const processingIntervalRef = useRef<any>(null);
+    const triggerSelectorRef = useRef<string | null>(null);
 
     useEffect(() => {
         const handleFocusIn = (e: FocusEvent) => {
@@ -25,7 +25,10 @@ const GlobalDictate: React.FC = () => {
             let foundInput = null;
 
             if (e.detail?.selector) {
+                triggerSelectorRef.current = e.detail.selector;
                 foundInput = document.querySelector(e.detail.selector);
+            } else {
+                triggerSelectorRef.current = null;
             }
 
             if (!foundInput && e.detail?.target) {
@@ -54,6 +57,9 @@ const GlobalDictate: React.FC = () => {
 
     const startDictation = async () => {
         try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error("HTTPS required");
+            }
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
             mediaRecorderRef.current = mediaRecorder;
@@ -93,37 +99,16 @@ const GlobalDictate: React.FC = () => {
 
             mediaRecorder.start();
         } catch (error) {
-            console.warn("Mic Access Error (Fallback to simulation):", error);
-
-            // Elegant mock fallback for environments without microphone access
-            setIsListening(true);
-            setTranscript('');
+            console.warn("Mic Access Error:", error);
+            setIsListening(false);
+            setTranscript('Microphone Data Blocked: Please ensure you are running on an HTTPS connection or localhost, and that your browser has allowed Microphone Permissions for this site.');
             mediaRecorderRef.current = null;
-
-            let text = "This is a simulated Whisper transcription since mic access is restricted in this environment... Patient presents with mild symptoms...";
-            let currentLength = 0;
-
-            const interval = setInterval(() => {
-                currentLength += 5;
-                if (currentLength > text.length) {
-                    clearInterval(interval);
-                    setIsListening(false);
-                    return;
-                }
-                setTranscript(text.substring(0, currentLength));
-            }, 50);
-
-            processingIntervalRef.current = interval;
         }
     };
 
     const handleFinishRecording = () => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
             mediaRecorderRef.current.stop();
-        } else if (processingIntervalRef.current) {
-            clearInterval(processingIntervalRef.current);
-            processingIntervalRef.current = null;
-            setIsListening(false);
         }
     };
 
@@ -137,39 +122,49 @@ const GlobalDictate: React.FC = () => {
             targetNode = activeDom as any;
         }
 
-        if (targetNode && transcript && transcript !== 'Listening...') {
-            // Update the value natively and dispatch a React syntethic event equivalent
-            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-                window.HTMLInputElement.prototype,
-                "value"
-            )?.set;
+        if (transcript && transcript !== 'Listening...') {
 
-            const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
-                window.HTMLTextAreaElement.prototype,
-                "value"
-            )?.set;
+            // Broadcast the result system-wide for custom components to catch
+            window.dispatchEvent(new CustomEvent('global-dictation-result', {
+                detail: { text: transcript, selector: triggerSelectorRef.current }
+            }));
 
-            const setter = targetNode.tagName === 'TEXTAREA' ? nativeTextAreaValueSetter : nativeInputValueSetter;
+            if (targetNode) {
+                // Update the value natively and dispatch a React syntethic event equivalent
+                const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                    window.HTMLInputElement.prototype,
+                    "value"
+                )?.set;
 
-            if (setter) {
-                // Append text if there's already some, or just replace
-                const currentValue = targetNode.value || '';
-                const newValue = currentValue ? `${currentValue} ${transcript}` : transcript;
+                const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
+                    window.HTMLTextAreaElement.prototype,
+                    "value"
+                )?.set;
 
-                setter.call(targetNode, newValue);
-                const ev2 = new Event('input', { bubbles: true });
-                targetNode.dispatchEvent(ev2);
-                const ev3 = new Event('change', { bubbles: true });
-                targetNode.dispatchEvent(ev3);
+                const setter = targetNode.tagName === 'TEXTAREA' ? nativeTextAreaValueSetter : nativeInputValueSetter;
+
+                if (setter) {
+                    // Append text if there's already some, or just replace
+                    const currentValue = targetNode.value || '';
+                    const newValue = currentValue ? `${currentValue} ${transcript}` : transcript;
+
+                    setter.call(targetNode, newValue);
+                    const ev2 = new Event('input', { bubbles: true });
+                    targetNode.dispatchEvent(ev2);
+                    const ev3 = new Event('change', { bubbles: true });
+                    targetNode.dispatchEvent(ev3);
+                } else {
+                    // Fallback
+                    targetNode.value += (targetNode.value ? ' ' : '') + transcript;
+                    targetNode.dispatchEvent(new Event('input', { bubbles: true }));
+                    targetNode.dispatchEvent(new Event('change', { bubbles: true }));
+                }
             } else {
-                // Fallback
-                targetNode.value += (targetNode.value ? ' ' : '') + transcript;
-                targetNode.dispatchEvent(new Event('input', { bubbles: true }));
-                targetNode.dispatchEvent(new Event('change', { bubbles: true }));
+                // If no target node, copy to clipboard if supported
+                if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(transcript).catch(e => console.warn(e));
+                }
             }
-        } else if (transcript && transcript !== 'Listening...') {
-            // If no input was focused, we can try to copy to clipboard as fallback
-            navigator.clipboard.writeText(transcript).catch(e => console.error(e));
         }
 
         closeDictation();
@@ -179,10 +174,6 @@ const GlobalDictate: React.FC = () => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
             mediaRecorderRef.current.stop();
         }
-        if (processingIntervalRef.current) {
-            clearInterval(processingIntervalRef.current);
-            processingIntervalRef.current = null;
-        }
         closeDictation();
     };
 
@@ -191,10 +182,6 @@ const GlobalDictate: React.FC = () => {
         setIsProcessing(false);
         setTranscript('');
         mediaRecorderRef.current = null;
-        if (processingIntervalRef.current) {
-            clearInterval(processingIntervalRef.current);
-            processingIntervalRef.current = null;
-        }
     };
 
     return (

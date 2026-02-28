@@ -104,32 +104,11 @@ export const startListening = (
         if (transcriptEl) transcriptEl.textContent = t.listening || "Listening (Whisper NLP)...";
 
     }).catch(err => {
-        console.warn("Microphone access error (Fallback to simulation):", err);
-        // Fallback simulation
-        if (transcriptEl) transcriptEl.textContent = "Listening (Simulation)...";
-
-        let text = "Simulated transcription because microphone access is unavailable in this browser environment... Patient is experiencing mild symptoms.";
-        let currentLength = 0;
-
-        const interval = setInterval(() => {
-            currentLength += 5;
-            if (currentLength > text.length) {
-                clearInterval(interval);
-                if (transcriptEl) transcriptEl.textContent = text;
-                onTranscript(text);
-                setTimeout(() => {
-                    if (doneBtn) doneBtn.click();
-                }, 500);
-                return;
-            }
-            const currentText = text.substring(0, currentLength);
-            if (transcriptEl) transcriptEl.textContent = currentText;
-            onTranscript(currentText);
-        }, 50);
+        console.warn("Microphone access error:", err);
+        if (transcriptEl) transcriptEl.textContent = "Microphone Data Blocked: Please ensure you are running on an HTTPS connection or localhost, and that your browser has allowed Microphone Permissions for this site.";
 
         cancelBtn.onclick = (e) => {
             e.preventDefault();
-            clearInterval(interval);
             setTimeout(() => {
                 aura.classList.remove('active');
                 if (onEnd) onEnd();
@@ -138,9 +117,6 @@ export const startListening = (
 
         doneBtn.onclick = (e) => {
             e.preventDefault();
-            clearInterval(interval);
-            const finalText = transcriptEl?.textContent || text;
-            onTranscript(finalText);
             setTimeout(() => {
                 aura.classList.remove('active');
                 if (onEnd) onEnd();
