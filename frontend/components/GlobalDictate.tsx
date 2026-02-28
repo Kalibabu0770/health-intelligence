@@ -10,6 +10,7 @@ const GlobalDictate: React.FC = () => {
     const [transcript, setTranscript] = useState('');
     const [lastFocusedInput, setLastFocusedInput] = useState<HTMLInputElement | HTMLTextAreaElement | null>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const recognitionRef = useRef<any>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const triggerSelectorRef = useRef<string | null>(null);
 
@@ -60,6 +61,52 @@ const GlobalDictate: React.FC = () => {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 throw new Error("HTTPS required");
             }
+
+            // Layer 1: Best-effort Real-Time Chrome API for instant UI feedback
+            const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            if (SpeechRecognitionAPI) {
+                try {
+                    const recognition = new SpeechRecognitionAPI();
+                    recognitionRef.current = recognition;
+
+                    const getBcp47Code = (lang: string) => {
+                        const map: Record<string, string> = {
+                            'hi': 'hi-IN', 'te': 'te-IN', 'ta': 'ta-IN', 'kn': 'kn-IN', 'mr': 'mr-IN',
+                            'es': 'es-ES', 'fr': 'fr-FR', 'de': 'de-DE', 'zh': 'zh-CN', 'ja': 'ja-JP',
+                            'ar': 'ar-SA', 'ru': 'ru-RU', 'pt': 'pt-BR', 'en': 'en-IN'
+                        };
+                        return map[lang] || 'en-IN';
+                    };
+
+                    recognition.continuous = true;
+                    recognition.interimResults = true;
+                    recognition.lang = getBcp47Code(language);
+
+                    recognition.onresult = (event: any) => {
+                        let finalTxt = '';
+                        let interimTxt = '';
+                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                            if (event.results[i].isFinal) {
+                                finalTxt += event.results[i][0].transcript;
+                            } else {
+                                interimTxt += event.results[i][0].transcript;
+                            }
+                        }
+                        const text = (finalTxt + " " + interimTxt).trim();
+                        if (text) setTranscript(text);
+                    };
+
+                    recognition.onerror = (e: any) => {
+                        console.warn("Real-time UI Speech error (suppressed, relying on Whisper backend):", e.error);
+                    };
+
+                    recognition.start();
+                } catch (e) {
+                    console.warn("Could not start real-time layer", e);
+                }
+            }
+
+            // Layer 2: Secure Robust Whisper Media Recorder
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
             mediaRecorderRef.current = mediaRecorder;
@@ -73,22 +120,25 @@ const GlobalDictate: React.FC = () => {
 
             mediaRecorder.onstart = () => {
                 setIsListening(true);
-                setTranscript('Listening... Speak now.');
+                setTranscript(transcript || 'Listening... Speak now.');
             };
 
             mediaRecorder.onstop = async () => {
                 setIsListening(false);
                 setIsProcessing(true);
-                setTranscript('AI Guardian analyzing audio via Whisper NLP...');
+                if (recognitionRef.current) {
+                    try { recognitionRef.current.stop(); } catch (e) { }
+                }
+                setTranscript('AI Guardian perfecting analysis via Whisper Backend...');
 
                 const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
 
                 try {
                     const text = await transcribeAudio(audioBlob, language);
-                    setTranscript(text);
+                    setTranscript(text); // PERFECT transcription overrides the realtime interim
                 } catch (error) {
                     console.error("Transcription Error:", error);
-                    setTranscript("Failed to transcribe audio. Please ensure Groq is available.");
+                    setTranscript("Failed to transcribe via AI. Connection error.");
                 } finally {
                     setIsProcessing(false);
                 }
@@ -109,6 +159,9 @@ const GlobalDictate: React.FC = () => {
     const handleFinishRecording = () => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
             mediaRecorderRef.current.stop();
+        }
+        if (recognitionRef.current) {
+            try { recognitionRef.current.stop(); } catch (e) { }
         }
     };
 
@@ -174,6 +227,9 @@ const GlobalDictate: React.FC = () => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
             mediaRecorderRef.current.stop();
         }
+        if (recognitionRef.current) {
+            try { recognitionRef.current.stop(); } catch (e) { }
+        }
         closeDictation();
     };
 
@@ -182,6 +238,7 @@ const GlobalDictate: React.FC = () => {
         setIsProcessing(false);
         setTranscript('');
         mediaRecorderRef.current = null;
+        recognitionRef.current = null;
     };
 
     return (
