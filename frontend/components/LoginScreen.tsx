@@ -402,7 +402,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                     }}
                                                     className={`absolute right-5 top-1/2 -translate-y-1/2 transition-all active:scale-95 ${isListening ? 'text-rose-500 animate-pulse' : 'text-slate-300 hover:text-emerald-500'}`}
                                                 >
-                                                    <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={20} /></span>
+                                                    <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={20} /></span>
                                                 </button>
                                             </div>
                                             <div className="grid grid-cols-4 gap-3">

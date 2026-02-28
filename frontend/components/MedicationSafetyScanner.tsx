@@ -158,7 +158,7 @@ const MedicationSafetyScanner: React.FC = () => {
                                                 }}
                                                 className={`w-10 h-10 rounded-xl bg-white border border-slate-100 transition-all flex items-center justify-center shadow-sm ${isListening ? 'text-rose-500 animate-pulse' : 'text-slate-400 hover:text-rose-600'}`}
                                             >
-                                                <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={16} /></span>
+                                                <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={16} /></span>
                                             </button>
                                         </div>
                                     </div>
@@ -213,7 +213,7 @@ const MedicationSafetyScanner: React.FC = () => {
                             }}
                             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-slate-900 animate-pulse' : 'bg-slate-50 text-slate-400 hover:text-emerald-600'}`}
                         >
-                            <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={18} /></span>
+                            <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={18} /></span>
                         </button>
                     </section>
                 </div>

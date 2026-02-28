@@ -164,7 +164,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                 }}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 p-3 text-orange-600 active:scale-90 hover:bg-orange-50 rounded-xl transition-all"
                             >
-                                <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={22} /></span>
+                                <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={22} /></span>
                             </button>
                         </div>
                         <button

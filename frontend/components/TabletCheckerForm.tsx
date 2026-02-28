@@ -135,7 +135,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
                                         className={`p-1.5 transition-all rounded-lg active:scale-90 ${isListeningMed === idx ? 'bg-emerald-100 text-slate-900 animate-pulse' : 'text-slate-900/20 hover:text-emerald-400 hover:bg-emerald-100/10'}`}
                                         title="Voice input"
                                     >
-                                        <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={12} /></span>
+                                        <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={12} /></span>
                                     </button>
                                 </div>
                             </div>
@@ -176,7 +176,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
                         }}
                         className={`absolute right-2 top-2.5 p-1.5 rounded-lg transition-all ${isListeningSymptom ? 'bg-emerald-100 text-slate-900 animate-pulse' : 'text-slate-900/20 hover:text-emerald-400 hover:bg-emerald-100/10'}`}
                     >
-                        <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={13} /></span>
+                        <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={13} /></span>
                     </button>
                 </div>
             </div>

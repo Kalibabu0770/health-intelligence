@@ -17,7 +17,19 @@ const GlobalDictate: React.FC = () => {
             }
         };
 
-        const listenToGlobalTrigger = () => {
+        const listenToGlobalTrigger = (e: any) => {
+            if (e.detail?.target) {
+                const triggerNode = e.detail.target as HTMLElement;
+                // Find nearest input or textarea by traversing up to common parent
+                let container = triggerNode.parentElement;
+                let foundInput = null;
+                while (container && !foundInput) {
+                    foundInput = container.querySelector('input, textarea');
+                    if (foundInput) break;
+                    container = container.parentElement;
+                }
+                if (foundInput) setLastFocusedInput(foundInput as any);
+            }
             startDictation();
         };
 
@@ -185,23 +197,24 @@ const GlobalDictate: React.FC = () => {
                         </div>
 
                         {/* Live Text Area */}
-                        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 min-h-[100px] max-h-[200px] overflow-y-auto w-full text-lg font-bold text-slate-700 font-sans custom-scrollbar mb-6 break-words">
-                            {transcript || <span className="opacity-40 italic flex items-center gap-2"><Loader2 size={16} className="animate-spin" /> Waiting for voice...</span>}
+                        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5 min-h-[120px] max-h-[250px] overflow-y-auto w-full text-xl font-bold text-slate-800 font-sans custom-scrollbar mb-6 break-words shadow-inner">
+                            {transcript || <span className="opacity-40 italic flex items-center gap-3"><Loader2 size={18} className="animate-spin text-emerald-500" /> Awaiting voice input... Speak now.</span>}
                         </div>
 
-                        {/* Action Buttons */}
+                        {/* Professional Action Buttons */}
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={handleCancel}
-                                className="flex-1 h-12 bg-white border-2 border-rose-200 text-rose-600 rounded-xl flex items-center justify-center gap-2 font-black uppercase tracking-widest hover:bg-rose-50 hover:border-rose-400 transition-all active:scale-95 shadow-sm"
+                                className="flex-1 h-14 bg-white border-2 border-rose-200 text-rose-600 rounded-xl flex items-center justify-center gap-3 font-black uppercase tracking-[0.2em] hover:bg-rose-50 hover:border-rose-400 transition-all active:scale-95 shadow-sm"
                             >
-                                <X size={20} /> Cancel
+                                <X size={24} /> Cancel
                             </button>
                             <button
                                 onClick={handleConfirm}
-                                className="flex-1 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center gap-2 font-black uppercase tracking-widest hover:bg-emerald-700 transition-all active:scale-95 shadow-md"
+                                disabled={!transcript || transcript === 'Listening...'}
+                                className="flex-1 h-14 bg-emerald-600 text-white rounded-xl flex items-center justify-center gap-3 font-black uppercase tracking-[0.2em] hover:bg-emerald-700 transition-all active:scale-95 shadow-lg disabled:opacity-50 disabled:grayscale"
                             >
-                                <Check size={20} /> Confirm & Paste
+                                <Check size={24} /> Confirm & Paste
                             </button>
                         </div>
 

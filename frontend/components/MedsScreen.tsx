@@ -209,7 +209,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                                         {isIdentifying ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
                                     </button>
                                     <button onClick={() => startListening(language, text => setNewMed(p => ({ ...p, drugName: text })))} className="w-8 h-8 flex items-center justify-center text-rose-500 bg-white border border-slate-100 rounded-lg shadow-sm">
-                                        <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={14} /></span>
+                                        <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={14} /></span>
                                     </button>
                                 </div>
                                 <input type="file" ref={medPhotoRef} className="hidden" accept="image/*" onChange={handleMedPhoto} />
