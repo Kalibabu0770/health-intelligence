@@ -36,12 +36,12 @@ const Dashboard: React.FC<{
     const totalCal = todayFood.reduce((s, l) => s + (l.calories || 0), 0);
 
     const navModules = [
-        { id: 'scanner', title: 'SAFETY & ADHERENCE', icon: ShieldCheck, color: 'rose', screen: 'analysis' },
-        { id: 'vitals', title: 'VITALS TREND', icon: Activity, color: 'blue', screen: 'reports' },
-        { id: 'ayush', title: 'AYUSH AI', icon: Sparkles, color: 'emerald', screen: 'ayush' },
-        { id: 'meds', title: 'MEDICATION', icon: Pill, color: 'emerald', screen: 'meds' },
-        { id: 'disease', title: 'DISEASE FINDER', icon: Stethoscope, color: 'indigo', screen: 'symptoms' },
-        { id: 'files', title: 'HEALTH FILES', icon: Layout, color: 'slate', screen: 'reports' }
+        { id: 'scanner', title: t.safety_adherence || 'SAFETY & ADHERENCE', icon: ShieldCheck, color: 'rose', screen: 'analysis' },
+        { id: 'vitals', title: t.vitals_trend || 'VITALS TREND', icon: Activity, color: 'blue', screen: 'reports' },
+        { id: 'ayush', title: t.ayush_ai || 'AYUSH AI', icon: Sparkles, color: 'emerald', screen: 'ayush' },
+        { id: 'meds', title: t.meds || 'MEDICATION', icon: Pill, color: 'emerald', screen: 'meds' },
+        { id: 'disease', title: t.triage_hub || 'DISEASE FINDER', icon: Stethoscope, color: 'indigo', screen: 'symptoms' },
+        { id: 'files', title: t.bio_hub || 'HEALTH FILES', icon: Layout, color: 'slate', screen: 'reports' }
     ];
 
     return (
@@ -55,8 +55,8 @@ const Dashboard: React.FC<{
                         <BrainCircuit size={24} className="relative z-10" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-black italic tracking-tighter text-slate-900 leading-none uppercase">DASHBOARD</h1>
-                        <p className="text-[9px] font-black text-emerald-600 uppercase tracking-[0.4em] italic mt-1 leading-none">CENTRAL INTELLIGENCE</p>
+                        <h1 className="text-xl font-black italic tracking-tighter text-slate-900 leading-none uppercase">{t.dashboard || 'DASHBOARD'}</h1>
+                        <p className="text-[9px] font-black text-emerald-600 uppercase tracking-[0.4em] italic mt-1 leading-none">{t.central_intelligence || 'CENTRAL INTELLIGENCE'}</p>
                     </div>
                 </div>
 
@@ -77,7 +77,7 @@ const Dashboard: React.FC<{
                 <div className="col-span-12 lg:col-span-4 flex flex-col gap-5 min-h-0">
                     <section className="flex-1 bg-white border border-slate-100 rounded-[2.2rem] p-6 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden group">
                         <div className="absolute top-0 inset-x-0 h-1 bg-emerald-500 opacity-20" />
-                        <h3 className="text-[8px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6 italic">Molecular Readiness</h3>
+                        <h3 className="text-[8px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6 italic">{t.molecular_readiness || 'Molecular Readiness'}</h3>
 
                         <div className="relative w-36 h-36 p-4 rounded-full border-4 border-slate-50 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
                             <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full -rotate-90">
@@ -91,13 +91,13 @@ const Dashboard: React.FC<{
                             </svg>
                             <div className="flex flex-col items-center">
                                 <span className="text-4xl font-black italic tracking-tighter text-slate-900 leading-none">{healthScoreVal}%</span>
-                                <span className="text-[7px] font-black uppercase text-slate-400 mt-2 tracking-widest">Score</span>
+                                <span className="text-[7px] font-black uppercase text-slate-400 mt-2 tracking-widest">{t.score || 'Score'}</span>
                             </div>
                         </div>
 
                         <div className="mt-6 flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Optimal Sync Active</span>
+                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">{t.optimal_sync_active || 'Optimal Sync Active'}</span>
                         </div>
                     </section>
 
@@ -106,14 +106,14 @@ const Dashboard: React.FC<{
                             <ActivitySquare size={20} className="text-emerald-500 transition-transform group-hover:scale-110" />
                             <div className="mt-2">
                                 <p className="text-2xl font-black italic text-white leading-none">{totalCal}<span className="text-[10px] ml-1.5 text-slate-500">KCAL</span></p>
-                                <p className="text-[7px] font-black uppercase tracking-widest text-slate-500 mt-2 italic">Intake Node</p>
+                                <p className="text-[7px] font-black uppercase tracking-widest text-slate-500 mt-2 italic">{t.intake_node || 'Intake Node'}</p>
                             </div>
                         </div>
                         <div onClick={onOpenMeds} className="bg-white border border-slate-100 rounded-[1.8rem] p-5 flex flex-col justify-between aspect-square group cursor-pointer hover:border-emerald-500 transition-all">
                             <Pill size={20} className="text-rose-500 transition-transform group-hover:scale-110" />
                             <div className="mt-2">
                                 <p className="text-2xl font-black italic text-slate-900 leading-none">{medications.length}<span className="text-[10px] ml-1.5 text-slate-300">PROTO</span></p>
-                                <p className="text-[7px] font-black uppercase tracking-widest text-slate-400 mt-2 italic">Pharmacy Node</p>
+                                <p className="text-[7px] font-black uppercase tracking-widest text-slate-400 mt-2 italic">{t.pharmacy_node || 'Pharmacy Node'}</p>
                             </div>
                         </div>
                     </div>
@@ -135,7 +135,7 @@ const Dashboard: React.FC<{
                                 </div>
                                 <div className="text-left">
                                     <h4 className="text-[10px] font-black italic text-slate-900 leading-none uppercase">{mod.title}</h4>
-                                    <p className="text-[6px] font-black text-slate-400 mt-1 uppercase tracking-widest">Access Node</p>
+                                    <p className="text-[6px] font-black text-slate-400 mt-1 uppercase tracking-widest">{t.access_node || 'Access Node'}</p>
                                 </div>
                             </button>
                         ))}
@@ -146,16 +146,16 @@ const Dashboard: React.FC<{
                         <header className="px-6 py-4 border-b border-slate-50 flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-3">
                                 <Activity size={16} className="text-slate-900" />
-                                <h3 className="text-[10px] font-black uppercase tracking-tight italic uppercase">Protocol Activity Feed</h3>
+                                <h3 className="text-[10px] font-black uppercase tracking-tight italic uppercase">{t.protocol_activity_feed || 'Protocol Activity Feed'}</h3>
                             </div>
-                            <button onClick={onOpenFoodLog} className="h-7 px-4 rounded-lg bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">+ REGISTER INTAKE</button>
+                            <button onClick={onOpenFoodLog} className="h-7 px-4 rounded-lg bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">+ {t.register_intake || 'REGISTER INTAKE'}</button>
                         </header>
 
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-2">
                             {activities.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center opacity-20 py-12">
                                     <Layout size={32} strokeWidth={1} />
-                                    <p className="text-[8px] font-black uppercase tracking-[0.4em] mt-3">Registry Offline</p>
+                                    <p className="text-[8px] font-black uppercase tracking-[0.4em] mt-3">{t.registry_offline || 'Registry Offline'}</p>
                                 </div>
                             ) : (
                                 activities.map((act, i) => (
@@ -185,23 +185,23 @@ const Dashboard: React.FC<{
             <section className="shrink-0 pt-1">
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     {[
-                        { label: 'Liver', score: riskScores?.liver || 0, color: 'emerald', icon: ActivitySquare },
-                        { label: 'Renal', score: riskScores?.kidney || 0, color: 'blue', icon: Activity },
-                        { label: 'Cardiac', score: riskScores?.heart || 0, color: 'rose', icon: Heart },
-                        { label: 'Neuro', score: 8, color: 'indigo', icon: BrainCircuit },
-                        { label: 'Lung', score: 12, color: 'slate', icon: Target },
-                        { label: '7D Bio', score: (100 - (riskScores?.projection7Day || 0)), color: 'emerald', icon: TrendingUp }
+                        { label: t.liver || 'Liver', score: riskScores?.liver || 0, color: 'emerald', icon: ActivitySquare },
+                        { label: t.renal || 'Renal', score: riskScores?.kidney || 0, color: 'blue', icon: Activity },
+                        { label: t.cardiac || 'Cardiac', score: riskScores?.heart || 0, color: 'rose', icon: Heart },
+                        { label: t.neuro || 'Neuro', score: 8, color: 'indigo', icon: BrainCircuit },
+                        { label: t.lung || 'Lung', score: 12, color: 'slate', icon: Target },
+                        { label: t.bio_7d || '7D Bio', score: (100 - (riskScores?.projection7Day || 0)), color: 'emerald', icon: TrendingUp }
                     ].map(node => (
                         <div key={node.label} className="bg-white border border-slate-100 rounded-[1.5rem] p-4 shadow-sm flex flex-col justify-between group">
                             <div className="flex justify-between items-center mb-3">
                                 <div className={`w-8 h-8 rounded-lg bg-${node.color}-50 text-${node.color}-600 flex items-center justify-center`}>
                                     <node.icon size={14} />
                                 </div>
-                                <span className="text-[11px] font-black italic tracking-tighter text-slate-900">{node.label === '7D Bio' ? node.score : (100 - node.score)}%</span>
+                                <span className="text-[11px] font-black italic tracking-tighter text-slate-900">{node.label === (t.bio_7d || '7D Bio') ? node.score : (100 - (node.score as number))}%</span>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-1 w-full bg-slate-50 rounded-full overflow-hidden">
-                                    <div className={`h-full bg-${node.color}-500 transition-all duration-1000`} style={{ width: `${node.label === '7D Bio' ? node.score : (100 - node.score)}%` }} />
+                                    <div className={`h-full bg-${node.color}-500 transition-all duration-1000`} style={{ width: `${node.label === (t.bio_7d || '7D Bio') ? node.score : (100 - (node.score as number))}%` }} />
                                 </div>
                                 <p className="text-[6px] font-black text-slate-400 uppercase tracking-widest">{node.label} NODE</p>
                             </div>

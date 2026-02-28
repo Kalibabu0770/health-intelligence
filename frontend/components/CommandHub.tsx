@@ -64,7 +64,7 @@ const CommandHub: React.FC<{
     onOpenAnalysis: (node: string) => void,
     theme: 'light' | 'dark'
 }> = ({ unifiedData, isOrchestrating, onRefresh, onOpenAnalysis }) => {
-    const { nutritionLogs, activityLogs, medications, clinicalVault, profile } = usePatientContext();
+    const { nutritionLogs, activityLogs, medications, clinicalVault, profile, t } = usePatientContext();
     const today = new Date().toDateString();
 
     const todayFood = (nutritionLogs || []).filter((l: any) => new Date(l.timestamp).toDateString() === today);
@@ -88,11 +88,11 @@ const CommandHub: React.FC<{
                     <div>
                         <div className="flex items-center gap-3">
                             <h1 className="text-[14px] font-black uppercase tracking-tight text-slate-900 leading-none">
-                                Integrated Command <span className="text-emerald-600 italic">Sentinel</span>
+                                {t.integrated_command || "Integrated Command"} <span className="text-emerald-600 italic">{t.sentinel || "Sentinel"}</span>
                             </h1>
                             <div className="flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
                                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10B981]" />
-                                <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Quantum Bio-Sync</span>
+                                <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">{t.quantum_bio_sync || "Quantum Bio-Sync"}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-4 mt-2">
@@ -105,7 +105,7 @@ const CommandHub: React.FC<{
 
                 <div className="flex items-center gap-6 relative z-10">
                     <div className="hidden lg:flex flex-col items-end">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Node Identity</span>
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{t.node_identity || "Node Identity"}</span>
                         <p className="text-xs font-black text-slate-900 uppercase mt-1">{profile?.name || 'Auth_User_01'}</p>
                     </div>
                     <button
@@ -124,8 +124,8 @@ const CommandHub: React.FC<{
                 <div className="col-span-12 lg:col-span-4 flex flex-col gap-8 min-h-0">
                     <div className="flex-1">
                         <CommandModule
-                            title="Disease Triage"
-                            subTitle="Clinical Reasoning Hub"
+                            title={t.disease_triage || "Disease Triage"}
+                            subTitle={t.clinical_reasoning_hub || "Clinical Reasoning Hub"}
                             icon={Stethoscope}
                             color="indigo"
                             gradient="from-indigo-600 to-violet-500"
@@ -163,8 +163,8 @@ const CommandHub: React.FC<{
 
                     <div className="flex-1">
                         <CommandModule
-                            title="Medication Safety"
-                            subTitle="Predictive Danger Analysis"
+                            title={t.medication_safety || "Medication Safety"}
+                            subTitle={t.predictive_danger_analysis || "Predictive Danger Analysis"}
                             icon={ShieldAlert}
                             color="rose"
                             gradient="from-rose-600 to-pink-500"
@@ -206,8 +206,8 @@ const CommandHub: React.FC<{
                 <div className="col-span-12 lg:col-span-5 flex flex-col gap-8 min-h-0">
                     <div className="flex-[0.6]">
                         <CommandModule
-                            title="Protocol Adherence"
-                            subTitle="Adherence Sentinel"
+                            title={t.protocol_adherence || "Protocol Adherence"}
+                            subTitle={t.adherence_sentinel || "Adherence Sentinel"}
                             icon={ClipboardList}
                             color="blue"
                             gradient="from-blue-600 to-indigo-500"
@@ -251,8 +251,8 @@ const CommandHub: React.FC<{
 
                     <div className="flex-[0.4] grid grid-cols-2 gap-8">
                         <CommandModule
-                            title="Life Audit"
-                            subTitle="Tracker"
+                            title={t.life_audit || "Life Audit"}
+                            subTitle={t.tracker || "Tracker"}
                             icon={TrendingUp}
                             color="blue"
                             gradient="from-blue-600 to-cyan-500"
@@ -270,8 +270,8 @@ const CommandHub: React.FC<{
                         </CommandModule>
 
                         <CommandModule
-                            title="Wisdom"
-                            subTitle="AYUSH"
+                            title={t.wisdom || "Wisdom"}
+                            subTitle={t.ayush || "AYUSH"}
                             icon={Leaf}
                             color="emerald"
                             gradient="from-emerald-600 to-teal-500"

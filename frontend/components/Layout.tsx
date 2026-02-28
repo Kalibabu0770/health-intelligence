@@ -65,13 +65,13 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
               <ShieldCheck size={24} />
             </div>
             <div className="min-w-0">
-              <h1 className={`font-black text-[16px] uppercase tracking-tight leading-none text-slate-900 italic`}>Health Intelligence</h1>
+              <h1 className={`font-black text-[16px] uppercase tracking-tight leading-none text-slate-900 italic`}>{t.health_intelligence || 'Health Intelligence'}</h1>
               <p className="text-[8px] font-black text-emerald-600 uppercase tracking-widest mt-1">Bio-Sentinel v2.8</p>
             </div>
           </header>
 
           <nav className="flex-1 overflow-y-auto custom-scrollbar py-6 px-3 space-y-1">
-            <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.4em] px-4 pb-3">Protocol Modules</p>
+            <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.4em] px-4 pb-3">{t.protocol_modules || 'Protocol Modules'}</p>
             {menuItems.map((item) => {
               const IconComp = item.icon;
               const isActive = activeScreen === item.id;
@@ -112,7 +112,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
                 <p className="text-[11px] font-black uppercase truncate text-slate-900 leading-none">{profile?.name || 'USER'}</p>
                 <div className="flex items-center gap-1 mt-1">
                   <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                  <p className="text-[7px] font-black text-emerald-600 uppercase tracking-widest leading-none">Secured Link</p>
+                  <p className="text-[7px] font-black text-emerald-600 uppercase tracking-widest leading-none">{t.secured_link || 'Secured Link'}</p>
                 </div>
               </div>
             </div>

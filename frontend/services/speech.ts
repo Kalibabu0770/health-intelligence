@@ -30,6 +30,8 @@ export const startListening = (
     recognition.continuous = true;
     recognition.interimResults = true;
 
+    const t = translations[language as Language] || translations['en'];
+
     // ChatGPT-style Global Overlay Management
     let aura = document.getElementById('ai-aura') as HTMLElement;
     if (!aura) {
@@ -45,12 +47,12 @@ export const startListening = (
             <div class="orb orb-2"></div>
             <div class="orb orb-3"></div>
             <div class="orb orb-4"></div>
-            <span class="listening-text">AI Guardian Listening...</span>
+            <span class="listening-text">${t.ai_guardian_listening || 'AI Guardian Listening...'}</span>
         </div>
-        <div id="aura-transcript" class="aura-transcript-area">Please speak clearly...</div>
+        <div id="aura-transcript" class="aura-transcript-area">${t.please_speak_clearly || 'Please speak clearly...'}</div>
         <div class="aura-actions">
-            <button id="aura-done" class="aura-btn aura-btn-confirm">DONE / USE TEXT</button>
-            <button id="aura-cancel" class="aura-btn aura-btn-cancel">CANCEL</button>
+            <button id="aura-done" class="aura-btn aura-btn-confirm">${t.done_use_text || 'DONE / USE TEXT'}</button>
+            <button id="aura-cancel" class="aura-btn aura-btn-cancel">${t.cancel || 'CANCEL'}</button>
         </div>
     `;
 
@@ -65,7 +67,7 @@ export const startListening = (
 
     const finalize = () => {
         const text = transcriptEl.textContent?.trim() || finalTranscript.trim();
-        if (text && text !== "Please speak clearly...") {
+        if (text && text !== (t.please_speak_clearly || "Please speak clearly...")) {
             onTranscript(text);
         }
     };
@@ -82,7 +84,7 @@ export const startListening = (
     };
 
     recognition.onstart = () => {
-        if (transcriptEl) transcriptEl.textContent = "Listening...";
+        if (transcriptEl) transcriptEl.textContent = t.listening || "Listening...";
     };
 
     recognition.onresult = (event: any) => {
@@ -105,7 +107,7 @@ export const startListening = (
 
     recognition.onerror = (event: any) => {
         console.error("Speech Recognition Error:", event.error);
-        if (transcriptEl) transcriptEl.textContent = "Error: " + event.error + ". Please check microphone permissions.";
+        if (transcriptEl) transcriptEl.textContent = (t.error || "Error: ") + event.error + ". " + (t.check_mic || "Please check microphone permissions.");
         setTimeout(() => recognition.stop(), 3000);
     };
 

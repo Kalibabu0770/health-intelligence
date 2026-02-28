@@ -140,14 +140,15 @@ const callAI = async (
     if (GROQ_API_KEY && GROQ_API_KEY !== 'your_groq_api_key_here') {
         try {
             // For JSON requests, add explicit JSON instruction to system message
-            const groqMessages = options.json
-                ? messages.map((m, i) =>
-                    i === 0 && m.role === 'system'
-                        ? { ...m, content: CLINICAL_SYSTEM_PROMPT + '\n' + m.content + '\nIMPORTANT: Return ONLY valid JSON. No markdown, no extra text.' }
-                        : m
-                )
-                : [{ role: 'system', content: CLINICAL_SYSTEM_PROMPT }, ...messages];
-            const result = await callGroq(groqMessages, { temperature: 0.7 });
+            let groqMessages = [...messages];
+            if (groqMessages[0].role !== 'system') {
+                groqMessages.unshift({ role: 'system', content: CLINICAL_SYSTEM_PROMPT });
+            }
+            if (options.json) {
+                groqMessages[0].content += '\nIMPORTANT: Return ONLY valid JSON. No markdown, no extra text.';
+            }
+
+            const result = await callGroq(groqMessages, { temperature: 0.7, json: options.json });
             console.log('[AI] ✅ Groq (cloud) responded');
             return result;
         } catch (e: any) {
@@ -1052,7 +1053,64 @@ export const orchestrateHealth = async (context: PatientContext, options: {
         if (!riskScores || !profile) return null;
 
         const activeMeds = options.medications || [];
-        const riskLevel = (riskScores?.healthScore || 80) > 80 ? 'SAFE' : (riskScores?.healthScore || 80) > 60 ? 'CAUTION' : 'DANGER';
+        let interactionLevel = 'CAUTION';
+        let explanation = `Unable to verify "${activeMeds.join(', ')}" for "${options.problem_context || 'reported symptoms'}". Please consult a medical professional.`;
+        let conflicts: string[] = [];
+
+        if (activeMeds.length > 0) {
+            try {
+                const medPrompt = `
+                You are a Medical Expert AI.
+                Patient Age: ${profile.age}, Gender: ${profile.gender}, Conditions: ${profile.conditions.map((c: any) => c.name).join(', ')}.
+                Medications to check: ${activeMeds.join(', ')}.
+                Reported symptoms / problem: ${options.problem_context || 'None specified'}.
+                
+                Task: Check if taking these medications is SAFE, CAUTION, or DANGER for the reported symptoms and patient profile. Provide a professional clinical analysis.
+                If the medication is totally incorrect for the symptom (like antihistamines for AIDS, or Paracetamol for severe viral infections instead of just the fever), explain this.
+                
+                Respond in EXACTLY this format:
+                STATUS: [SAFE or CAUTION or DANGER]
+                EXPLANATION: [2-3 sentences of medical reasoning answering if it helps their symptom.]
+                `;
+
+                // Direct explicit cloud call to completely avoid offline loop
+                const fallbackKey = "your_fallback_api_key_here";
+                const activeKey = GROQ_API_KEY || fallbackKey;
+
+                const cloudResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${activeKey}` },
+                    body: JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        messages: [
+                            { role: 'system', content: CLINICAL_SYSTEM_PROMPT },
+                            { role: 'user', content: medPrompt }
+                        ],
+                        temperature: 0.5
+                    })
+                });
+
+                if (!cloudResp.ok) throw new Error("Cloud synthesis failed");
+                const data = await cloudResp.json();
+                const aiResult = data.choices && data.choices[0] && data.choices[0].message.content ? data.choices[0].message.content : "STATUS: CAUTION\nEXPLANATION: Unable to decode result.";
+
+                let parsedStatus = 'CAUTION';
+                if (aiResult.includes('STATUS: SAFE') || aiResult.includes('[SAFE]')) parsedStatus = 'SAFE';
+                if (aiResult.includes('STATUS: DANGER') || aiResult.includes('[DANGER]')) parsedStatus = 'DANGER';
+
+                let expl = aiResult.split('EXPLANATION:')[1] || aiResult.split('EXPLANATION')[1] || aiResult.replace(/STATUS:.*?\n/, '');
+
+                interactionLevel = parsedStatus;
+                explanation = `[REAL-TIME AI SCAN: ${new Date().toLocaleString()}] ` + expl.trim();
+
+            } catch (err) {
+                // Failsafe behavior when even direct Groq fails (e.g., no internet connection)
+                interactionLevel = 'CAUTION';
+                const medsText = activeMeds.join(', ');
+                const probText = options.problem_context || 'reported medical condition';
+                explanation = `[SYSTEM SCAN COMPLETED: ${new Date().toLocaleString()}] Neural synthesis could not firmly verify "${medsText}" for "${probText}". Check dosage with a healthcare provider before taking.`;
+            }
+        }
 
         return {
             bio_risk: {
@@ -1067,12 +1125,10 @@ export const orchestrateHealth = async (context: PatientContext, options: {
                 }
             },
             medication_safety: activeMeds.length > 0 ? {
-                interaction_level: activeMeds.length > 1 ? 'CAUTION' : 'SAFE',
-                conflicts_detected: activeMeds.length > 1 ? [`Interaction between ${activeMeds[0]} and ${activeMeds[1]}`] : [],
-                explanation: activeMeds.length > 1
-                    ? `Potential metabolic conflict between ${activeMeds.join(' and ')}. Neural analysis suggests adjusted dosage timings for ${profile.name || 'Citizen'}.`
-                    : `Analysis of ${activeMeds[0]} complete. Compound compatible with current bio-rhythms in ${profile.location || 'current sector'}.`,
-                next_action: "Monitor for thermal variations."
+                interaction_level: interactionLevel,
+                conflicts_detected: conflicts,
+                explanation: explanation,
+                next_action: "Monitor for adverse effects."
             } : null,
             triage: {
                 triage_level: "Optimal",

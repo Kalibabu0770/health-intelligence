@@ -252,9 +252,14 @@ const MedicationSafetyScanner: React.FC = () => {
                                     <p className="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-4 flex items-center gap-2 italic">
                                         <Info size={12} /> Clinical Synthesis
                                     </p>
-                                    <p className="text-[11px] font-bold text-slate-700 leading-relaxed italic uppercase tracking-tight">
+                                    <p className="text-[11px] font-bold text-slate-700 leading-relaxed italic uppercase tracking-tight mb-4">
                                         "{result.explanation}"
                                     </p>
+                                    <div className="pt-4 border-t border-slate-200">
+                                        <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">
+                                            DISCLAIMER: AI-generated analysis based on real-time data. Not a substitute for professional medical advice.
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">

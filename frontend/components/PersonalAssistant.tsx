@@ -10,7 +10,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
     const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>([
         {
             role: 'model',
-            text: `Hello ${profile?.name?.split(' ')[0] || 'there'}! I am your AI Health Guardian. How can I assist you today?`
+            text: t.assistant_greeting ? t.assistant_greeting.replace('{name}', profile?.name?.split(' ')[0] || '') : `Hello ${profile?.name?.split(' ')[0] || 'there'}! I am your AI Health Guardian. How can I assist you today?`
         }
     ]);
     const [input, setInput] = useState('');
@@ -27,7 +27,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
             const res = await getAIPersonalAssistantResponse(context, msg, messages, { ...analysis, epidemiology });
             setMessages(p => [...p, { role: 'model', text: res }]);
         } catch (e) {
-            setMessages(p => [...p, { role: 'model', text: "I'm currently recalibrating my neural links. Please try again or visit our specific health modules." }]);
+            setMessages(p => [...p, { role: 'model', text: t.assistant_error || "I'm currently recalibrating my neural links. Please try again or visit our specific health modules." }]);
         } finally { setLoading(false); }
     };
 
@@ -47,10 +47,10 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                         <Bot size={24} strokeWidth={2.5} />
                     </div>
                     <div>
-                        <h3 className="font-black text-sm text-white uppercase tracking-tight leading-none">AI Health Guardian</h3>
+                        <h3 className="font-black text-sm text-white uppercase tracking-tight leading-none">{t.ai_health_guardian || 'AI Health Guardian'}</h3>
                         <div className="flex items-center gap-1.5 mt-1.5 font-black uppercase text-[8px] text-emerald-500 tracking-widest">
                             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                            Secure Link Active
+                            {t.secure_link_active || 'Secure Link Active'}
                         </div>
                     </div>
                 </div>
@@ -97,7 +97,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                     <input
                         type="text"
                         className="w-full bg-slate-50 border-2 border-slate-100 p-5 pr-24 rounded-2xl font-black text-xs outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-inner placeholder:text-slate-300 placeholder:uppercase"
-                        placeholder="Ask me anything about your health..."
+                        placeholder={t.ask_me_anything || "Ask me anything about your health..."}
                         value={input}
                         onChange={e => setInput(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && handleSend()}
@@ -126,7 +126,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                 </div>
                 <div className="mt-4 flex items-center justify-center gap-3 opacity-20">
                     <ShieldCheck size={10} className="text-emerald-600" />
-                    <p className="text-[7px] font-black uppercase tracking-[0.4em] text-slate-400">Encrypted AI Protocol • G20 Secure</p>
+                    <p className="text-[7px] font-black uppercase tracking-[0.4em] text-slate-400">{t.encrypted_ai_protocol || 'Encrypted AI Protocol • G20 Secure'}</p>
                 </div>
             </div>
 
