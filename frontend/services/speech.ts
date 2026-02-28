@@ -97,7 +97,7 @@ export const startListening = (
         const liveText = (finalTranscript + interimTranscript).trim();
         if (liveText) {
             if (transcriptEl) transcriptEl.textContent = liveText;
-            // Real-time preview in the overlay, but we wait for 'DONE' to call onTranscript
+            onTranscript(liveText);
             // This provides the 'confirmation mechanism' requested by the user.
         }
 
