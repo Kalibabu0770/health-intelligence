@@ -1,9 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from models import UnifiedRequest, UnifiedResponse
 from orchestrator import HealthIntelligenceOrchestrator
 import uvicorn
 import os
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -56,6 +57,43 @@ async def generate_ehr(request: UnifiedRequest):
         return response
     except Exception as e:
         print(f"[EHR] Synthesis Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/transcribe")
+async def transcribe(audio: UploadFile = File(...), language: str = Form("en-IN")):
+    # Security proxy to bypass frontend Groq API disclosure blocks. Uses the backend env.
+    key = os.getenv("GROQ_API_KEY")
+    if not key:
+        raise HTTPException(status_code=500, detail="Backend missing GROQ_API_KEY")
+
+    url = 'https://api.groq.com/openai/v1/audio/transcriptions'
+    
+    # Whisper expects 2-letter codes mostly, but some others work
+    language_code = language.split('-')[0] if '-' in language else language
+
+    files = {
+        'file': (audio.filename or 'audio.webm', await audio.read(), audio.content_type or 'audio/webm')
+    }
+    data = {
+        'model': 'whisper-large-v3',
+        'response_format': 'json',
+        'language': language_code
+    }
+    headers = {
+        "Authorization": f"Bearer {key}"
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(url, headers=headers, data=data, files=files)
+            resp.raise_for_status()
+            content = resp.json()
+            return {"text": content.get("text", "")}
+    except httpx.HTTPStatusError as e:
+        print(f"Groq API Error: {e.response.text}")
+        raise HTTPException(status_code=500, detail="Transcription AI proxy error: " + e.response.text)
+    except Exception as e:
+        print(f"File Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")

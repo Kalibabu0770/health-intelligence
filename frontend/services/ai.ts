@@ -95,33 +95,20 @@ const callGroq = async (messages: any[], options: any = {}): Promise<string> => 
     }
 };
 
-// ── Audio Interface: Groq Whisper ─────────────────────────────────────────
+// ── Audio Interface: Proxy to Backend ─────────────────────────────────────────
 export const transcribeAudio = async (audioBlob: Blob, language?: string): Promise<string> => {
-    if (!GROQ_API_KEY) {
-        throw new Error('Groq API key not configured for audio transcription');
-    }
-
     const formData = new FormData();
-    formData.append('file', audioBlob, 'recording.webm');
-    formData.append('model', 'whisper-large-v3');
-    if (language && language !== 'en') {
-        // Whisper language hints: mostly 2-letter ISO codes (hi, te, kn, mr, ta, en)
-        const code = language.split('-')[0];
-        formData.append('language', code);
+    formData.append('audio', audioBlob, 'recording.webm');
+    if (language) {
+        formData.append('language', language);
     }
-
-    // We want the raw text back
-    formData.append('response_format', 'json');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s for audio usually
 
     try {
-        const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+        const response = await fetch(`${BACKEND_BASE_URL}/transcribe`, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${GROQ_API_KEY}`,
-            },
             body: formData,
             signal: controller.signal,
         });
@@ -129,12 +116,12 @@ export const transcribeAudio = async (audioBlob: Blob, language?: string): Promi
 
         if (!response.ok) {
             const err = await response.text().catch(() => 'Unknown error');
-            throw new Error(`Groq Whisper error ${response.status}: ${err}`);
+            throw new Error(`Whisper Backend error ${response.status}: ${err}`);
         }
 
         const data = await response.json();
         const content = data.text || '';
-        console.log(`[Whisper] ✅ Transcript received (${content.length} chars)`);
+        console.log(`[Whisper] ✅ Transcript received via backend (${content.length} chars)`);
         return content;
     } catch (error: any) {
         clearTimeout(timeoutId);
