@@ -70,16 +70,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
           </div>
         </div>
 
-        {/* GUIDANCE MESSAGE */}
-        <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl mb-6 shrink-0">
-          <div className="flex items-start gap-2">
-            <Bot size={16} className="text-emerald-600 mt-0.5" />
-            <p className="text-[9px] font-bold text-emerald-800 uppercase tracking-widest leading-relaxed">
-              Welcome. This portal is integrated with AHMIS to provide real-time, explainable AI guidance across all modules. Ensure to log symptoms accurately for best precision.
-            </p>
-          </div>
-        </div>
-
         <div className="flex flex-col gap-2 flex-1">
           {menuItems.map(item => (
             <MenuButton key={item.id} item={item} />
