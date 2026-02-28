@@ -97,7 +97,7 @@ const callGroq = async (messages: any[], options: any = {}): Promise<string> => 
 
 // ── Audio Interface: Groq Whisper ─────────────────────────────────────────
 export const transcribeAudio = async (audioBlob: Blob, language?: string): Promise<string> => {
-    if (!GROQ_API_KEY || GROQ_API_KEY === 'your_groq_api_key_here') {
+    if (!GROQ_API_KEY) {
         throw new Error('Groq API key not configured for audio transcription');
     }
 
