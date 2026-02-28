@@ -85,7 +85,8 @@ const GlobalDictate: React.FC = () => {
                     recognition.onresult = (event: any) => {
                         let finalTxt = '';
                         let interimTxt = '';
-                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        // Loop from 0 to capture entire history of the session, preventing vanishing text
+                        for (let i = 0; i < event.results.length; ++i) {
                             if (event.results[i].isFinal) {
                                 finalTxt += event.results[i][0].transcript;
                             } else {
