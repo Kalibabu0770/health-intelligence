@@ -177,35 +177,6 @@ const Dashboard: React.FC<{
                 </div>
             </main>
 
-            {/* ORGAN MATRIX (Classic Bottom Section) */}
-            <section className="shrink-0 pt-1">
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    {[
-                        { label: t.liver || 'Liver', score: riskScores?.liver || 0, color: 'emerald', icon: ActivitySquare },
-                        { label: t.renal || 'Renal', score: riskScores?.kidney || 0, color: 'blue', icon: Activity },
-                        { label: t.cardiac || 'Cardiac', score: riskScores?.heart || 0, color: 'rose', icon: Heart },
-                        { label: t.neuro || 'Neuro', score: 8, color: 'indigo', icon: BrainCircuit },
-                        { label: t.lung || 'Lung', score: 12, color: 'slate', icon: Target },
-                        { label: t.bio_7d || '7D Bio', score: (100 - (riskScores?.projection7Day || 0)), color: 'emerald', icon: TrendingUp }
-                    ].map(node => (
-                        <div key={node.label} className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex flex-col justify-between group">
-                            <div className="flex justify-between items-center mb-3">
-                                <div className={`w-8 h-8 rounded-lg bg-${node.color}-50 text-${node.color}-600 flex items-center justify-center`}>
-                                    <node.icon size={14} />
-                                </div>
-                                <span className="text-[11px] font-black italic tracking-tighter text-slate-900">{node.label === (t.bio_7d || '7D Bio') ? node.score : (100 - (node.score as number))}%</span>
-                            </div>
-                            <div className="space-y-2">
-                                <div className="h-1 w-full bg-slate-50 rounded-full overflow-hidden">
-                                    <div className={`h-full bg-${node.color}-500 transition-all duration-1000`} style={{ width: `${node.label === (t.bio_7d || '7D Bio') ? node.score : (100 - (node.score as number))}%` }} />
-                                </div>
-                                <p className="text-[6px] font-black text-slate-400 uppercase tracking-widest">{node.label} NODE</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
             <style>{`
                 .custom-scrollbar::-webkit-scrollbar { width: 3px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
