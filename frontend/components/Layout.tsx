@@ -28,12 +28,12 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
 
   const menuItems = [
     { id: 'hub', icon: Home, label: t.dashboard || 'DASHBOARD', desc: t.central_intelligence || 'CENTRAL INTELLIGENCE' },
+    { id: 'reports', icon: FileText, label: t.bio_hub || 'HEALTH FILES', desc: t.vault_registry || 'HEALTH FILE REGISTRY' },
     { id: 'symptoms', icon: Stethoscope, label: t.triage_hub || 'DISEASE FINDER', desc: t.clinical_analysis || 'CLINICAL ANALYSIS' },
     { id: 'analysis', icon: ShieldAlert, label: t.safety_adherence || 'SAFETY & ADHERENCE', desc: 'MEDICATION SAFETY SCANNER' },
     { id: 'ayush', icon: Leaf, label: t.ayush_ai || 'AYUSH AI', desc: t.ancient_wisdom || 'ANCIENT WISDOM HUB' },
     { id: 'meds', icon: ClipboardList, label: t.pharmacy || 'MEDICATION REMINDER', desc: t.safety_adherence || 'SAFETY & ADHERENCE' },
     { id: 'audit', icon: Activity, label: t.vitals_trend || 'LIFESTYLE & NUTRITION', desc: 'LOG DIET & EXERCISE' },
-    { id: 'reports', icon: FileText, label: t.bio_hub || 'HEALTH FILES', desc: t.vault_registry || 'HEALTH FILE REGISTRY' },
     { id: 'profile', icon: UserCircle, label: t.identity || 'IDENTITY', desc: t.vault_registry || 'HEALTH FILE REGISTRY' },
   ];
 

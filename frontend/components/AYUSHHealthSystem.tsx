@@ -61,12 +61,12 @@ const AYUSHHealthSystem: React.FC = () => {
     ];
 
     return (
-        <div className="h-full w-full bg-slate-50 flex flex-col font-sans">
+        <div className="h-full w-full bg-[#fcfdfe] p-4 lg:p-6 flex flex-col gap-5 font-sans overflow-y-auto custom-scrollbar relative">
 
             {/* Header */}
-            <header className="bg-white border-b-4 border-slate-200 p-6 shrink-0 shadow-sm flex items-start gap-4">
-                <div className="w-16 h-16 bg-white border-2 border-emerald-500 rounded-xl flex items-center justify-center text-slate-800 shrink-0 shadow-sm">
-                    <Globe size={32} />
+            <header className="flex flex-col lg:flex-row items-start lg:items-center gap-4 bg-white border-2 border-emerald-500 p-5 rounded-xl shadow-sm shrink-0">
+                <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 shadow-sm shrink-0">
+                    <Globe size={28} />
                 </div>
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 leading-tight uppercase tracking-tight">Outbreak Sentinel</h1>
@@ -78,7 +78,7 @@ const AYUSHHealthSystem: React.FC = () => {
                 </div>
             </header>
 
-            <main className="flex-1 overflow-hidden p-4 lg:p-8 relative">
+            <main className="flex-1 min-h-min pb-4 flex flex-col gap-5">
                 {/* PAGE 1: LOCAL SAFETY */}
                 {page === 1 && (
                     <div className="h-full w-full bg-white border border-slate-200 rounded-2xl p-8 flex flex-col shadow-sm animate-in zoom-in-95 duration-500">
@@ -171,7 +171,7 @@ const AYUSHHealthSystem: React.FC = () => {
             </main>
 
             {/* Bottom Navigation */}
-            <footer className="bg-white border-t border-slate-200 p-6 shrink-0 flex justify-between items-center">
+            <footer className="bg-white border-2 border-slate-200 p-5 rounded-xl shrink-0 flex justify-between items-center shadow-sm">
                 <button
                     onClick={() => setPage((p) => Math.max(1, p - 1) as any)}
                     disabled={page === 1}

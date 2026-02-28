@@ -36,12 +36,12 @@ const Dashboard: React.FC<{
     const totalCal = todayFood.reduce((s, l) => s + (l.calories || 0), 0);
 
     const navModules = [
+        { id: 'files', title: t.bio_hub || 'HEALTH FILES', icon: Layout, color: 'slate', screen: 'reports' },
         { id: 'scanner', title: t.safety_adherence || 'SAFETY & ADHERENCE', icon: ShieldCheck, color: 'rose', screen: 'analysis' },
         { id: 'vitals', title: t.vitals_trend || 'VITALS TREND', icon: Activity, color: 'blue', screen: 'reports' },
         { id: 'ayush', title: t.ayush_ai || 'AYUSH AI', icon: Sparkles, color: 'emerald', screen: 'ayush' },
         { id: 'meds', title: t.meds || 'MEDICATION', icon: Pill, color: 'emerald', screen: 'meds' },
-        { id: 'disease', title: t.triage_hub || 'DISEASE FINDER', icon: Stethoscope, color: 'indigo', screen: 'symptoms' },
-        { id: 'files', title: t.bio_hub || 'HEALTH FILES', icon: Layout, color: 'slate', screen: 'reports' }
+        { id: 'disease', title: t.triage_hub || 'DISEASE FINDER', icon: Stethoscope, color: 'indigo', screen: 'symptoms' }
     ];
 
     return (
