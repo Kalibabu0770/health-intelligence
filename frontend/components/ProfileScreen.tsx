@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { Pencil, Check, Mic, Heart } from 'lucide-react';
 import { usePatientContext } from '../core/patientContext/patientStore';
-import { startListening } from '../services/speech';
 import { UserProfile } from '../types';
 
 const ProfileScreen: React.FC = () => {
     const { profile, updateProfile, resetVault, language, t } = usePatientContext();
     const [isEditing, setIsEditing] = useState(false);
-    const [isListening, setIsListening] = useState(false);
     const [edited, setEdited] = useState<UserProfile | null>(profile);
 
     if (!profile || !edited) return null;
@@ -39,13 +37,7 @@ const ProfileScreen: React.FC = () => {
                             <input className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-lg outline-none" value={edited.name} onChange={e => setEdited({ ...edited, name: e.target.value })} placeholder="Identity" />
                             <button
                                 type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    if (isListening) return;
-                                    setIsListening(true);
-                                    startListening(language, text => setEdited(p => p ? { ...p, name: text } : null), () => setIsListening(false));
-                                }}
-                                className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all text-emerald-600 hover:text-emerald-700`}
                             >
                                 <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={20} /></span>
                             </button>
@@ -53,31 +45,19 @@ const ProfileScreen: React.FC = () => {
 
                         <div className="flex gap-3">
                             <div className="relative w-1/2">
-                                <input type="number" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none pr-10" value={edited.age || ''} onChange={e => setEdited({ ...edited, age: Number(e.target.value) })} placeholder={t.age} />
+                                <input type="number" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none pr-10" value={edited.age || ''} onChange={e => setEdited({ ...edited, age: parseInt(e.target.value) || 0 })} placeholder={t.age} />
                                 <button
                                     type="button"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (isListening) return;
-                                        setIsListening(true);
-                                        startListening(language, text => setEdited(p => p ? { ...p, age: parseInt(text.replace(/\D/g, '')) || p.age } : null), () => setIsListening(false));
-                                    }}
-                                    className={`absolute right-2 top-1/2 -translate-y-1/2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                    className={`absolute right-2 top-1/2 -translate-y-1/2 active:scale-90 transition-all text-emerald-600 hover:text-emerald-700`}
                                 >
                                     <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={14} /></span>
                                 </button>
                             </div>
                             <div className="relative w-1/2">
-                                <input type="number" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none pr-10" value={edited.weight || ''} onChange={e => setEdited({ ...edited, weight: Number(e.target.value) })} placeholder={t.weight} />
+                                <input type="number" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none pr-10" value={edited.weight || ''} onChange={e => setEdited({ ...edited, weight: parseInt(e.target.value) || 0 })} placeholder={t.weight} />
                                 <button
                                     type="button"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (isListening) return;
-                                        setIsListening(true);
-                                        startListening(language, text => setEdited(p => p ? { ...p, weight: parseInt(text.replace(/\D/g, '')) || p.weight } : null), () => setIsListening(false));
-                                    }}
-                                    className={`absolute right-2 top-1/2 -translate-y-1/2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                    className={`absolute right-2 top-1/2 -translate-y-1/2 active:scale-90 transition-all text-emerald-600 hover:text-emerald-700`}
                                 >
                                     <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={14} /></span>
                                 </button>
@@ -94,13 +74,7 @@ const ProfileScreen: React.FC = () => {
                             <input className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none" value={edited.location || ''} onChange={e => setEdited({ ...edited, location: e.target.value })} placeholder={t.region_placeholder} />
                             <button
                                 type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    if (isListening) return;
-                                    setIsListening(true);
-                                    startListening(language, text => setEdited(p => p ? { ...p, location: text } : null), () => setIsListening(false));
-                                }}
-                                className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all text-emerald-600 hover:text-emerald-700`}
                             >
                                 <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={20} /></span>
                             </button>
@@ -111,13 +85,7 @@ const ProfileScreen: React.FC = () => {
                                 <input className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-black text-base outline-none" value={edited.profession || ''} onChange={e => setEdited({ ...edited, profession: e.target.value })} placeholder="Profession" />
                                 <button
                                     type="button"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (isListening) return;
-                                        setIsListening(true);
-                                        startListening(language, text => setEdited(p => p ? { ...p, profession: text } : null), () => setIsListening(false));
-                                    }}
-                                    className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all ${isListening ? 'text-rose-500 animate-pulse' : 'text-emerald-600 hover:text-emerald-700'}`}
+                                    className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 active:scale-90 transition-all text-emerald-600 hover:text-emerald-700`}
                                 >
                                     <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={20} /></span>
                                 </button>

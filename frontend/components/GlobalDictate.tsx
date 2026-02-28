@@ -18,18 +18,24 @@ const GlobalDictate: React.FC = () => {
         };
 
         const listenToGlobalTrigger = (e: any) => {
-            if (e.detail?.target) {
+            let foundInput = null;
+
+            if (e.detail?.selector) {
+                foundInput = document.querySelector(e.detail.selector);
+            }
+
+            if (!foundInput && e.detail?.target) {
                 const triggerNode = e.detail.target as HTMLElement;
                 // Find nearest input or textarea by traversing up to common parent
                 let container = triggerNode.parentElement;
-                let foundInput = null;
                 while (container && !foundInput) {
                     foundInput = container.querySelector('input, textarea');
                     if (foundInput) break;
                     container = container.parentElement;
                 }
-                if (foundInput) setLastFocusedInput(foundInput as any);
             }
+            if (foundInput) setLastFocusedInput(foundInput as any);
+
             startDictation();
         };
 
@@ -58,11 +64,11 @@ const GlobalDictate: React.FC = () => {
 
         const langMap: Record<string, string> = {
             'hi': 'hi-IN', 'te': 'te-IN', 'ta': 'ta-IN',
-            'kn': 'kn-IN', 'mr': 'mr-IN', 'en': 'en-US'
+            'kn': 'kn-IN', 'mr': 'mr-IN', 'en': 'en-IN'
         };
 
-        // We use the language context to support all languages, defaulting to local or en-US
-        recognition.lang = langMap[language || 'en'] || 'en-US';
+        // We use the language context to support all languages, defaulting to local IN to handle Indian dialects/Slangs naturally
+        recognition.lang = langMap[language || 'en'] || 'en-IN';
         recognition.continuous = true;
         recognition.interimResults = true;
 
@@ -144,10 +150,13 @@ const GlobalDictate: React.FC = () => {
                 setter.call(targetNode, newValue);
                 const ev2 = new Event('input', { bubbles: true });
                 targetNode.dispatchEvent(ev2);
+                const ev3 = new Event('change', { bubbles: true });
+                targetNode.dispatchEvent(ev3);
             } else {
                 // Fallback
                 targetNode.value += (targetNode.value ? ' ' : '') + transcript;
                 targetNode.dispatchEvent(new Event('input', { bubbles: true }));
+                targetNode.dispatchEvent(new Event('change', { bubbles: true }));
             }
         } else if (transcript && transcript !== 'Listening...') {
             // If no input was focused, we can try to copy to clipboard as fallback
