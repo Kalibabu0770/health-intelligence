@@ -9,8 +9,7 @@ const GlobalDictate: React.FC = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [transcript, setTranscript] = useState('');
     const [lastFocusedInput, setLastFocusedInput] = useState<HTMLInputElement | HTMLTextAreaElement | null>(null);
-    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-    const audioChunksRef = useRef<Blob[]>([]);
+    const recognitionRef = useRef<any>(null);
     const triggerSelectorRef = useRef<string | null>(null);
 
     useEffect(() => {
@@ -55,60 +54,72 @@ const GlobalDictate: React.FC = () => {
         };
     }, [language]); // Depend on language so the closure has the latest language
 
-    const startDictation = async () => {
+    const startDictation = () => {
         try {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                throw new Error("HTTPS required");
+            // Priority 1: Native Real-time browser speech API (Chrome, Safari, Edge)
+            const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+            if (SpeechRecognitionAPI) {
+                const recognition = new SpeechRecognitionAPI();
+                recognitionRef.current = recognition;
+
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = language === 'en-IN' ? 'en-IN' : language; // Defaulting to IN for Indian English parsing natively
+
+                recognition.onstart = () => {
+                    setIsListening(true);
+                    setTranscript('Listening... Speak now.');
+                };
+
+                recognition.onresult = (event: any) => {
+                    let finalTxt = '';
+                    let interimTxt = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            finalTxt += event.results[i][0].transcript;
+                        } else {
+                            interimTxt += event.results[i][0].transcript;
+                        }
+                    }
+                    const text = (finalTxt + " " + interimTxt).trim();
+                    if (text) {
+                        setTranscript(text);
+                    }
+                };
+
+                recognition.onerror = (event: any) => {
+                    console.error("Speech Recognition Error:", event.error);
+                    setIsListening(false);
+                    if (event.error === 'not-allowed') {
+                        setTranscript("Microphone Access Blocked. Please allow mic permissions.");
+                    } else if (event.error !== 'aborted') {
+                        setTranscript(`Speech Recognition Error: ${event.error}`);
+                    }
+                };
+
+                recognition.onend = () => {
+                    setIsListening(false);
+                };
+
+                recognition.start();
+                return;
             }
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-            mediaRecorderRef.current = mediaRecorder;
-            audioChunksRef.current = [];
 
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    audioChunksRef.current.push(event.data);
-                }
-            };
+            // Fallback: If absolutely no Web Speech API, show hard error
+            throw new Error("SpeechRecognition API Not Supported");
 
-            mediaRecorder.onstart = () => {
-                setIsListening(true);
-                setTranscript('Listening... Speak now.');
-            };
-
-            mediaRecorder.onstop = async () => {
-                setIsListening(false);
-                setIsProcessing(true);
-                setTranscript('AI Guardian analyzing audio via Whisper NLP...');
-
-                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-
-                try {
-                    const text = await transcribeAudio(audioBlob, language);
-                    setTranscript(text);
-                } catch (error) {
-                    console.error("Transcription Error:", error);
-                    setTranscript("Failed to transcribe audio. Please ensure Groq is available.");
-                } finally {
-                    setIsProcessing(false);
-                }
-
-                // Release the mic
-                stream.getTracks().forEach(track => track.stop());
-            };
-
-            mediaRecorder.start();
         } catch (error) {
-            console.warn("Mic Access Error:", error);
+            console.error("Mic Access / Compatibility Error:", error);
             setIsListening(false);
-            setTranscript('Microphone Data Blocked: Please ensure you are running on an HTTPS connection or localhost, and that your browser has allowed Microphone Permissions for this site.');
-            mediaRecorderRef.current = null;
+            setTranscript('Speech Recognition API is not supported in this browser or environments. Please test using Google Chrome.');
+            recognitionRef.current = null;
         }
     };
 
     const handleFinishRecording = () => {
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-            mediaRecorderRef.current.stop();
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
         }
     };
 
@@ -171,8 +182,8 @@ const GlobalDictate: React.FC = () => {
     };
 
     const handleCancel = () => {
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-            mediaRecorderRef.current.stop();
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
         }
         closeDictation();
     };
@@ -181,7 +192,7 @@ const GlobalDictate: React.FC = () => {
         setIsListening(false);
         setIsProcessing(false);
         setTranscript('');
-        mediaRecorderRef.current = null;
+        recognitionRef.current = null;
     };
 
     return (
