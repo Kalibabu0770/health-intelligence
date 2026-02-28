@@ -25,6 +25,7 @@ import FoodLogScreen from './components/FoodLogScreen';
 import TabletCheckerForm from './components/TabletCheckerForm';
 import MedicationSafetyScanner from './components/MedicationSafetyScanner';
 import DoctorDashboard from './components/DoctorDashboard'; // Added DoctorDashboard
+import GlobalDictate from './components/GlobalDictate'; // Global Voice Input
 import { ShieldAlert, Bot, MessageSquare } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -214,6 +215,10 @@ const App: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* Global Voice Input Overlay */}
+      <GlobalDictate />
+
     </>
   );
 };
