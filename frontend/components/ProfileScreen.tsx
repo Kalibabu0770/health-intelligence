@@ -187,6 +187,7 @@ const ProfileScreen: React.FC = () => {
                 ) : (
                     <div className="space-y-1 w-full text-slate-900">
                         <h3 className="font-black text-3xl text-slate-900 uppercase leading-none">{profile.name}</h3>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">AHMIS ID: <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded">{profile.patientId || 'PENDING'}</span></p>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">{profile.age} {t.yrs} • {profile.weight} {t.kg} • {t[profile.gender.toLowerCase()] || profile.gender}</p>
 
                         {(profile.location || (profile.foodPreferences && profile.foodPreferences.length > 0)) && (

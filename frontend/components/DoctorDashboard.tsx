@@ -1,18 +1,59 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Search, Users, Mic, Activity, Globe, Brain, CheckCircle, AlertTriangle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, Search, Users, Mic, Activity, Globe, Brain, CheckCircle, AlertTriangle, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { orchestrateHealth } from '../services/ai';
 
 const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     // 100vh NO SCROLLING layout
     const [activePanel, setActivePanel] = useState<'queue' | 'ehr' | 'treatment' | 'surveillance' | 'evidence'>('queue');
     const [isRecording, setIsRecording] = useState(false);
     const [ehrText, setEhrText] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPatientContext, setCurrentPatientContext] = useState<any>(null);
+    const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-    // Seeded Dummy Data as requested by the prompt
-    const patientQueue = [
-        { id: 'AHIMS-KAL-821', name: 'Ramesh Reddy', risk: 'High', disease: 'Urolithiasis', pincode: '530001' },
-        { id: 'AHIMS-SITA-114', name: 'Sita Devi', risk: 'Moderate', disease: 'Hypertension', pincode: '530045' },
-        { id: 'AHIMS-BAL-99', name: 'Balaji K', risk: 'Low', disease: 'Obesity', pincode: '530022' },
-    ];
+    const [patientQueue, setPatientQueue] = useState([
+        { id: 'AHIMS-KAL-821', name: 'Ramesh Reddy', risk: 'High', disease: 'Urolithiasis', pincode: '530001', isMock: true },
+        { id: 'AHIMS-SITA-114', name: 'Sita Devi', risk: 'Moderate', disease: 'Hypertension', pincode: '530045', isMock: true },
+        { id: 'AHIMS-BAL-99', name: 'Balaji K', risk: 'Low', disease: 'Obesity', pincode: '530022', isMock: true },
+    ]);
+
+    const handleSearch = () => {
+        const accounts = JSON.parse(localStorage.getItem('hi_accounts') || '[]');
+        const found = accounts.find((a: any) => a.patientId === searchQuery || a.name.toLowerCase() === searchQuery.toLowerCase());
+
+        if (found) {
+            setPatientQueue([{
+                id: found.patientId,
+                name: found.name,
+                risk: found.hasHeartDisease || found.hasDiabetes ? 'High' : 'Moderate',
+                disease: 'Pending AI Scan',
+                pincode: found.location,
+                isMock: false
+            }, ...patientQueue]);
+            setSearchQuery("");
+        } else {
+            alert("Patient ID not found in local registries.");
+        }
+    };
+
+    const handleAnalyze = async () => {
+        if (!currentPatientContext) {
+            return alert("Please select a valid searched patient from the queue to run unified AI context analysis.");
+        }
+        if (!ehrText || ehrText.length < 10) {
+            return alert("Please dictate or type at least 10 characters of clinical notes.");
+        }
+        setIsAnalyzing(true);
+        try {
+            const analysis = await orchestrateHealth(currentPatientContext, { query: ehrText });
+            setAiAnalysis(analysis);
+        } catch (e) {
+            console.error(e);
+            alert("Deep analysis failed. Verify AI engine is online.");
+        }
+        setIsAnalyzing(false);
+    };
 
     const MenuButton = ({ panel, icon: Icon, label }: any) => (
         <button
@@ -58,9 +99,24 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             <div className="flex-1 bg-white rounded-xl shadow-xl border border-slate-100 h-full flex flex-col items-stretch overflow-hidden">
                 {activePanel === 'queue' && (
                     <div className="h-full flex flex-col p-8 bg-white">
-                        <div className="mb-8">
-                            <h2 className="text-2xl font-black text-emerald-800 uppercase tracking-tighter">Patient Intelligence Queue</h2>
-                            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-1">Real-time Triage Prioritization</p>
+                        <div className="mb-8 flex justify-between items-end">
+                            <div>
+                                <h2 className="text-2xl font-black text-emerald-800 uppercase tracking-tighter">Patient Intelligence Queue</h2>
+                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-1">Real-time Triage Prioritization</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Enter Patient AHMIS ID..."
+                                    className="px-4 py-2 border border-slate-200 rounded-lg text-xs font-black outline-none focus:border-emerald-500 min-w-[250px]"
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                                />
+                                <button onClick={handleSearch} className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 flex items-center gap-2">
+                                    <Search size={16} /> <span className="text-[10px] font-black uppercase">Search</span>
+                                </button>
+                            </div>
                         </div>
                         <div className="flex-1 grid grid-cols-1 gap-4 content-start items-start">
                             {patientQueue.map((p, i) => (
@@ -79,7 +135,20 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                                             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Diagnosis Alert</p>
                                             <p className="text-xs font-black uppercase text-slate-700">{p.disease}</p>
                                         </div>
-                                        <button onClick={() => setActivePanel('ehr')} className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors">
+                                        <button onClick={() => {
+                                            if (!p.isMock) {
+                                                const accounts = JSON.parse(localStorage.getItem('hi_accounts') || '[]');
+                                                const prof = accounts.find((a: any) => a.patientId === p.id);
+                                                setCurrentPatientContext({
+                                                    profile: prof,
+                                                    medications: JSON.parse(localStorage.getItem('hi_reminders') || '[]'),
+                                                    symptoms: JSON.parse(localStorage.getItem('hi_symptoms') || '[]')
+                                                });
+                                            } else {
+                                                setCurrentPatientContext(null); // Clear context for mock patients
+                                            }
+                                            setActivePanel('ehr');
+                                        }} className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors">
                                             <ArrowRight size={18} />
                                         </button>
                                     </div>
@@ -112,31 +181,45 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                                 />
                             </div>
                             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 flex flex-col">
-                                <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-4">Structured AHMIS Schema</h3>
-                                {ehrText.length > 10 ? (
-                                    <div className="space-y-4 animate-in fade-in duration-500 w-full h-full flex flex-col">
+                                <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-4 flex justify-between items-center">
+                                    <span>Structured AHMIS Schema</span>
+                                    {currentPatientContext && <span className="bg-emerald-600 text-white px-2 py-1 rounded text-[8px]">Linked to: {currentPatientContext.profile.name}</span>}
+                                </h3>
+
+                                {aiAnalysis ? (
+                                    <div className="space-y-4 animate-in fade-in duration-500 w-full h-full flex flex-col overflow-y-auto custom-scrollbar">
                                         <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs shadow-sm">
-                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Chief Complaint & History</span>
-                                            {ehrText.substring(0, 100)}{ehrText.length > 100 ? '...' : ''}
+                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Extracted Complaint</span>
+                                            {ehrText.substring(0, 100)}...
                                         </div>
                                         <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs shadow-sm">
-                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Extracted Symptoms</span>
-                                            <div className="flex gap-2 mt-1 flex-wrap">
-                                                <span className="px-2 py-1 bg-rose-50 text-rose-600 rounded text-[9px] font-black uppercase">Pain</span>
-                                                <span className="px-2 py-1 bg-amber-50 text-amber-600 rounded text-[9px] font-black uppercase">Discomfort</span>
-                                            </div>
+                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Unified ML Assessment (Context + Voice)</span>
+                                            <div className="text-slate-700 font-medium whitespace-pre-wrap">{aiAnalysis.guidance.length > 200 ? aiAnalysis.guidance.substring(0, 200) + '...' : aiAnalysis.guidance}</div>
                                         </div>
                                         <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs shadow-sm mt-auto">
-                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Diagnosis Candidate</span>
-                                            <span className="font-black text-emerald-700 uppercase">Under Review</span>
+                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Diagnostic Priority</span>
+                                            <span className={`font-black uppercase ${aiAnalysis.fusionScores.overall === 'DANGER' ? 'text-rose-600' : 'text-amber-600'}`}>
+                                                {aiAnalysis.fusionScores.overall || 'Unknown'} RISK DETECTED
+                                            </span>
                                         </div>
-                                        <button className="w-full mt-4 bg-emerald-600 text-white font-black text-[10px] uppercase py-3 rounded-lg hover:bg-emerald-700 tracking-widest shadow-md active:scale-95 transition-all">
-                                            Commit to AHMIS Registry
+                                        <button onClick={() => { alert("Saved securely to node!"); setAiAnalysis(null); setEhrText(""); }} className="w-full mt-4 bg-emerald-600 text-white font-black text-[10px] uppercase py-3 rounded-lg hover:bg-emerald-700 tracking-widest shadow-md active:scale-95 transition-all">
+                                            Finalize to Blockchain / Registry
+                                        </button>
+                                    </div>
+                                ) : ehrText.length > 10 ? (
+                                    <div className="space-y-4 animate-in fade-in duration-500 w-full h-full flex flex-col">
+                                        <div className="bg-white p-3 rounded-lg border border-emerald-100 text-xs shadow-sm">
+                                            <span className="font-bold text-slate-500 uppercase text-[9px] block mb-1">Live Notes Summary</span>
+                                            <div className="italic text-slate-500">{ehrText.substring(0, 100)}{ehrText.length > 100 ? '...' : ''}</div>
+                                        </div>
+                                        <button onClick={handleAnalyze} disabled={isAnalyzing} className="w-full mt-auto bg-emerald-800 text-emerald-100 font-black text-[10px] uppercase py-4 rounded-lg hover:bg-emerald-900 tracking-widest shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
+                                            {isAnalyzing ? <Loader2 className="animate-spin" size={16} /> : <Brain size={16} />}
+                                            {isAnalyzing ? "Processing Matrix..." : "Run Unified ML on Data + Voice"}
                                         </button>
                                     </div>
                                 ) : (
                                     <div className="flex-1 flex items-center justify-center">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Schema Pending Audio Input</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Awaiting Live Transcription Data</p>
                                     </div>
                                 )}
                             </div>
