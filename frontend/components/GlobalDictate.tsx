@@ -86,8 +86,11 @@ const GlobalDictate: React.FC = () => {
         };
 
         recognition.onerror = (e: any) => {
-            console.error(e);
-            if (e.error !== 'aborted') {
+            console.error("Speech Recognition Error:", e);
+            setIsListening(false);
+            if (e.error === 'not-allowed') {
+                setTranscript("⚠️ Microphone access blocked. Please click the site settings icon in your URL bar to allow microphone permissions.");
+            } else if (e.error !== 'aborted') {
                 setTranscript(`Error: ${e.error}`);
             }
         };
