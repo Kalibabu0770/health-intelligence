@@ -45,7 +45,7 @@ const Dashboard: React.FC<{
     ];
 
     return (
-        <div className="h-full w-full bg-[#fcfdfe] p-4 lg:p-6 flex flex-col gap-5 font-sans overflow-hidden relative">
+        <div className="h-full w-full bg-[#fcfdfe] p-4 lg:p-6 flex flex-col gap-5 font-sans overflow-y-auto custom-scrollbar relative">
 
             {/* ═══ SIMPLE GUIDANCE HEADER ═══ */}
             <header className="flex flex-col gap-4 bg-white border-2 border-emerald-500 p-5 rounded-xl shadow-sm shrink-0">
@@ -70,11 +70,11 @@ const Dashboard: React.FC<{
                 </div>
             </header>
 
-            <main className="flex-1 grid grid-cols-12 gap-5 min-h-0">
+            <main className="flex flex-col lg:grid grid-cols-12 gap-5 min-h-min pb-4">
 
                 {/* BIOMETRIC CORE (Classic Widget Mix) */}
-                <div className="col-span-12 lg:col-span-4 flex flex-col gap-5 min-h-0">
-                    <section className="flex-1 bg-white border border-slate-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                <div className="col-span-12 lg:col-span-4 flex flex-col gap-5 h-full">
+                    <section className="bg-white border border-slate-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden group min-h-[300px]">
                         <div className="absolute top-0 inset-x-0 h-1 bg-emerald-100 opacity-20" />
                         <h3 className="text-[8px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6 italic">{t.molecular_readiness || 'Molecular Readiness'}</h3>
 
@@ -138,7 +138,7 @@ const Dashboard: React.FC<{
                     </section>
 
                     {/* ACTIVITY FEED (Refined Classic) */}
-                    <section className="flex-1 bg-white border border-slate-100 rounded-xl shadow-sm flex flex-col overflow-hidden min-h-0">
+                    <section className="bg-white border border-slate-100 rounded-xl shadow-sm flex flex-col overflow-hidden min-h-[350px]">
                         <header className="px-6 py-4 border-b border-slate-50 flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-3">
                                 <Activity size={16} className="text-slate-900" />
