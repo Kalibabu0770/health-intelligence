@@ -63,9 +63,18 @@ const GlobalDictate: React.FC = () => {
                 const recognition = new SpeechRecognitionAPI();
                 recognitionRef.current = recognition;
 
+                const getBcp47Code = (lang: string) => {
+                    const map: Record<string, string> = {
+                        'hi': 'hi-IN', 'te': 'te-IN', 'ta': 'ta-IN', 'kn': 'kn-IN', 'mr': 'mr-IN',
+                        'es': 'es-ES', 'fr': 'fr-FR', 'de': 'de-DE', 'zh': 'zh-CN', 'ja': 'ja-JP',
+                        'ar': 'ar-SA', 'ru': 'ru-RU', 'pt': 'pt-BR', 'en': 'en-IN'
+                    };
+                    return map[lang] || 'en-IN';
+                };
+
                 recognition.continuous = true;
                 recognition.interimResults = true;
-                recognition.lang = language === 'en-IN' ? 'en-IN' : language; // Defaulting to IN for Indian English parsing natively
+                recognition.lang = getBcp47Code(language);
 
                 recognition.onstart = () => {
                     setIsListening(true);

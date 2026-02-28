@@ -56,10 +56,19 @@ export const startListening = (
     const recognition = new SpeechRecognitionModel();
     currentRecognition = recognition;
 
+    const getBcp47Code = (lang: string) => {
+        const map: Record<string, string> = {
+            'hi': 'hi-IN', 'te': 'te-IN', 'ta': 'ta-IN', 'kn': 'kn-IN', 'mr': 'mr-IN',
+            'es': 'es-ES', 'fr': 'fr-FR', 'de': 'de-DE', 'zh': 'zh-CN', 'ja': 'ja-JP',
+            'ar': 'ar-SA', 'ru': 'ru-RU', 'pt': 'pt-BR', 'en': 'en-IN'
+        };
+        return map[lang] || 'en-IN';
+    };
+
     // Use native continuous listening
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = language === 'en-IN' ? 'en-IN' : language;
+    recognition.lang = getBcp47Code(language);
 
     const cleanup = () => {
         currentRecognition = null;
