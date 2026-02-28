@@ -171,13 +171,13 @@ const GlobalDictate: React.FC = () => {
 
             {/* The Dictation Action Bar Overlay */}
             {(isListening || transcript) && (
-                <div className="fixed inset-x-0 bottom-0 z-[1000] p-4 lg:p-8 flex items-end justify-center pointer-events-none">
-                    <div className="bg-white border-4 border-emerald-500 rounded-2xl p-6 shadow-2xl w-full max-w-2xl text-slate-900 flex flex-col pointer-events-auto animate-in slide-in-from-bottom-10 fade-in duration-300">
+                <div className="fixed inset-0 z-[1000] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 lg:p-8 pointer-events-auto">
+                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] w-full max-w-2xl text-slate-100 flex flex-col animate-in zoom-in-95 fade-in duration-300">
 
-                        <div className="flex items-center gap-4 mb-4 border-b border-slate-100 pb-4">
+                        <div className="flex items-center gap-5 mb-6 pb-6 border-b border-slate-800">
                             <div className="relative">
-                                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                                    <Mic size={24} className={isListening ? "animate-pulse" : ""} />
+                                <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400">
+                                    <Mic size={28} className={isListening ? "animate-pulse" : ""} />
                                 </div>
                                 {isListening && (
                                     <span className="absolute -top-1 -right-1 flex h-4 w-4">
@@ -187,34 +187,43 @@ const GlobalDictate: React.FC = () => {
                                 )}
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-sm font-black uppercase text-slate-800 tracking-widest flex items-center gap-2">
-                                    Real-Time Voice Dictation <Globe size={14} className="text-emerald-500 font-bold" />
+                                <h3 className="text-xl font-bold text-white tracking-wide">
+                                    AI Guardian Listening...
                                 </h3>
-                                <p className="text-[10px] font-bold text-slate-500 uppercase">
-                                    {isListening ? 'Speak now. Translating to active language...' : 'Recording stopped. Review text.'}
-                                </p>
+                                <div className="flex items-center gap-2 mt-2 h-4">
+                                    {isListening ? (
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '450ms' }} />
+                                        </div>
+                                    ) : (
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">RECORDING STOPPED</span>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
                         {/* Live Text Area */}
-                        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5 min-h-[120px] max-h-[250px] overflow-y-auto w-full text-xl font-bold text-slate-800 font-sans custom-scrollbar mb-6 break-words shadow-inner">
-                            {transcript || <span className="opacity-40 italic flex items-center gap-3"><Loader2 size={18} className="animate-spin text-emerald-500" /> Awaiting voice input... Speak now.</span>}
+                        <div className="min-h-[160px] w-full text-2xl font-light text-slate-300 font-sans mb-8 break-words leading-relaxed overflow-hidden">
+                            {transcript || <span className="opacity-30 italic">Awaiting voice input...</span>}
                         </div>
 
                         {/* Professional Action Buttons */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 mt-auto">
                             <button
                                 onClick={handleCancel}
-                                className="flex-1 h-14 bg-white border-2 border-rose-200 text-rose-600 rounded-xl flex items-center justify-center gap-3 font-black uppercase tracking-[0.2em] hover:bg-rose-50 hover:border-rose-400 transition-all active:scale-95 shadow-sm"
+                                className="flex-1 h-14 bg-slate-800 border border-slate-700 text-slate-300 rounded-xl flex items-center justify-center gap-3 font-bold uppercase tracking-widest hover:bg-slate-700 hover:text-white transition-all active:scale-95 shadow-sm"
                             >
-                                <X size={24} /> Cancel
+                                <X size={20} /> CANCEL
                             </button>
                             <button
                                 onClick={handleConfirm}
                                 disabled={!transcript || transcript === 'Listening...'}
-                                className="flex-1 h-14 bg-emerald-600 text-white rounded-xl flex items-center justify-center gap-3 font-black uppercase tracking-[0.2em] hover:bg-emerald-700 transition-all active:scale-95 shadow-lg disabled:opacity-50 disabled:grayscale"
+                                className="flex-1 h-14 bg-emerald-600 text-white rounded-xl flex items-center justify-center gap-3 font-bold uppercase tracking-widest hover:bg-emerald-500 transition-all active:scale-95 shadow-lg disabled:opacity-20 disabled:grayscale"
                             >
-                                <Check size={24} /> Confirm & Paste
+                                <Check size={20} /> DONE / CONFIRM
                             </button>
                         </div>
 
