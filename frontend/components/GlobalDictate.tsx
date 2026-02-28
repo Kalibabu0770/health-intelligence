@@ -89,7 +89,11 @@ const GlobalDictate: React.FC = () => {
             console.error("Speech Recognition Error:", e);
             setIsListening(false);
             if (e.error === 'not-allowed') {
-                setTranscript("⚠️ Microphone access blocked. Please click the site settings icon in your URL bar to allow microphone permissions.");
+                if (!window.isSecureContext) {
+                    setTranscript("⚠️ SECURE CONTEXT REQUIRED: Browsers block the microphone on HTTP IP addresses. You must access this site via 'http://localhost:5173' or 'http://127.0.0.1:5173' (NOT a local network IP) or configure HTTPS.");
+                } else {
+                    setTranscript("⚠️ MICROPHONE BLOCKED BY OS: Even if allowed in the browser, your computer's OS might be blocking it. On Mac: Go to System Settings -> Privacy & Security -> Microphone, and check the box next to your web browser.");
+                }
             } else if (e.error !== 'aborted') {
                 setTranscript(`Error: ${e.error}`);
             }
