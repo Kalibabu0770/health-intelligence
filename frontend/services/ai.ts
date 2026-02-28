@@ -92,6 +92,54 @@ const callGroq = async (messages: any[], options: any = {}): Promise<string> => 
     } catch (error: any) {
         clearTimeout(timeoutId);
         if (error.name === 'AbortError') throw new Error('Groq request timed out');
+    }
+};
+
+// ── Audio Interface: Groq Whisper ─────────────────────────────────────────
+export const transcribeAudio = async (audioBlob: Blob, language?: string): Promise<string> => {
+    if (!GROQ_API_KEY || GROQ_API_KEY === 'your_groq_api_key_here') {
+        throw new Error('Groq API key not configured for audio transcription');
+    }
+
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'recording.webm');
+    formData.append('model', 'whisper-large-v3');
+    if (language && language !== 'en') {
+        // Whisper language hints: mostly 2-letter ISO codes (hi, te, kn, mr, ta, en)
+        const code = language.split('-')[0];
+        formData.append('language', code);
+    }
+
+    // We want the raw text back
+    formData.append('response_format', 'json');
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s for audio usually
+
+    try {
+        const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${GROQ_API_KEY}`,
+            },
+            body: formData,
+            signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const err = await response.text().catch(() => 'Unknown error');
+            throw new Error(`Groq Whisper error ${response.status}: ${err}`);
+        }
+
+        const data = await response.json();
+        const content = data.text || '';
+        console.log(`[Whisper] ✅ Transcript received (${content.length} chars)`);
+        return content;
+    } catch (error: any) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') throw new Error('Whisper request timed out');
+        console.error("Transcription Failed:", error);
         throw error;
     }
 };

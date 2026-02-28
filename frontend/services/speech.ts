@@ -7,61 +7,14 @@ export const startListening = (
     onTranscript: (text: string) => void,
     onEnd?: () => void
 ) => {
-    let recognition: any;
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-        // Fallback for IDEs/local dev without Speech API access
-        recognition = {
-            lang: 'en-IN',
-            continuous: true,
-            interimResults: true,
-            start: () => {
-                let text = "Simulated transcription because Speech API is unavailable... Patient is feeling dizzy.";
-                let currentLength = 0;
-
-                // If it relies on aura overlay elements being set up, just directly call onTranscript after small delay
-                const interval = setInterval(() => {
-                    currentLength += 5;
-                    if (currentLength > text.length) {
-                        clearInterval(interval);
-                        if (recognition._mockDone) recognition._mockDone(text);
-                        return;
-                    }
-                    if (recognition._mockUpdate) recognition._mockUpdate(text.substring(0, currentLength));
-                }, 50);
-                recognition._mockInterval = interval;
-            },
-            stop: () => {
-                if (recognition._mockInterval) clearInterval(recognition._mockInterval);
-            },
-            abort: () => {
-                if (recognition._mockInterval) clearInterval(recognition._mockInterval);
-            }
-        };
-    } else {
-        recognition = new SpeechRecognition();
+    // Stop any existing
+    if (currentRecognition && currentRecognition.state === 'recording') {
+        try { currentRecognition.stop(); } catch (e) { }
     }
-
-    if (currentRecognition) {
-        try { currentRecognition.abort(); } catch (e) { }
-        currentRecognition = null;
-    }
-
-    currentRecognition = recognition;
-
-    const langMap: Record<string, string> = {
-        'hi': 'hi-IN', 'te': 'te-IN', 'ta': 'ta-IN',
-        'kn': 'kn-IN', 'mr': 'mr-IN', 'en': 'en-US'
-    };
-
-    recognition.lang = langMap[language] || 'en-US';
-    recognition.continuous = true;
-    recognition.interimResults = true;
 
     const t = translations[language as Language] || translations['en'];
 
-    // ChatGPT-style Global Overlay Management
+    // Global Overlay Management
     let aura = document.getElementById('ai-aura') as HTMLElement;
     if (!aura) {
         aura = document.createElement('div');
@@ -76,11 +29,11 @@ export const startListening = (
             <div class="orb orb-2"></div>
             <div class="orb orb-3"></div>
             <div class="orb orb-4"></div>
-            <span class="listening-text">${t.ai_guardian_listening || 'AI Guardian Listening...'}</span>
+            <span class="listening-text">${t.ai_guardian_listening || 'AI Guardian Listening (Whisper NLP)...'}</span>
         </div>
-        <div id="aura-transcript" class="aura-transcript-area">${t.please_speak_clearly || 'Please speak clearly...'}</div>
+        <div id="aura-transcript" class="aura-transcript-area">${t.please_speak_clearly || 'Speak now...'}</div>
         <div class="aura-actions">
-            <button id="aura-done" class="aura-btn aura-btn-confirm">${t.done_use_text || 'DONE / USE TEXT'}</button>
+            <button id="aura-done" class="aura-btn aura-btn-confirm">${t.done_use_text || 'FINISH / TRANSCRIBE'}</button>
             <button id="aura-cancel" class="aura-btn aura-btn-cancel">${t.cancel || 'CANCEL'}</button>
         </div>
     `;
@@ -91,76 +44,71 @@ export const startListening = (
 
     aura.classList.add('active');
 
-    let finalTranscript = '';
-    let silenceTimer: any = null;
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        currentRecognition = mediaRecorder;
+        let audioChunks: Blob[] = [];
 
-    const finalize = () => {
-        const text = transcriptEl.textContent?.trim() || finalTranscript.trim();
-        if (text && text !== (t.please_speak_clearly || "Please speak clearly...")) {
-            onTranscript(text);
-        }
-    };
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                audioChunks.push(event.data);
+            }
+        };
 
-    doneBtn.onclick = (e) => {
-        e.preventDefault();
-        finalize();
-        recognition.stop();
-    };
+        const cleanup = () => {
+            currentRecognition = null;
+            aura.classList.remove('active');
+            stream.getTracks().forEach(track => track.stop());
+            if (onEnd) onEnd();
+        };
 
-    cancelBtn.onclick = (e) => {
-        e.preventDefault();
-        recognition.abort();
-    };
+        mediaRecorder.onstop = async () => {
+            if (transcriptEl) transcriptEl.textContent = "AI Transcribing via Whisper...";
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
 
-    recognition.onstart = () => {
-        if (transcriptEl) transcriptEl.textContent = t.listening || "Listening...";
-    };
+            try {
+                // We're inside `speech.ts`, so we need to dynamically import or just assume `transcribeAudio` is available 
+                // Since `ai.ts` is in the same directory structure, we'll import it at the top of the file
+                const { transcribeAudio } = await import('./ai');
+                const text = await transcribeAudio(audioBlob, language);
 
-    recognition.onresult = (event: any) => {
-        let interimTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
-            else interimTranscript += event.results[i][0].transcript;
-        }
+                if (text && transcriptEl) {
+                    transcriptEl.textContent = text;
+                    onTranscript(text);
+                }
+            } catch (error) {
+                console.error("Transcription Failed:", error);
+                if (transcriptEl) transcriptEl.textContent = "Transcription failed. Please try again.";
+            } finally {
+                setTimeout(cleanup, 1000);
+            }
+        };
 
-        const liveText = (finalTranscript + interimTranscript).trim();
-        if (liveText) {
-            if (transcriptEl) transcriptEl.textContent = liveText;
-            onTranscript(liveText);
-            // This provides the 'confirmation mechanism' requested by the user.
-        }
+        doneBtn.onclick = (e) => {
+            e.preventDefault();
+            if (mediaRecorder.state === 'recording') mediaRecorder.stop();
+        };
 
-        clearTimeout(silenceTimer);
-        silenceTimer = setTimeout(() => recognition.stop(), 8000);
-    };
+        cancelBtn.onclick = (e) => {
+            e.preventDefault();
+            if (mediaRecorder.state === 'recording') {
+                // Empty the chunks so it doesn't try to transcribe
+                audioChunks = [];
+                mediaRecorder.stop();
+            } else {
+                cleanup();
+            }
+        };
 
-    // Attach mock hooks
-    recognition._mockUpdate = (text: string) => {
-        if (transcriptEl) transcriptEl.textContent = text;
-        onTranscript(text);
-    };
-    recognition._mockDone = (text: string) => {
-        if (transcriptEl) transcriptEl.textContent = text;
-        onTranscript(text);
+        mediaRecorder.start();
+        if (transcriptEl) transcriptEl.textContent = t.listening || "Listening (Whisper NLP)...";
+
+    }).catch(err => {
+        console.error("Microphone access error:", err);
+        if (transcriptEl) transcriptEl.textContent = "Microphone access denied.";
         setTimeout(() => {
-            if (doneBtn) doneBtn.click();
-        }, 500);
-    };
-
-    recognition.onerror = (event: any) => {
-        console.error("Speech Recognition Error:", event.error);
-        if (transcriptEl) transcriptEl.textContent = (t.error || "Error: ") + event.error + ". " + (t.check_mic || "Please check microphone permissions.");
-        setTimeout(() => recognition.stop(), 3000);
-    };
-
-    recognition.onend = () => {
-        currentRecognition = null;
-        aura.classList.remove('active');
-        clearTimeout(silenceTimer);
-        if (onEnd) onEnd();
-    };
-
-    try { recognition.start(); } catch (e: any) {
-        console.error("Start failed:", e);
-    }
+            aura.classList.remove('active');
+            if (onEnd) onEnd();
+        }, 3000);
+    });
 };

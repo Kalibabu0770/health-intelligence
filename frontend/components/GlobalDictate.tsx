@@ -1,13 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Check, X, Loader2, Globe } from 'lucide-react';
 import { usePatientContext } from '../core/patientContext/patientStore';
+import { transcribeAudio } from '../services/ai';
 
 const GlobalDictate: React.FC = () => {
     const { language } = usePatientContext();
     const [isListening, setIsListening] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
     const [transcript, setTranscript] = useState('');
     const [lastFocusedInput, setLastFocusedInput] = useState<HTMLInputElement | HTMLTextAreaElement | null>(null);
-    const recognitionRef = useRef<any>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+    const processingIntervalRef = useRef<any>(null);
 
     useEffect(() => {
         const handleFocusIn = (e: FocusEvent) => {
@@ -48,112 +52,59 @@ const GlobalDictate: React.FC = () => {
         };
     }, [language]); // Depend on language so the closure has the latest language
 
-    const startDictation = () => {
-        if (recognitionRef.current) {
-            try { recognitionRef.current.abort(); } catch (e) { }
-        }
+    const startDictation = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
 
-        let recognition: any;
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-        if (!SpeechRecognition) {
-            // Elegant mock fallback for browsers/environments (like IDE previews) that lack Speech APIs
-            recognition = {
-                lang: 'en-IN',
-                continuous: true,
-                interimResults: true,
-                start: () => {
-                    if (recognition.onstart) recognition.onstart();
-                    let text = "This is a simulated recording because Speech API is restricted in this browser... Patient presents with mild symptoms...";
-                    let currentLength = 0;
-
-                    const interval = setInterval(() => {
-                        currentLength += 5;
-                        if (currentLength > text.length) {
-                            clearInterval(interval);
-                            if (recognition.onresult) recognition.onresult({
-                                resultIndex: 0,
-                                results: [{ isFinal: true, 0: { transcript: text } }]
-                            });
-                            return;
-                        }
-                        if (recognition.onresult) recognition.onresult({
-                            resultIndex: 0,
-                            results: [{ isFinal: false, 0: { transcript: text.substring(0, currentLength) } }]
-                        });
-                    }, 50);
-                    recognition._mockInterval = interval;
-                },
-                stop: () => {
-                    if (recognition._mockInterval) clearInterval(recognition._mockInterval);
-                },
-                abort: () => {
-                    if (recognition._mockInterval) clearInterval(recognition._mockInterval);
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data);
                 }
             };
-        } else {
-            recognition = new SpeechRecognition();
+
+            mediaRecorder.onstart = () => {
+                setIsListening(true);
+                setTranscript('Listening... Speak now.');
+            };
+
+            mediaRecorder.onstop = async () => {
+                setIsListening(false);
+                setIsProcessing(true);
+                setTranscript('AI Guardian analyzing audio via Whisper NLP...');
+
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+
+                try {
+                    const text = await transcribeAudio(audioBlob, language);
+                    setTranscript(text);
+                } catch (error) {
+                    console.error("Transcription Error:", error);
+                    setTranscript("Failed to transcribe audio. Please ensure Groq is available.");
+                } finally {
+                    setIsProcessing(false);
+                }
+
+                // Release the mic
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+        } catch (error) {
+            console.error("Mic Access Error:", error);
+            setTranscript("Microphone access denied. Please enable permissions.");
         }
+    };
 
-        recognitionRef.current = recognition;
-
-        const langMap: Record<string, string> = {
-            'hi': 'hi-IN', 'te': 'te-IN', 'ta': 'ta-IN',
-            'kn': 'kn-IN', 'mr': 'mr-IN', 'en': 'en-IN'
-        };
-
-        // We use the language context to support all languages, defaulting to local IN to handle Indian dialects/Slangs naturally
-        recognition.lang = langMap[language || 'en'] || 'en-IN';
-        recognition.continuous = true;
-        recognition.interimResults = true;
-
-        let finalTranscript = '';
-
-        recognition.onstart = () => {
-            setIsListening(true);
-            setTranscript('Listening...');
-        };
-
-        recognition.onresult = (event: any) => {
-            let interimTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
-                } else {
-                    interimTranscript += event.results[i][0].transcript;
-                }
-            }
-            setTranscript((finalTranscript + interimTranscript).trim());
-        };
-
-        recognition.onerror = (e: any) => {
-            console.error("Speech Recognition Error:", e);
-            setIsListening(false);
-            if (e.error === 'not-allowed') {
-                if (!window.isSecureContext) {
-                    setTranscript("⚠️ SECURE CONTEXT REQUIRED: Browsers block the microphone on HTTP IP addresses. You must access this site via 'http://localhost:5173' or 'http://127.0.0.1:5173' (NOT a local network IP) or configure HTTPS.");
-                } else {
-                    setTranscript("⚠️ MICROPHONE BLOCKED BY OS: Even if allowed in the browser, your computer's OS might be blocking it. On Mac: Go to System Settings -> Privacy & Security -> Microphone, and check the box next to your web browser.");
-                }
-            } else if (e.error !== 'aborted') {
-                setTranscript(`Error: ${e.error}`);
-            }
-        };
-
-        recognition.onend = () => {
-            // Keep the overlay open even if it stops listening, so they can confirm
-        };
-
-        recognition.start();
-        setIsListening(true);
-        setTranscript('');
+    const handleFinishRecording = () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            mediaRecorderRef.current.stop();
+        }
     };
 
     const handleConfirm = () => {
-        // Stop recognition
-        if (recognitionRef.current) {
-            try { recognitionRef.current.stop(); } catch (e) { }
-        }
 
         // Find the input to paste into
         const activeDom = document.activeElement;
@@ -202,33 +153,31 @@ const GlobalDictate: React.FC = () => {
     };
 
     const handleCancel = () => {
-        if (recognitionRef.current) {
-            try { recognitionRef.current.abort(); } catch (e) { }
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            mediaRecorderRef.current.stop();
         }
         closeDictation();
     };
 
     const closeDictation = () => {
         setIsListening(false);
+        setIsProcessing(false);
         setTranscript('');
-        if (recognitionRef.current) {
-            try { recognitionRef.current.abort(); } catch (e) { }
-            recognitionRef.current = null;
-        }
+        mediaRecorderRef.current = null;
     };
 
     return (
         <>
 
             {/* The Dictation Action Bar Overlay */}
-            {(isListening || transcript) && (
+            {(isListening || transcript || isProcessing) && (
                 <div className="fixed inset-0 z-[1000] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 lg:p-8 pointer-events-auto">
                     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] w-full max-w-2xl text-slate-100 flex flex-col animate-in zoom-in-95 fade-in duration-300">
 
                         <div className="flex items-center gap-5 mb-6 pb-6 border-b border-slate-800">
                             <div className="relative">
                                 <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400">
-                                    <Mic size={28} className={isListening ? "animate-pulse" : ""} />
+                                    {isProcessing ? <Loader2 size={28} className="animate-spin" /> : <Mic size={28} className={isListening ? "animate-pulse" : ""} />}
                                 </div>
                                 {isListening && (
                                     <span className="absolute -top-1 -right-1 flex h-4 w-4">
@@ -239,7 +188,7 @@ const GlobalDictate: React.FC = () => {
                             </div>
                             <div className="flex-1">
                                 <h3 className="text-xl font-bold text-white tracking-wide">
-                                    AI Guardian Listening...
+                                    {isProcessing ? 'AI Whisper Transcription...' : 'AI Guardian Listening...'}
                                 </h3>
                                 <div className="flex items-center gap-2 mt-2 h-4">
                                     {isListening ? (
@@ -250,7 +199,7 @@ const GlobalDictate: React.FC = () => {
                                             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '450ms' }} />
                                         </div>
                                     ) : (
-                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">RECORDING STOPPED</span>
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{isProcessing ? 'PROCESSING AUDIO DATA' : 'RECORDING STOPPED'}</span>
                                     )}
                                 </div>
                             </div>
@@ -265,17 +214,28 @@ const GlobalDictate: React.FC = () => {
                         <div className="flex items-center gap-4 mt-auto">
                             <button
                                 onClick={handleCancel}
-                                className="flex-1 h-14 bg-slate-800 border border-slate-700 text-slate-300 rounded-xl flex items-center justify-center gap-3 font-bold uppercase tracking-widest hover:bg-slate-700 hover:text-white transition-all active:scale-95 shadow-sm"
+                                disabled={isProcessing}
+                                className="flex-1 h-14 bg-slate-800 border border-slate-700 text-slate-300 rounded-xl flex items-center justify-center gap-3 font-bold uppercase tracking-widest hover:bg-slate-700 hover:text-white transition-all active:scale-95 shadow-sm disabled:opacity-50"
                             >
                                 <X size={20} /> CANCEL
                             </button>
-                            <button
-                                onClick={handleConfirm}
-                                disabled={!transcript || transcript === 'Listening...'}
-                                className="flex-1 h-14 bg-emerald-600 text-white rounded-xl flex items-center justify-center gap-3 font-bold uppercase tracking-widest hover:bg-emerald-500 transition-all active:scale-95 shadow-lg disabled:opacity-20 disabled:grayscale"
-                            >
-                                <Check size={20} /> DONE / CONFIRM
-                            </button>
+
+                            {isListening ? (
+                                <button
+                                    onClick={handleFinishRecording}
+                                    className="flex-1 h-14 bg-rose-600 text-white rounded-xl flex items-center justify-center gap-3 font-bold uppercase tracking-widest hover:bg-rose-500 transition-all active:scale-95 shadow-lg"
+                                >
+                                    <Mic size={20} /> FINISH SPEAKING
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleConfirm}
+                                    disabled={!transcript || transcript.includes('Listening...') || isProcessing}
+                                    className="flex-1 h-14 bg-emerald-600 text-white rounded-xl flex items-center justify-center gap-3 font-bold uppercase tracking-widest hover:bg-emerald-500 transition-all active:scale-95 shadow-lg disabled:opacity-20 disabled:grayscale"
+                                >
+                                    {isProcessing ? <Loader2 size={20} className="animate-spin" /> : <Check size={20} />} INSERT TEXT
+                                </button>
+                            )}
                         </div>
 
                     </div>
