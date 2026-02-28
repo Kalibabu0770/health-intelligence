@@ -113,7 +113,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                             }}
                             className={`w-10 h-10 flex items-center justify-center rounded-xl border border-slate-100 shadow-sm transition-all active:scale-95 ${isListening ? 'bg-rose-500 text-slate-900 animate-pulse' : 'bg-white text-slate-400 hover:text-emerald-600'}`}
                         >
-                            <Mic size={18} />
+                            <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={18} /></span>
                         </button>
                         <button
                             onClick={handleSend}

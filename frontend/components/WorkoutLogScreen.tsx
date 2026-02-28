@@ -70,7 +70,7 @@ const WorkoutLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = (
                         }}
                         className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-emerald-600 bg-white shadow-sm rounded-lg active:scale-90 transition-all"
                     >
-                        <Mic size={18} />
+                        <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={18} /></span>
                     </button>
                 </div>
                 <div className="relative">
@@ -83,7 +83,7 @@ const WorkoutLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = (
                         }}
                         className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-emerald-600 bg-white shadow-sm rounded-lg active:scale-90 transition-all"
                     >
-                        <Mic size={18} />
+                        <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={18} /></span>
                     </button>
                 </div>
                 <button onClick={() => { if (type && mins) { logWorkout({ id: Date.now().toString(), type, durationMinutes: Number(mins), intensity: 'medium', timestamp: Date.now() }); setType(''); setMins(''); } }} className="w-full bg-blue-600 text-slate-900 font-black py-6 rounded-xl shadow-xl active:scale-95 text-[11px] uppercase italic tracking-wider">{t.log_effort || "Log Effort"}</button>

@@ -96,7 +96,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                                 <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-1">Multilingual Transcription to AHMIS Schema</p>
                             </div>
                             <button onClick={() => setIsRecording(!isRecording)} className={`flex items-center gap-3 px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest text-white transition-all ${isRecording ? 'bg-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.5)] animate-pulse' : 'bg-emerald-600 hover:bg-emerald-700'}`}>
-                                <Mic size={18} />
+                                <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={18} /></span>
                                 {isRecording ? 'Recording Active...' : 'Initialize Audio Capture'}
                             </button>
                         </div>

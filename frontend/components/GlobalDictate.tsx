@@ -9,7 +9,6 @@ const GlobalDictate: React.FC = () => {
     const [lastFocusedInput, setLastFocusedInput] = useState<HTMLInputElement | HTMLTextAreaElement | null>(null);
     const recognitionRef = useRef<any>(null);
 
-    // Track the last focused input element globally
     useEffect(() => {
         const handleFocusIn = (e: FocusEvent) => {
             const target = e.target as HTMLElement;
@@ -17,9 +16,19 @@ const GlobalDictate: React.FC = () => {
                 setLastFocusedInput(target as any);
             }
         };
+
+        const listenToGlobalTrigger = () => {
+            startDictation();
+        };
+
         document.addEventListener('focusin', handleFocusIn);
-        return () => document.removeEventListener('focusin', handleFocusIn);
-    }, []);
+        window.addEventListener('start-global-dictation', listenToGlobalTrigger);
+
+        return () => {
+            document.removeEventListener('focusin', handleFocusIn);
+            window.removeEventListener('start-global-dictation', listenToGlobalTrigger);
+        };
+    }, [language]); // Depend on language so the closure has the latest language
 
     const startDictation = () => {
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -147,18 +156,6 @@ const GlobalDictate: React.FC = () => {
 
     return (
         <>
-            {/* Global Floating Mic Button */}
-            {!isListening && transcript === '' && (
-                <div className="fixed bottom-8 left-8 z-[100] animate-in fade-in zoom-in duration-500">
-                    <button
-                        onClick={startDictation}
-                        className="w-16 h-16 bg-white border-4 border-emerald-500 text-emerald-600 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 hover:bg-emerald-50 active:scale-95 group relative"
-                        title="Global Voice Dictation (Any Language)"
-                    >
-                        <Mic size={28} className="relative z-10 group-hover:animate-bounce" />
-                    </button>
-                </div>
-            )}
 
             {/* The Dictation Action Bar Overlay */}
             {(isListening || transcript) && (

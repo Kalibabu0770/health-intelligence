@@ -247,7 +247,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                 onClick={handleVoiceInput}
                                 className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isListening ? 'bg-rose-500 text-slate-900 animate-pulse shadow-lg shadow-rose-200' : 'bg-white text-slate-400 hover:text-emerald-600 hover:shadow-md border border-slate-200'}`}
                             >
-                                <Mic size={20} />
+                                <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={20} /></span>
                             </button>
 
                             <button
@@ -352,7 +352,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                         }}
                                         className={`absolute right-6 bottom-6 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-slate-900 animate-pulse' : 'bg-slate-50 text-slate-400 hover:text-emerald-600 border border-slate-100 shadow-sm'}`}
                                     >
-                                        <Mic size={20} />
+                                        <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event("start-global-dictation")); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={20} /></span>
                                     </button>
                                 </div>
                                 <div className="flex gap-4">
