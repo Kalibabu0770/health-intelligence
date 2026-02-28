@@ -15,7 +15,7 @@ const QuickActionCard: React.FC<{
     return (
         <button
             onClick={onClick}
-            className="group relative overflow-hidden bg-white p-8 rounded-[3rem] border border-slate-200/50 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.04)] transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] hover:-translate-y-2 hover:scale-[1.02] active:scale-95 text-left flex flex-col justify-between h-[280px]"
+            className="group relative overflow-hidden bg-white p-8 rounded-xl border border-slate-200/50 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.04)] transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] hover:-translate-y-2 hover:scale-[1.02] active:scale-95 text-left flex flex-col justify-between h-[280px]"
         >
             {/* Background Aesthetic */}
             <div className={`absolute -top-12 -right-12 w-48 h-48 bg-${color}-500 opacity-0 group-hover:opacity-[0.07] rounded-full blur-3xl transition-opacity duration-1000`} />
@@ -23,7 +23,7 @@ const QuickActionCard: React.FC<{
 
             <div>
                 <div className="flex justify-between items-start mb-8">
-                    <div className={`w-16 h-16 bg-${color}-50 text-${color}-600 rounded-[1.5rem] flex items-center justify-center shadow-sm group-hover:bg-${color}-600 group-hover:text-white group-hover:shadow-2xl group-hover:shadow-${color}-200 transition-all duration-500`}>
+                    <div className={`w-16 h-16 bg-${color}-50 text-${color}-600 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-${color}-600 group-hover:text-white group-hover:shadow-2xl group-hover:shadow-${color}-200 transition-all duration-500`}>
                         <Icon size={28} strokeWidth={2.5} />
                     </div>
                     {statusBadge && (
@@ -45,7 +45,7 @@ const QuickActionCard: React.FC<{
                     <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest italic">{stats || 'Action Required'}</p>
                     <p className="text-[8px] font-bold text-slate-300 uppercase mt-1 tracking-widest">Protocol Node Confirmed</p>
                 </div>
-                <div className={`w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 shadow-xl`}>
+                <div className={`w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 shadow-xl`}>
                     <ChevronRight size={20} />
                 </div>
             </div>

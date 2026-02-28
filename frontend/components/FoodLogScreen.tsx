@@ -122,9 +122,9 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
         <div className="h-full flex flex-col gap-6 p-6 overflow-hidden animate-in fade-in duration-500">
             {/* 1. HEADER */}
             {!embedded && (
-                <div className="flex items-center justify-between bg-white px-8 py-4 rounded-[2rem] border border-slate-100 shadow-sm shrink-0">
+                <div className="flex items-center justify-between bg-white px-8 py-4 rounded-xl border border-slate-100 shadow-sm shrink-0">
                     <div className="flex items-center gap-4">
-                        <button onClick={onBack} className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:bg-slate-100 transition-all active:scale-90 border border-slate-100"><ChevronLeft size={20} /></button>
+                        <button onClick={onBack} className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:bg-slate-100 transition-all active:scale-90 border border-slate-100"><ChevronLeft size={20} /></button>
                         <div>
                             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight leading-none">{t.nutrition_lab}</h2>
                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Metabolic Fuel Synthesis</p>
@@ -141,7 +141,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                 {/* LEFT: LOGGING LAYER (40%) */}
                 <div className="col-span-12 lg:col-span-4 flex flex-col gap-6 min-h-0">
                     {/* MANUAL ENTRY */}
-                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col gap-4 relative overflow-hidden group">
+                    <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-4 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform"><Plus size={80} /></div>
                         <div className="flex items-center gap-3 mb-2">
                             <div className="bg-orange-50 p-2.5 rounded-xl text-orange-600 border border-orange-100"><Pencil size={18} /></div>
@@ -149,7 +149,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                         </div>
                         <div className="relative">
                             <input
-                                className="w-full p-5 pr-14 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-base outline-none focus:border-orange-500 focus:bg-white transition-all shadow-inner placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
+                                className="w-full p-5 pr-14 bg-slate-50 border border-slate-200 rounded-xl font-bold text-base outline-none focus:border-orange-500 focus:bg-white transition-all shadow-inner placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
                                 placeholder="E.G. 2 CHAPATIS & DAAL"
                                 id="manualFoodInput"
                             />
@@ -175,7 +175,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                     input.value = '';
                                 }
                             }}
-                            className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black uppercase text-[11px] shadow-xl flex justify-center items-center gap-4 active:scale-95 hover:bg-emerald-700 transition-all"
+                            className="w-full bg-emerald-600 text-white py-5 rounded-xl font-black uppercase text-[11px] shadow-xl flex justify-center items-center gap-4 active:scale-95 hover:bg-emerald-700 transition-all"
                         >
                             <Plus size={20} />
                             Execute Intake Log
@@ -183,9 +183,9 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                     </div>
 
                     {/* AI SCANNER */}
-                    <div className="flex-1 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col justify-center text-center space-y-6 relative overflow-hidden group">
+                    <div className="flex-1 bg-white p-8 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-center text-center space-y-6 relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-b from-orange-50/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <div className="w-20 h-20 bg-orange-100 rounded-3xl flex items-center justify-center mx-auto text-orange-600 shadow-inner group-hover:scale-110 transition-transform">
+                        <div className="w-20 h-20 bg-orange-100 rounded-xl flex items-center justify-center mx-auto text-orange-600 shadow-inner group-hover:scale-110 transition-transform">
                             {analyzing ? <Loader2 className="animate-spin" size={32} /> : <Camera size={32} />}
                         </div>
                         <div>
@@ -195,7 +195,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={analyzing}
-                            className="w-full bg-orange-600 text-white font-black py-6 rounded-[2rem] shadow-xl hover:bg-orange-700 active:scale-95 disabled:opacity-50 transition-all text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 relative z-10"
+                            className="w-full bg-orange-600 text-white font-black py-6 rounded-xl shadow-xl hover:bg-orange-700 active:scale-95 disabled:opacity-50 transition-all text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 relative z-10"
                         >
                             {analyzing ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
                             {analyzing ? "Synthesizing Data" : "Launch AI Bio-Scanner"}
@@ -205,23 +205,23 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                 </div>
 
                 {/* RIGHT: ANALYTICAL HUB (60%) */}
-                <div className="col-span-12 lg:col-span-8 flex flex-col gap-6 min-h-0 bg-slate-50/50 p-6 rounded-[3rem] border border-slate-100">
+                <div className="col-span-12 lg:col-span-8 flex flex-col gap-6 min-h-0 bg-slate-50/50 p-6 rounded-xl border border-slate-100">
                     <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar space-y-8">
                         {profile && (
                             <div className="space-y-8">
                                 {/* LAB PREDICTOR */}
-                                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
+                                <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:scale-110 transition-transform"><TrendingUp size={120} /></div>
                                     <div className="relative z-10 grid grid-cols-12 gap-8 items-center">
                                         <div className="col-span-12 lg:col-span-5 space-y-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="bg-emerald-600 p-3 rounded-2xl text-white shadow-lg"><Apple size={20} /></div>
+                                                <div className="bg-emerald-600 p-3 rounded-xl text-white shadow-lg"><Apple size={20} /></div>
                                                 <div>
                                                     <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{lt.energy_predictor || "Labor Energy Predictor"}</p>
                                                     <h3 className="font-black text-2xl uppercase tracking-tighter text-slate-900">{profile.profession || "General Public"}</h3>
                                                 </div>
                                             </div>
-                                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-inner flex flex-col items-center justify-center text-center">
+                                            <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 shadow-inner flex flex-col items-center justify-center text-center">
                                                 <span className="text-[9px] font-black text-slate-400 uppercase mb-1">{t.daily_target}</span>
                                                 <div className="flex items-baseline gap-2">
                                                     <p className="text-4xl font-black text-slate-900">{getWorkBasedNutrition(profile).suggestedCalories}</p>
@@ -237,7 +237,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                                     return (
                                                         <>
                                                             <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">
-                                                                <span className="text-blue-600">Prot: {rec.macronutrients.protein}</span>
+                                                                <span className="text-emerald-600">Prot: {rec.macronutrients.protein}</span>
                                                                 <span className="text-emerald-600">Carb: {rec.macronutrients.carbs}</span>
                                                                 <span className="text-orange-600">Fat: {rec.macronutrients.fat}</span>
                                                             </div>
@@ -261,10 +261,10 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
 
                                 {/* DEFICIENCY ANALYSIS */}
                                 {deficiencyAnalysis && (
-                                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6 relative overflow-hidden group">
+                                    <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-6 relative overflow-hidden group">
                                         <div className="absolute top-0 right-0 p-6 opacity-[0.03] scale-125 rotate-12 text-emerald-500"><ShieldCheck size={120} /></div>
                                         <div className="flex items-center gap-4 border-b border-slate-50 pb-6 mb-6">
-                                            <div className="bg-emerald-50 p-4 rounded-2xl text-emerald-600 border border-emerald-100"><ShieldCheck size={24} /></div>
+                                            <div className="bg-emerald-50 p-4 rounded-xl text-emerald-600 border border-emerald-100"><ShieldCheck size={24} /></div>
                                             <div>
                                                 <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">{t.deficiency_analysis}</h3>
                                                 <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">Metabolic Optimization Protocol</p>
@@ -272,7 +272,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="bg-rose-50/50 p-6 rounded-[2rem] border border-rose-100/50 space-y-4">
+                                            <div className="bg-rose-50/50 p-6 rounded-xl border border-rose-100/50 space-y-4">
                                                 <div className="flex items-center gap-2">
                                                     <AlertTriangle size={16} className="text-rose-500" />
                                                     <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">{t.detected_gaps}</span>
@@ -286,7 +286,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                                     )) || <li className="text-[11px] font-black text-slate-400 uppercase italic">Homeostasis Maintained</li>}
                                                 </ul>
                                             </div>
-                                            <div className="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100/50 space-y-4">
+                                            <div className="bg-blue-50/50 p-6 rounded-xl border border-blue-100/50 space-y-4">
                                                 <div className="flex items-center gap-2">
                                                     <TrendingUp size={16} className="text-blue-500" />
                                                     <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">{t.remaining_needs}</span>
@@ -298,16 +298,16 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                 )}
 
                                 {/* VISUAL TRENDS */}
-                                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-8">
+                                <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-8">
                                     <div className="flex justify-between items-center px-2">
                                         <div className="flex items-center gap-4">
-                                            <div className="bg-slate-100 p-3 rounded-2xl text-slate-500"><BarChartIcon size={20} /></div>
+                                            <div className="bg-slate-100 p-3 rounded-xl text-slate-500"><BarChartIcon size={20} /></div>
                                             <div>
                                                 <h3 className="text-base font-black text-slate-900 uppercase tracking-tight">{t.micro_trends}</h3>
                                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Macro-Nutrient Synthesis</p>
                                             </div>
                                         </div>
-                                        <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100 shadow-inner">
+                                        <div className="flex bg-slate-50 p-1.5 rounded-xl border border-slate-100 shadow-inner">
                                             {(['day', 'week', 'month'] as const).map(m => (
                                                 <button
                                                     key={m}

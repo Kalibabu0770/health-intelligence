@@ -42,9 +42,9 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
 
     return (
         <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-md min-h-[500px] rounded-[2.5rem] p-8 sm:p-12 flex flex-col justify-center space-y-8 animate-in zoom-in-95 duration-500 shadow-xl border border-slate-200">
+            <div className="bg-white w-full max-w-md min-h-[500px] rounded-xl p-8 sm:p-12 flex flex-col justify-center space-y-8 animate-in zoom-in-95 duration-500 shadow-xl border border-slate-200">
                 <div className="text-center space-y-3">
-                    <div className="bg-emerald-600 text-white w-20 h-20 rounded-[1.5rem] flex items-center justify-center mx-auto shadow-xl"><ShieldCheck size={40} /></div>
+                    <div className="bg-emerald-600 text-white w-20 h-20 rounded-xl flex items-center justify-center mx-auto shadow-xl"><ShieldCheck size={40} /></div>
                     <h1 className="text-3xl font-black text-slate-900 uppercase">{t.life_shield}</h1>
                     <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">{t.protocol_initialization || 'Protocol Initialization'}</p>
                 </div>
@@ -55,7 +55,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                             <input
                                 type="text"
                                 placeholder="Full Identity Name"
-                                className="w-full bg-slate-50 border border-slate-200 p-5 pr-12 rounded-2xl font-black text-sm outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
+                                className="w-full bg-slate-50 border border-slate-200 p-5 pr-12 rounded-xl font-black text-sm outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
                                 value={formData.name}
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                             />
@@ -78,7 +78,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                 <input
                                     type="number"
                                     placeholder="Age"
-                                    className="w-full bg-slate-50 border border-slate-200 p-5 rounded-2xl font-black text-sm outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
+                                    className="w-full bg-slate-50 border border-slate-200 p-5 rounded-xl font-black text-sm outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
                                     value={formData.age || ''}
                                     onChange={e => setFormData({ ...formData, age: parseInt(e.target.value) })}
                                 />
@@ -99,7 +99,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                 <input
                                     type="number"
                                     placeholder="Weight (kg)"
-                                    className="w-full bg-slate-50 border border-slate-200 p-5 rounded-2xl font-black text-sm outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
+                                    className="w-full bg-slate-50 border border-slate-200 p-5 rounded-xl font-black text-sm outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
                                     value={formData.weight || ''}
                                     onChange={e => setFormData({ ...formData, weight: parseInt(e.target.value) })}
                                 />
@@ -119,7 +119,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                         </div>
 
                         <select
-                            className="w-full bg-slate-50 border border-slate-200 p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest outline-none focus:border-emerald-500 transition-all appearance-none text-slate-500"
+                            className="w-full bg-slate-50 border border-slate-200 p-5 rounded-xl font-black text-[10px] uppercase tracking-widest outline-none focus:border-emerald-500 transition-all appearance-none text-slate-500"
                             value={formData.gender}
                             onChange={e => setFormData({ ...formData, gender: e.target.value as any })}
                         >
@@ -132,7 +132,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                             <input
                                 type="text"
                                 placeholder="Jurisdiction Pincode (e.g. 500001)"
-                                className="w-full bg-slate-50 border border-slate-200 p-5 pr-12 rounded-2xl font-black text-sm outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
+                                className="w-full bg-slate-50 border border-slate-200 p-5 pr-12 rounded-xl font-black text-sm outline-none focus:border-emerald-500 transition-all placeholder:text-slate-300 placeholder:uppercase placeholder:text-[10px]"
                                 value={formData.location || ''}
                                 onChange={e => setFormData({ ...formData, location: e.target.value })}
                             />
@@ -140,7 +140,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                         </div>
 
                         {formData.gender === 'female' && (
-                            <div className="flex items-center justify-between bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                            <div className="flex items-center justify-between bg-slate-50 p-5 rounded-xl border border-slate-200">
                                 <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Pregnancy Protocol</span>
                                 <button
                                     onClick={() => setFormData({ ...formData, isPregnant: !formData.isPregnant })}
@@ -158,7 +158,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                 if (!formData.location) return alert("Enter Jurisdiction Pincode");
                                 setStep(1.5);
                             }}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] tracking-[0.3em] shadow-xl active:scale-95 transition-all text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] tracking-[0.3em] shadow-xl active:scale-95 transition-all text-center"
                         >
                             Establish Basic Link
                         </button>
@@ -221,7 +221,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
 
                         <button
                             onClick={() => setStep(1.6)}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
                         >
                             {t.next_step || 'Next Step'}
                         </button>
@@ -242,7 +242,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                         const next = existing.includes(cond) ? existing.filter(x => x !== cond) : [...existing, cond];
                                         setFormData({ ...formData, familyHistory: next });
                                     }}
-                                    className={`p-4 rounded-xl text-[10px] font-black uppercase flex items-center justify-between transition-all border ${formData.familyHistory?.includes(cond) ? 'bg-blue-50 border-blue-500 text-blue-900' : 'bg-slate-50 border-slate-200 text-slate-500'}`}
+                                    className={`p-4 rounded-xl text-[10px] font-black uppercase flex items-center justify-between transition-all border ${formData.familyHistory?.includes(cond) ? 'bg-emerald-50 border-blue-500 text-blue-900' : 'bg-slate-50 border-slate-200 text-slate-500'}`}
                                 >
                                     {cond}
                                     {formData.familyHistory?.includes(cond) && <Check size={14} />}
@@ -283,7 +283,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
 
                         <button
                             onClick={() => setStep(1.7)}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
                         >
                             {t.next_step || 'Next Step'}
                         </button>
@@ -345,7 +345,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
 
                         <button
                             onClick={() => setStep(1.72)}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
                         >
                             {t.next_step || 'Next Step'}
                         </button>
@@ -407,7 +407,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
 
                         <button
                             onClick={() => setStep(1.75)}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
                         >
                             {t.next_step || 'Next Step'}
                         </button>
@@ -477,7 +477,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
 
                         <button
                             onClick={() => setStep(1.8)}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all mt-4 text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all mt-4 text-center"
                         >
                             {t.next_step || 'Next Step'}
                         </button>
@@ -543,7 +543,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                         </div>
                         <button
                             onClick={() => setStep(2)}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
                         >
                             {t.next_step || 'Next Step'}
                         </button>
@@ -601,7 +601,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                         </div>
                         <button
                             onClick={() => setStep(3)}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
                         >
                             {t.establish_context || 'Establish Context'}
                         </button>
@@ -610,13 +610,13 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
 
                 {step === 3 && (
                     <div className="space-y-8 animate-in slide-in-from-right max-w-[300px] mx-auto w-full">
-                        <div className="bg-emerald-50 p-6 rounded-2xl text-center space-y-3">
+                        <div className="bg-emerald-50 p-6 rounded-xl text-center space-y-3">
                             <h3 className="text-lg font-black text-emerald-900 uppercase">{t.clinical_safe || 'Clinical Safeguard'}</h3>
                             <p className="text-[10px] text-emerald-700 font-bold uppercase leading-relaxed">{t.medical_context_note || 'This AI provides health observations based on your input. It does not replace professional medical advice.'}</p>
                         </div>
                         <button
                             onClick={() => setStep(4)}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all text-center"
                         >
                             {t.agree_continue || 'Agree & Continue'}
                         </button>
@@ -637,7 +637,7 @@ const Onboarding: React.FC<{ onComplete: (p: UserProfile) => Promise<void> }> = 
                                 }
                             }}
                             disabled={isFinishing}
-                            className="w-full bg-emerald-600 text-white py-6 rounded-2xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3"
+                            className="w-full bg-emerald-600 text-white py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3"
                         >
                             {isFinishing ? <Loader2 size={18} className="animate-spin text-white" /> : <ShieldCheck size={18} />}
                             {isFinishing ? 'Initializing Guardian...' : (t.launch_guardian || 'Launch Guardian')}

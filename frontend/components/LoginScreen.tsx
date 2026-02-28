@@ -195,11 +195,9 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
     );
 
     return (
-        <div className="fixed inset-0 z-[100] h-screen w-full flex items-center justify-center bg-[#F1F5F9] font-sans selection:bg-emerald-100 selection:text-emerald-900 px-4">
+        <div className="fixed inset-0 z-[100] h-screen w-screen bg-slate-50 overflow-hidden flex items-center justify-center font-sans text-slate-900 border-4 border-emerald-600 box-border p-4 selection:bg-emerald-100 selection:text-emerald-900">
 
-            
-
-            <div className="relative z-10 w-full max-w-[440px] bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-500 max-h-[90vh]">
+            <div className="relative z-10 w-full max-w-[500px] bg-white rounded-xl shadow-xl border-2 border-slate-100 flex flex-col p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-500 max-h-full overflow-hidden">
 
                 {isVerifying ? (
                     <div className="flex-1 flex flex-col items-center justify-center py-20 space-y-6">
@@ -229,9 +227,9 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                     <div className="grid grid-cols-1 gap-4">
                                         <button
                                             onClick={() => { setSelectedPortalRole('citizen'); setMode('select'); }}
-                                            className="group relative bg-white border-2 border-slate-100 p-6 rounded-[2rem] flex items-center gap-5 hover:border-emerald-500 hover:shadow-2xl transition-all duration-500"
+                                            className="group relative bg-white border-2 border-slate-100 p-6 rounded-xl flex items-center gap-5 hover:border-emerald-500 hover:shadow-2xl transition-all duration-500"
                                         >
-                                            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">
+                                            <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">
                                                 <User size={28} />
                                             </div>
                                             <div className="text-left">
@@ -245,9 +243,9 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
                                         <button
                                             onClick={() => { setSelectedPortalRole('doctor'); setMode('select'); }}
-                                            className="group relative bg-white border-2 border-slate-100 p-6 rounded-[2rem] flex items-center gap-5 hover:border-emerald-500 hover:shadow-2xl transition-all duration-500"
+                                            className="group relative bg-white border-2 border-slate-100 p-6 rounded-xl flex items-center gap-5 hover:border-emerald-500 hover:shadow-2xl transition-all duration-500"
                                         >
-                                            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
+                                            <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
                                                 <Activity size={28} />
                                             </div>
                                             <div className="text-left">
@@ -259,7 +257,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                             </div>
                                         </button>
 
-                                        
+
                                     </div>
                                 </div>
                             )}
@@ -270,7 +268,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                     {selectedAccount ? (
                                         <div className="space-y-8 py-4">
                                             <div className="flex flex-col items-center text-center">
-                                                <div className="w-20 h-20 bg-emerald-50 rounded-[1.5rem] flex items-center justify-center text-emerald-500 border border-emerald-100 mb-4">
+                                                <div className="w-20 h-20 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-100 mb-4">
                                                     <User size={40} />
                                                 </div>
                                                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{selectedAccount.name}</h2>
@@ -282,7 +280,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                     <input
                                                         type="password"
                                                         placeholder="••••"
-                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-6 rounded-2xl text-center text-4xl font-black tracking-[0.6em] focus:bg-white focus:border-emerald-500 transition-all outline-none"
+                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-6 rounded-xl text-center text-4xl font-black tracking-[0.6em] focus:bg-white focus:border-emerald-500 transition-all outline-none"
                                                         maxLength={4}
                                                         autoFocus
                                                         value={pin}
@@ -294,7 +292,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 <button
                                                     onClick={handlePinSubmit}
                                                     disabled={pin.length !== 4}
-                                                    className="w-full bg-emerald-500 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 transition-all disabled:opacity-30 disabled:shadow-none"
+                                                    className="w-full bg-emerald-500 text-white py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 transition-all disabled:opacity-30 disabled:shadow-none"
                                                 >
                                                     Verify Access
                                                 </button>
@@ -331,7 +329,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 const filtered = accounts.filter(acc => (acc.role === selectedPortalRole) || (!acc.role && selectedPortalRole === 'citizen'));
                                                 if (filtered.length > 0) {
                                                     return filtered.map((acc, i) => (
-                                                        <button key={i} onClick={() => setSelectedAccount(acc)} className="group w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl flex items-center gap-5 hover:bg-white hover:border-emerald-500 hover:shadow-xl transition-all">
+                                                        <button key={i} onClick={() => setSelectedAccount(acc)} className="group w-full bg-slate-50 border border-slate-100 p-5 rounded-xl flex items-center gap-5 hover:bg-white hover:border-emerald-500 hover:shadow-xl transition-all">
                                                             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm border border-slate-50">
                                                                 <User size={24} />
                                                             </div>
@@ -349,7 +347,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                     ));
                                                 } else {
                                                     return (
-                                                        <div className="py-12 text-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-100">
+                                                        <div className="py-12 text-center bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-100">
                                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">No Authorized {selectedPortalRole === 'doctor' ? 'Clinical' : 'Citizen'} Nodes Detected</p>
                                                             <div className="flex flex-col gap-3 px-8">
                                                                 <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="bg-emerald-600 text-white w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100">Initialize New {selectedPortalRole === 'doctor' ? 'Doctor Node' : 'Guardian Link'}</button>
@@ -390,7 +388,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 <input
                                                     type="text"
                                                     placeholder="Full Identity Name"
-                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-sm focus:bg-white focus:border-emerald-500 outline-none transition-all"
+                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:bg-white focus:border-emerald-500 outline-none transition-all"
                                                     value={regData.name}
                                                     onChange={e => setRegData({ ...regData, name: e.target.value })}
                                                 />
@@ -414,7 +412,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                         inputMode="numeric"
                                                         maxLength={2}
                                                         placeholder="DD"
-                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-center text-sm focus:border-emerald-500 outline-none"
+                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-center text-sm focus:border-emerald-500 outline-none"
                                                         value={regData.dobDay}
                                                         onChange={e => setRegData({ ...regData, dobDay: e.target.value.replace(/\D/g, '').slice(0, 2) })}
                                                     />
@@ -423,7 +421,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                         inputMode="numeric"
                                                         maxLength={2}
                                                         placeholder="MM"
-                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-center text-sm focus:border-emerald-500 outline-none"
+                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-center text-sm focus:border-emerald-500 outline-none"
                                                         value={regData.dobMonth}
                                                         onChange={e => setRegData({ ...regData, dobMonth: e.target.value.replace(/\D/g, '').slice(0, 2) })}
                                                     />
@@ -432,20 +430,20 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                         inputMode="numeric"
                                                         maxLength={4}
                                                         placeholder="YYYY"
-                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-center text-sm focus:border-emerald-500 outline-none"
+                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-center text-sm focus:border-emerald-500 outline-none"
                                                         value={regData.dobYear}
                                                         onChange={e => setRegData({ ...regData, dobYear: e.target.value.replace(/\D/g, '').slice(0, 4) })}
                                                     />
                                                     <div className="absolute -top-2 left-4 px-2 bg-white text-[8px] font-black text-emerald-500 uppercase tracking-widest">Date of Birth</div>
                                                 </div>
                                                 <div className="relative">
-                                                    <input type="number" readOnly placeholder="Age" className="w-full bg-emerald-50 border-2 border-emerald-100 p-5 rounded-2xl font-black text-center text-xs text-emerald-700 outline-none" value={regData.age || ''} />
+                                                    <input type="number" readOnly placeholder="Age" className="w-full bg-emerald-50 border-2 border-emerald-100 p-5 rounded-xl font-black text-center text-xs text-emerald-700 outline-none" value={regData.age || ''} />
                                                     <div className="absolute -top-2 left-4 px-2 bg-white text-[8px] font-black text-emerald-500 uppercase tracking-widest">Age</div>
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 gap-4">
                                                 <div className="relative">
-                                                    <input type="number" placeholder="Weight (Kg)" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-sm focus:border-emerald-500 outline-none" value={regData.weight} onChange={e => setRegData({ ...regData, weight: e.target.value })} />
+                                                    <input type="number" placeholder="Weight (Kg)" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-emerald-500 outline-none" value={regData.weight} onChange={e => setRegData({ ...regData, weight: e.target.value })} />
                                                     <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase italic">Body Mass Node</div>
                                                 </div>
                                             </div>
@@ -453,7 +451,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 <input
                                                     type="text"
                                                     placeholder="Security Nickname (For Recovery)"
-                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-sm focus:bg-white focus:border-emerald-500 outline-none transition-all"
+                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:bg-white focus:border-emerald-500 outline-none transition-all"
                                                     value={regData.nickname}
                                                     onChange={e => setRegData({ ...regData, nickname: e.target.value })}
                                                 />
@@ -465,20 +463,20 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                     inputMode="numeric"
                                                     maxLength={6}
                                                     placeholder="Area Pincode (6 Digits)"
-                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-sm focus:border-emerald-500 outline-none transition-all"
+                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-emerald-500 outline-none transition-all"
                                                     value={regData.location}
                                                     onChange={e => setRegData({ ...regData, location: e.target.value.replace(/\D/g, '').slice(0, 6) })}
                                                 />
                                                 <MapPin className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
-                                                <select className="bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-sm focus:border-emerald-500 outline-none" value={regData.gender} onChange={e => setRegData({ ...regData, gender: e.target.value as any })}>
+                                                <select className="bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-emerald-500 outline-none" value={regData.gender} onChange={e => setRegData({ ...regData, gender: e.target.value as any })}>
                                                     <option value="male">Male</option>
                                                     <option value="female">Female</option>
                                                 </select>
                                                 <button
                                                     onClick={() => setRegData({ ...regData, isTribal: !regData.isTribal })}
-                                                    className={`p-5 rounded-2xl font-bold text-[10px] uppercase border-2 transition-all ${regData.isTribal ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
+                                                    className={`p-5 rounded-xl font-bold text-[10px] uppercase border-2 transition-all ${regData.isTribal ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
                                                 >
                                                     {regData.isTribal ? 'Tribal Node ✅' : 'Tribal Initial?'}
                                                 </button>
@@ -560,9 +558,9 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
                                                 <div className="flex flex-wrap gap-2">
                                                     {(regData.customConditions as any).map((cond: string, idx: number) => (
-                                                        <div key={idx} className="bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg flex items-center gap-2 animate-in zoom-in-95">
-                                                            <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">{cond}</span>
-                                                            <button onClick={() => setRegData({ ...regData, customConditions: (regData.customConditions as any).filter((_: any, i: number) => i !== idx) })} className="text-blue-300 hover:text-blue-600">
+                                                        <div key={idx} className="bg-emerald-50 border border-blue-100 px-3 py-1.5 rounded-lg flex items-center gap-2 animate-in zoom-in-95">
+                                                            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">{cond}</span>
+                                                            <button onClick={() => setRegData({ ...regData, customConditions: (regData.customConditions as any).filter((_: any, i: number) => i !== idx) })} className="text-blue-300 hover:text-emerald-600">
                                                                 <X size={10} />
                                                             </button>
                                                         </div>
@@ -681,12 +679,12 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                     <input
                                                         type="text"
                                                         placeholder="Profession (e.g. Farmer, Engineer)"
-                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-sm focus:bg-white focus:border-blue-400 outline-none transition-all"
+                                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:bg-white focus:border-blue-400 outline-none transition-all"
                                                         value={regData.profession}
                                                         onChange={e => setRegData({ ...regData, profession: e.target.value })}
                                                     />
                                                 </div>
-                                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col gap-4">
+                                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col gap-4">
                                                     <div className="flex justify-between items-end">
                                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sleep Clock</p>
                                                         <span className="text-sm font-black text-slate-900">{regData.sleepHours} Hrs</span>
@@ -810,7 +808,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                     {/* Step 5: Finalize & Password Creation */}
                                     {regStep === 5 && (
                                         <div className="space-y-6 text-center py-6">
-                                            <div className="w-24 h-24 bg-emerald-500 rounded-[2rem] flex items-center justify-center text-white shadow-2xl mx-auto shadow-emerald-200 animate-bounce-slow">
+                                            <div className="w-24 h-24 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-2xl mx-auto shadow-emerald-200 animate-bounce-slow">
                                                 <Lock size={48} />
                                             </div>
                                             <div className="space-y-2">
@@ -822,14 +820,14 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                     type="password"
                                                     maxLength={4}
                                                     placeholder="••••"
-                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl text-center text-3xl font-black tracking-[0.4em] focus:bg-white focus:border-emerald-500 transition-all outline-none"
+                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl text-center text-3xl font-black tracking-[0.4em] focus:bg-white focus:border-emerald-500 transition-all outline-none"
                                                     value={regData.password}
                                                     onChange={e => setRegData({ ...regData, password: e.target.value.replace(/\D/g, '') })}
                                                 />
                                             </div>
                                             <div className="grid grid-cols-2 gap-3 pt-4">
-                                                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100"><ShieldCheck className="text-emerald-500 mx-auto mb-2" size={24} /><p className="text-[9px] font-black text-slate-400 uppercase">Encrypted</p></div>
-                                                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100"><Fingerprint className="text-emerald-500 mx-auto mb-2" size={24} /><p className="text-[9px] font-black text-slate-400 uppercase">Unique ID</p></div>
+                                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100"><ShieldCheck className="text-emerald-500 mx-auto mb-2" size={24} /><p className="text-[9px] font-black text-slate-400 uppercase">Encrypted</p></div>
+                                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100"><Fingerprint className="text-emerald-500 mx-auto mb-2" size={24} /><p className="text-[9px] font-black text-slate-400 uppercase">Unique ID</p></div>
                                             </div>
                                         </div>
                                     )}
@@ -837,13 +835,13 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                     {/* Action Buttons */}
                                     <div className="flex gap-3 pt-6 border-t border-slate-50 overflow-hidden">
                                         {regStep > 1 && (
-                                            <button onClick={() => setRegStep(prev => prev - 1)} className="p-5 rounded-2xl bg-slate-50 text-slate-400 hover:text-slate-900 transition-colors">
+                                            <button onClick={() => setRegStep(prev => prev - 1)} className="p-5 rounded-xl bg-slate-50 text-slate-400 hover:text-slate-900 transition-colors">
                                                 <ArrowLeft size={20} />
                                             </button>
                                         )}
                                         <button
                                             onClick={nextProtocol}
-                                            className="flex-1 bg-emerald-600 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                                            className="flex-1 bg-emerald-600 text-white py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                                         >
                                             {regStep === 5 ? 'Establish Node' : 'Continue Protocol'}
                                             <ArrowRight size={18} />
@@ -860,7 +858,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                             </div>
                                             <button
                                                 onClick={() => setMode('select')}
-                                                className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                                                className="w-full bg-emerald-800 text-white py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                                             >
                                                 <ShieldCheck size={18} />
                                                 Existing Node? Protocol Login
@@ -874,7 +872,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                             {mode === 'reset' && selectedAccount && (
                                 <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
                                     <div className="flex flex-col items-center text-center mb-4">
-                                        <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 border border-rose-100 mb-3">
+                                        <div className="w-16 h-16 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 border border-rose-100 mb-3">
                                             <ShieldAlert size={32} />
                                         </div>
                                         <h2 className="text-lg font-black text-slate-900 uppercase">Node Reset Protocol</h2>
@@ -884,15 +882,15 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                     {resetStep === 1 ? (
                                         <div className="space-y-4">
                                             <div className="relative">
-                                                <input type="text" placeholder="Registered Pincode" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-sm focus:border-rose-500 outline-none" value={resetData.location} onChange={e => setResetData({ ...resetData, location: e.target.value })} />
+                                                <input type="text" placeholder="Registered Pincode" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-rose-500 outline-none" value={resetData.location} onChange={e => setResetData({ ...resetData, location: e.target.value })} />
                                                 <MapPin className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
                                             </div>
                                             <div className="relative">
-                                                <input type="text" placeholder="Date of Birth (DD/MM/YYYY)" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-sm focus:border-rose-500 outline-none" value={resetData.dob} onChange={e => setResetData({ ...resetData, dob: e.target.value })} />
+                                                <input type="text" placeholder="Date of Birth (DD/MM/YYYY)" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-rose-500 outline-none" value={resetData.dob} onChange={e => setResetData({ ...resetData, dob: e.target.value })} />
                                                 <Activity className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
                                             </div>
                                             <div className="relative">
-                                                <input type="text" placeholder="Your Security Nickname" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl font-bold text-sm focus:border-rose-500 outline-none" value={resetData.nickname} onChange={e => setResetData({ ...resetData, nickname: e.target.value })} />
+                                                <input type="text" placeholder="Your Security Nickname" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-rose-500 outline-none" value={resetData.nickname} onChange={e => setResetData({ ...resetData, nickname: e.target.value })} />
                                                 <User className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
                                             </div>
                                         </div>
@@ -904,7 +902,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                     type="password"
                                                     maxLength={4}
                                                     placeholder="••••"
-                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl text-center text-3xl font-black tracking-[0.4em] focus:bg-white focus:border-emerald-500 transition-all outline-none"
+                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl text-center text-3xl font-black tracking-[0.4em] focus:bg-white focus:border-emerald-500 transition-all outline-none"
                                                     value={resetData.newPassword}
                                                     onChange={e => setResetData({ ...resetData, newPassword: e.target.value.replace(/\D/g, '') })}
                                                 />
@@ -913,12 +911,12 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                     )}
 
                                     <div className="flex gap-3 pt-4">
-                                        <button onClick={() => { setMode('select'); setResetStep(1); }} className="p-5 rounded-2xl bg-slate-50 text-slate-400 hover:text-slate-900 transition-colors">
+                                        <button onClick={() => { setMode('select'); setResetStep(1); }} className="p-5 rounded-xl bg-slate-50 text-slate-400 hover:text-slate-900 transition-colors">
                                             <ArrowLeft size={20} />
                                         </button>
                                         <button
                                             onClick={handleResetProtocol}
-                                            className={`flex-1 ${resetStep === 1 ? 'bg-rose-500 shadow-rose-200' : 'bg-emerald-500 shadow-emerald-200'} text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg transition-all active:scale-[0.98]`}
+                                            className={`flex-1 ${resetStep === 1 ? 'bg-rose-500 shadow-rose-200' : 'bg-emerald-500 shadow-emerald-200'} text-white py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg transition-all active:scale-[0.98]`}
                                         >
                                             {resetStep === 1 ? 'Verify Identity' : 'Update PIN'}
                                         </button>

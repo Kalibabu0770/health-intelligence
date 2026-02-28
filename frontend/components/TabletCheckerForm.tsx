@@ -71,7 +71,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
 
         return (
             <div className="space-y-3 animate-in zoom-in-95 duration-300">
-                <div className={`${statusBg} border ${statusBdr} rounded-2xl p-4`}>
+                <div className={`${statusBg} border ${statusBdr} rounded-xl p-4`}>
                     <div className="flex items-center justify-between mb-3">
                         <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${statusBg} border ${statusBdr}`}>
                             <div className={`w-1.5 h-1.5 rounded-full ${barColor} animate-pulse`} />
@@ -185,7 +185,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
                 <button
                     onClick={handleCheck}
                     disabled={loading || medicines.filter(m => m.trim()).length === 0 || !problem.trim()}
-                    className="col-span-2 py-4 rounded-2xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-emerald-700 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                    className="col-span-2 py-4 rounded-xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-emerald-700 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                     {loading ? <Loader2 size={16} className="animate-spin" /> : 'Analyze Safety'}
                 </button>

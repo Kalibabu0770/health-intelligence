@@ -54,7 +54,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
                         <button
                             key={m}
                             onClick={() => setMood(m)}
-                            className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${mood === m ? 'bg-emerald-50 border-emerald-500 shadow-sm font-black' : 'bg-slate-50 border-slate-100'}`}
+                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${mood === m ? 'bg-emerald-50 border-emerald-500 shadow-sm font-black' : 'bg-slate-50 border-slate-100'}`}
                         >
                             <span className="text-2xl">{m === 'Happy' ? '😊' : m === 'Neutral' ? '😐' : '😔'}</span>
                             <span className="text-[10px] font-black uppercase">{m === 'Happy' ? (t.mood_happy || 'Happy') : m === 'Neutral' ? (t.mood_neutral || 'Neutral') : (t.mood_sad || 'Sad')}</span>
@@ -102,7 +102,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
 
             <button
                 onClick={handleSubmit}
-                className="w-full py-5 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-xs rounded-2xl shadow-xl active:scale-95 transition-all"
+                className="w-full py-5 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-xs rounded-xl shadow-xl active:scale-95 transition-all"
             >
                 {t.log_daily_status || t.submit_checkin || "Log Daily Status"}
             </button>
@@ -133,8 +133,8 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
     }
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-white/60 backdrop-blur-md animate-in fade-in duration-300">
-            <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-white/60  animate-in fade-in duration-300">
+            <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500">
                 <div className="bg-emerald-600 p-8 text-white relative">
                     <div className="absolute top-0 right-0 p-8 opacity-10"><Heart size={80} /></div>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80 mb-2">{t.daily_checkin || "Daily Health Check-in"}</p>

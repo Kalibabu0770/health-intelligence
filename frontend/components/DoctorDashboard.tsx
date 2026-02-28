@@ -27,7 +27,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         <div className="h-screen w-screen bg-slate-50 overflow-hidden flex font-sans text-slate-900 border-4 border-emerald-600 box-border p-2">
 
             {/* Sidebar Navigation */}
-            <div className="w-72 bg-white rounded-2xl shadow-xl border border-slate-100 flex flex-col h-full mr-2 p-6">
+            <div className="w-72 bg-white rounded-xl shadow-xl border border-slate-100 flex flex-col h-full mr-2 p-6">
                 <div className="flex items-center gap-4 mb-10">
                     <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-md">
                         <ShieldCheck size={28} />
@@ -54,7 +54,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             </div>
 
             {/* Main Content Area (No Scrolling) */}
-            <div className="flex-1 bg-white rounded-2xl shadow-xl border border-slate-100 h-full flex flex-col items-stretch overflow-hidden">
+            <div className="flex-1 bg-white rounded-xl shadow-xl border border-slate-100 h-full flex flex-col items-stretch overflow-hidden">
                 {activePanel === 'queue' && (
                     <div className="h-full flex flex-col p-8 bg-white">
                         <div className="mb-8">
@@ -101,13 +101,13 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                             </button>
                         </div>
                         <div className="flex-1 grid grid-cols-2 gap-8">
-                            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col">
+                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col">
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Live Transcription (English / Regional)</h3>
                                 <div className="flex-1 overflow-auto text-sm text-slate-700 font-medium leading-relaxed italic content-start">
                                     {isRecording ? "Patient presents with sharp colicky pain in the left flank radiating to the groin. Nausea present. Suspecting nephrolithiasis based on prior history. Vitals normal. Recommend USG abdomen..." : "Awaiting transmission..."}
                                 </div>
                             </div>
-                            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 flex flex-col">
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 flex flex-col">
                                 <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-4">Structured AHMIS Schema</h3>
                                 {isRecording ? (
                                     <div className="space-y-4 animate-in fade-in duration-500 w-full h-full">
@@ -145,7 +145,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                         </div>
                         <div className="flex-1 flex gap-8">
                             {/* Mock Heatmap */}
-                            <div className="flex-1 bg-slate-100 rounded-2xl border border-slate-200 relative overflow-hidden flex items-center justify-center">
+                            <div className="flex-1 bg-slate-100 rounded-xl border border-slate-200 relative overflow-hidden flex items-center justify-center">
                                 <div className="absolute inset-0 opacity-20 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/India_Andhra_Pradesh_location_map.svg/1024px-India_Andhra_Pradesh_location_map.svg.png')] bg-cover bg-center mix-blend-multiply filter grayscale" />
                                 <div className="relative z-10 w-20 h-20 bg-rose-500 rounded-full blur-2xl opacity-60 absolute top-1/3 left-1/3" />
                                 <div className="relative z-10 w-32 h-32 bg-amber-500 rounded-full blur-3xl opacity-40 absolute bottom-1/4 right-1/4" />

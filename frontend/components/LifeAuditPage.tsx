@@ -246,7 +246,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                     { label: t.kinetic_output || 'Kinetic Output', val: workoutMins, goal: goals.mins, unit: 'min', color: 'blue', icon: Zap },
                                     { label: t.neural_recovery || 'Neural Recovery', val: mindMins, goal: goals.mind, unit: 'min', color: 'teal', icon: Wind }
                                 ].map((card, i) => (
-                                    <div key={i} className="bg-white p-7 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-4 group transition-all">
+                                    <div key={i} className="bg-white p-7 rounded-xl border border-slate-100 shadow-sm space-y-4 group transition-all">
                                         <div className="flex justify-between items-center">
                                             <div className={`p-3.5 rounded-xl bg-${card.color}-50 text-${card.color}-600 border border-${card.color}-100`}><card.icon size={22} /></div>
                                             <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{Math.round((card.val / card.goal) * 100)}%</span>
@@ -261,8 +261,8 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                     </div>
                                 ))}
                             </div>
-                            <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm flex flex-col items-center justify-center text-center space-y-4">
-                                <div className="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg"><ClipboardList size={26} /></div>
+                            <div className="bg-white p-10 rounded-xl border border-slate-50 shadow-sm flex flex-col items-center justify-center text-center space-y-4">
+                                <div className="w-14 h-14 bg-emerald-600 text-white rounded-xl flex items-center justify-center shadow-lg"><ClipboardList size={26} /></div>
                                 <h4 className="text-xl font-black uppercase text-slate-900 italic tracking-tight">{t.maintenance_console || 'Precision Monitor Console'}</h4>
                                 <p className="text-xs font-bold text-slate-500 uppercase leading-relaxed italic max-w-sm">
                                     {t.maintenance_console_desc || 'Document your metabolic intake, kinetic output, and neural rest phases to strengthen your bio-profile.'}
@@ -275,7 +275,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                 return (
                     <div className="h-full w-full grid grid-cols-12 gap-6 animate-in slide-in-from-right duration-500">
                         <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
-                            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm space-y-6">
+                            <div className="bg-white rounded-xl p-8 border border-slate-100 shadow-sm space-y-6">
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 italic">{t.meal_registration || 'In-take Entry'}</h3>
@@ -291,7 +291,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                         value={mealDescription}
                                         onChange={(e) => setMealDescription(e.target.value)}
                                         placeholder={t.type_meal_details || "Type meal details..."}
-                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl text-xs font-bold outline-none focus:border-orange-500 transition-all shadow-sm"
+                                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl text-xs font-bold outline-none focus:border-orange-500 transition-all shadow-sm"
                                     />
                                     <button
                                         type="button"
@@ -330,7 +330,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex-1 bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+                            <div className="flex-1 bg-white rounded-xl p-6 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4">{t.daily_intake_log || 'Intake History'}</p>
                                 <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3">
                                     {todayFood.length === 0 ? (
@@ -340,7 +340,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                         </div>
                                     ) : (
                                         todayFood.map((food, i) => (
-                                            <div key={i} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-white">
+                                            <div key={i} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl border border-white">
                                                 <div>
                                                     <p className="text-[10px] font-black uppercase text-slate-900 leading-none">{food.description}</p>
                                                     <p className="text-[7px] font-black text-slate-400 uppercase mt-1">{new Date(food.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
@@ -353,7 +353,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                             </div>
                         </div>
                         <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
-                            <div className="bg-white/60 backdrop-blur-md rounded-[2.5rem] p-8 border border-white/80 shadow-sm flex-1 flex flex-col gap-6 overflow-hidden">
+                            <div className="bg-white/60  rounded-xl p-8 border border-white/80 shadow-sm flex-1 flex flex-col gap-6 overflow-hidden">
                                 <div className="flex justify-between items-center shrink-0">
                                     <div>
                                         <h4 className="text-lg font-black uppercase text-slate-900 italic tracking-tight">{t.bio_fuel_protocol || 'Bio-Fuel Recommendations'}</h4>
@@ -384,7 +384,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                                     </div>
                                                     <div className="space-y-2">
                                                         {(nutriAnalysis.recommendations?.vegetarian || nutriAnalysis.suggestions?.vegetarian)?.map((item: any, i: number) => (
-                                                            <div key={i} className="bg-white/60 border border-slate-100 p-4 rounded-2xl hover:border-orange-200 transition-colors">
+                                                            <div key={i} className="bg-white/60 border border-slate-100 p-4 rounded-xl hover:border-orange-200 transition-colors">
                                                                 <span className="text-[10px] font-black text-slate-900 uppercase italic">{item.food}</span>
                                                                 <p className="text-[8px] font-bold text-slate-500 uppercase mt-1 leading-tight">{item.reason}</p>
                                                             </div>
@@ -398,7 +398,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                                     </div>
                                                     <div className="space-y-2">
                                                         {(nutriAnalysis.recommendations?.nonVegetarian || nutriAnalysis.suggestions?.nonVegetarian)?.map((item: any, i: number) => (
-                                                            <div key={i} className="bg-white/60 border border-slate-100 p-4 rounded-2xl hover:border-rose-200 transition-colors">
+                                                            <div key={i} className="bg-white/60 border border-slate-100 p-4 rounded-xl hover:border-rose-200 transition-colors">
                                                                 <span className="text-[10px] font-black text-slate-900 uppercase italic">{item.food}</span>
                                                                 <p className="text-[8px] font-bold text-slate-500 uppercase mt-1 leading-tight">{item.reason}</p>
                                                             </div>
@@ -406,7 +406,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="bg-emerald-600 rounded-2xl p-5 text-white relative overflow-hidden group">
+                                            <div className="bg-emerald-600 rounded-xl p-5 text-white relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-4 opacity-10"><Brain size={32} /></div>
                                                 <p className="text-[7px] font-black text-emerald-400 uppercase tracking-widest mb-1 italic">Diagnostic Insight</p>
                                                 <p className="text-[10px] font-medium leading-relaxed uppercase italic opacity-90">
@@ -438,7 +438,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                 </div>
                             </div>
 
-                            <div className="bg-emerald-600 p-7 rounded-[2.5rem] border border-slate-100 flex justify-between items-center group shadow-2xl">
+                            <div className="bg-emerald-600 p-7 rounded-xl border border-slate-100 flex justify-between items-center group shadow-2xl">
                                 <div className="flex items-center gap-5">
                                     <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-orange-500 transition-transform group-hover:scale-110"><TrendingUp size={24} /></div>
                                     <div>
@@ -458,13 +458,13 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                 return (
                     <div className="h-full w-full grid grid-cols-12 gap-6 animate-in slide-in-from-right duration-500">
                         <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
-                            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm space-y-5">
+                            <div className="bg-white rounded-xl p-8 border border-slate-100 shadow-sm space-y-5">
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 italic">{t.kinetic_registration || 'Kinetic Registry'}</h3>
                                         <p className="text-[8px] font-black text-blue-500 uppercase tracking-widest mt-1">Stress Node v2.1</p>
                                     </div>
-                                    <div className="bg-blue-50 text-blue-500 p-2.5 rounded-xl border border-blue-100"><Dumbbell size={20} /></div>
+                                    <div className="bg-emerald-50 text-blue-500 p-2.5 rounded-xl border border-blue-100"><Dumbbell size={20} /></div>
                                 </div>
                                 <div className="space-y-3">
                                     <div className="relative">
@@ -516,13 +516,13 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex-1 bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+                            <div className="flex-1 bg-white rounded-xl p-6 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">{t.daily_movement_cycle || 'Movement Timeline'}</p>
                                 <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3">
                                     {todayWorkout.map((w, i) => (
-                                        <div key={i} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-white">
+                                        <div key={i} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl border border-white">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-black text-[10px] italic shadow-sm">{Math.round(w.duration || w.minutes || 0)}</div>
+                                                <div className="w-9 h-9 rounded-xl bg-blue-100 text-emerald-600 flex items-center justify-center font-black text-[10px] italic shadow-sm">{Math.round(w.duration || w.minutes || 0)}</div>
                                                 <p className="text-[10px] font-black uppercase text-slate-900">{(w.activity || w.description || 'Workout')}</p>
                                             </div>
                                             <ChevronRight size={14} className="text-slate-300" />
@@ -531,7 +531,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                 </div>
                             </div>
                         </div>
-                        <div className="col-span-12 lg:col-span-7 bg-slate-50/50 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center text-center p-10">
+                        <div className="col-span-12 lg:col-span-7 bg-slate-50/50 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center p-10">
                             <Dumbbell size={40} className="text-blue-500 mb-5 opacity-10" />
                             <h4 className="text-lg font-black uppercase text-slate-900 italic tracking-tight">{t.kinetic_maintenance || 'Kinetic Maintenance'}</h4>
                             <p className="text-[10px] font-bold text-slate-500 uppercase leading-relaxed italic max-sm:max-w-xs max-w-sm">
@@ -544,8 +544,8 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                 return (
                     <div className="h-full w-full grid grid-cols-12 gap-6 animate-in slide-in-from-right duration-500">
                         <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
-                            <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm flex-1 flex flex-col items-center justify-center text-center space-y-6">
-                                <div className="bg-teal-50 text-teal-600 p-4 rounded-2xl border border-teal-100"><Wind size={32} /></div>
+                            <div className="bg-white rounded-xl p-8 border border-slate-100 shadow-sm flex-1 flex flex-col items-center justify-center text-center space-y-6">
+                                <div className="bg-teal-50 text-teal-600 p-4 rounded-xl border border-teal-100"><Wind size={32} /></div>
                                 <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 italic">{t.focus_node || 'Neural Focus Node'}</h3>
 
                                 {/* Custom Time Input (Professional Styled) */}
@@ -597,7 +597,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                 </button>
                             </div>
                         </div>
-                        <div className="col-span-12 lg:col-span-7 bg-slate-50/50 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center text-center p-10">
+                        <div className="col-span-12 lg:col-span-7 bg-slate-50/50 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center p-10">
                             <Wind size={40} className="text-teal-500 mb-5 opacity-10" />
                             <h4 className="text-lg font-black uppercase text-slate-900 italic tracking-tight">{t.neural_maintenance || 'Neural Recovery'}</h4>
                             <p className="text-[10px] font-bold text-slate-500 uppercase leading-relaxed italic max-w-sm">
@@ -613,7 +613,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
     // --- RENDER ANALYSIS TRACK ---
     const renderAnalysis = () => (
         <div className="h-full w-full flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-6 duration-700 min-h-0 pb-1">
-            <div className="flex-[1.2] min-h-0 bg-white rounded-[2rem] border border-slate-50 p-6 flex flex-col shadow-sm relative overflow-hidden group hover:border-emerald-100 transition-colors">
+            <div className="flex-[1.2] min-h-0 bg-white rounded-xl border border-slate-50 p-6 flex flex-col shadow-sm relative overflow-hidden group hover:border-emerald-100 transition-colors">
                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:rotate-6 transition-transform duration-1000"><TrendingUp size={100} /></div>
                 <div className="flex justify-between items-start mb-3 shrink-0">
                     <div>
@@ -642,7 +642,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
             </div>
 
             <div className="flex-1 min-h-0 grid grid-cols-12 gap-4">
-                <div className="col-span-12 lg:col-span-7 bg-white rounded-[2rem] border border-slate-50 p-6 shadow-sm flex flex-col justify-center">
+                <div className="col-span-12 lg:col-span-7 bg-white rounded-xl border border-slate-50 p-6 shadow-sm flex flex-col justify-center">
                     <h3 className="text-[8px] font-black uppercase tracking-[0.2em] mb-4 opacity-40 text-slate-500 italic">Molecular Component Analytics</h3>
                     <div className="flex items-center gap-6 flex-1 min-h-0">
                         <div className="h-full aspect-square flex-shrink-0">
@@ -675,7 +675,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                     </div>
                 </div>
 
-                <div className="col-span-12 lg:col-span-5 bg-indigo-600 rounded-[2rem] p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between group">
+                <div className="col-span-12 lg:col-span-5 bg-indigo-600 rounded-xl p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between group">
                     <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-1000"><Brain size={120} /></div>
                     <div className="relative z-10">
                         <div className="flex justify-between items-center mb-4">
@@ -689,7 +689,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                             </p>
                         </div>
                     </div>
-                    <button onClick={triggerComprehensiveAnalysis} className="relative z-10 w-full bg-white text-indigo-600 font-black py-3.5 rounded-xl text-[8px] uppercase tracking-widest mt-4 active:scale-95 transition-all shadow-lg hover:shadow-indigo-500/20">
+                    <button onClick={triggerComprehensiveAnalysis} className="relative z-10 w-full bg-white text-emerald-600 font-black py-3.5 rounded-xl text-[8px] uppercase tracking-widest mt-4 active:scale-95 transition-all shadow-lg hover:shadow-indigo-500/20">
                         {isCompAnalyzing ? <Loader2 size={12} className="animate-spin mx-auto" /> : 'Recalibrate Advisor'}
                     </button>
                 </div>
@@ -710,7 +710,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                     </div>
                 </div>
 
-                <div className="flex bg-slate-50 p-1 rounded-2xl border border-slate-100 shadow-inner">
+                <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100 shadow-inner">
                     <button onClick={() => setMainTab('registry')} className={`flex items-center gap-2 px-6 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all ${mainTab === 'registry' ? `bg-white shadow-sm text-slate-900 border border-slate-200/50` : 'text-slate-400 hover:text-slate-600'}`}>
                         <ClipboardList size={12} /> <span>{t.registry_logs || 'Logs'}</span>
                     </button>

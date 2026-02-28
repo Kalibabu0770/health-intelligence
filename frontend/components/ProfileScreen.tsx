@@ -31,8 +31,8 @@ const ProfileScreen: React.FC = () => {
                 </button>
             </div>
 
-            <div className="bg-white p-10 rounded-[2rem] border border-slate-200 shadow-sm text-center flex flex-col items-center justify-center space-y-6">
-                <div className="w-24 h-24 bg-emerald-100 rounded-[1.5rem] flex items-center justify-center text-emerald-600 text-4xl font-black shadow-inner border-4 border-white">{profile.name.charAt(0)}</div>
+            <div className="bg-white p-10 rounded-xl border border-slate-200 shadow-sm text-center flex flex-col items-center justify-center space-y-6">
+                <div className="w-24 h-24 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 text-4xl font-black shadow-inner border-4 border-white">{profile.name.charAt(0)}</div>
                 {isEditing ? (
                     <div className="w-full space-y-4">
                         <div className="relative">

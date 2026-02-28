@@ -99,9 +99,9 @@ const MedicationSafetyScanner: React.FC = () => {
         <div className="h-full w-full flex flex-col gap-6 animate-in fade-in duration-700 overflow-hidden font-sans">
 
             {/* ═══ COCKPIT HEADER ═══ */}
-            <header className="flex justify-between items-center bg-white border border-slate-200 p-6 rounded-[2.5rem] shadow-sm shrink-0">
+            <header className="flex justify-between items-center bg-white border border-slate-200 p-6 rounded-xl shadow-sm shrink-0">
                 <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 bg-rose-600 rounded-2xl flex items-center justify-center text-white shadow-xl">
+                    <div className="w-14 h-14 bg-rose-600 rounded-xl flex items-center justify-center text-white shadow-xl">
                         <Pill size={28} />
                     </div>
                     <div>
@@ -121,7 +121,7 @@ const MedicationSafetyScanner: React.FC = () => {
             <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
                 {/* ═══ INTAKE MATRIX (Left) ═══ */}
                 <div className="lg:col-span-12 xl:col-span-7 flex flex-col gap-6 min-h-0">
-                    <section className="flex-1 bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm flex flex-col gap-6 overflow-hidden">
+                    <section className="flex-1 bg-white border border-slate-200 rounded-xl p-8 shadow-sm flex flex-col gap-6 overflow-hidden">
                         <div className="flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-3">
                                 <Plus size={16} className="text-rose-600" />
@@ -139,7 +139,7 @@ const MedicationSafetyScanner: React.FC = () => {
                                             value={med}
                                             onChange={(e) => updateMed(idx, e.target.value)}
                                             placeholder="SCAN OR TYPE COMPOUND..."
-                                            className="w-full h-16 bg-slate-50 border border-slate-100 rounded-2xl px-6 pr-32 text-[11px] font-black uppercase tracking-tight text-slate-900 focus:bg-white focus:border-rose-500 outline-none transition-all shadow-inner"
+                                            className="w-full h-16 bg-slate-50 border border-slate-100 rounded-xl px-6 pr-32 text-[11px] font-black uppercase tracking-tight text-slate-900 focus:bg-white focus:border-rose-500 outline-none transition-all shadow-inner"
                                         />
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                                             <button
@@ -165,7 +165,7 @@ const MedicationSafetyScanner: React.FC = () => {
                                     {meds.length > 1 && (
                                         <button
                                             onClick={() => removeMed(idx)}
-                                            className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-all"
+                                            className="w-16 h-16 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-all"
                                         >
                                             <Minus size={20} />
                                         </button>
@@ -177,21 +177,21 @@ const MedicationSafetyScanner: React.FC = () => {
                         <div className="grid grid-cols-2 gap-4 shrink-0">
                             <button
                                 onClick={addMed}
-                                className="h-14 bg-slate-50 border border-dashed border-slate-300 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:bg-white hover:border-rose-500 hover:text-rose-600 transition-all flex items-center justify-center gap-3"
+                                className="h-14 bg-slate-50 border border-dashed border-slate-300 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:bg-white hover:border-rose-500 hover:text-rose-600 transition-all flex items-center justify-center gap-3"
                             >
                                 <Plus size={14} /> Add Compound Node
                             </button>
                             <button
                                 onClick={() => { setTargetIdx(0); fileInputRef.current?.click(); }}
-                                className="h-14 bg-slate-50 border border-dashed border-slate-300 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:bg-white hover:border-blue-500 hover:text-blue-600 transition-all flex items-center justify-center gap-3"
+                                className="h-14 bg-slate-50 border border-dashed border-slate-300 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:bg-white hover:border-blue-500 hover:text-emerald-600 transition-all flex items-center justify-center gap-3"
                             >
                                 <Camera size={14} /> Visual Analysis
                             </button>
                         </div>
                     </section>
 
-                    <section className="h-32 bg-white border border-slate-200 rounded-[2rem] p-6 shadow-sm flex items-center gap-4 shrink-0 overflow-hidden relative group">
-                        <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 border border-blue-100 shadow-sm shrink-0">
+                    <section className="h-32 bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex items-center gap-4 shrink-0 overflow-hidden relative group">
+                        <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 border border-blue-100 shadow-sm shrink-0">
                             <Activity size={24} />
                         </div>
                         <div className="flex-1 relative">
@@ -211,7 +211,7 @@ const MedicationSafetyScanner: React.FC = () => {
                                 setIsListening(true);
                                 startListening(language, text => setProblemContext(text), () => setIsListening(false));
                             }}
-                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-50 text-slate-400 hover:text-blue-600'}`}
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-50 text-slate-400 hover:text-emerald-600'}`}
                         >
                             <Mic size={18} />
                         </button>
@@ -220,10 +220,10 @@ const MedicationSafetyScanner: React.FC = () => {
 
                 {/* ═══ ANALYSIS CORE (Right) ═══ */}
                 <div className="lg:col-span-12 xl:col-span-5 flex flex-col gap-6 min-h-0">
-                    <section className="flex-1 bg-white border border-slate-200 rounded-[3rem] p-10 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
+                    <section className="flex-1 bg-white border border-slate-200 rounded-xl p-10 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
                         {isAnalyzing ? (
                             <div className="space-y-6 animate-pulse">
-                                <div className="w-24 h-24 bg-rose-50 rounded-[2rem] flex items-center justify-center text-rose-600 mx-auto">
+                                <div className="w-24 h-24 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 mx-auto">
                                     <Loader2 size={48} className="animate-spin" />
                                 </div>
                                 <div>
@@ -234,7 +234,7 @@ const MedicationSafetyScanner: React.FC = () => {
                         ) : result.status ? (
                             <div className="w-full flex flex-col gap-8 animate-in zoom-in-95 duration-500">
                                 <div className="flex flex-col items-center gap-4">
-                                    <div className={`w-28 h-28 rounded-[2.5rem] bg-white flex items-center justify-center shadow-2xl ${styles.glow} border border-white/50`}>
+                                    <div className={`w-28 h-28 rounded-xl bg-white flex items-center justify-center shadow-2xl ${styles.glow} border border-white/50`}>
                                         <StatusIcon size={64} className={styles.color} />
                                     </div>
                                     <div>
@@ -245,7 +245,7 @@ const MedicationSafetyScanner: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-50 border border-slate-100 rounded-[2rem] p-8 text-left relative overflow-hidden">
+                                <div className="bg-slate-50 border border-slate-100 rounded-xl p-8 text-left relative overflow-hidden">
                                     <div className="absolute top-0 right-0 p-4 opacity-5">
                                         <ShieldCheck size={80} />
                                     </div>
@@ -263,13 +263,13 @@ const MedicationSafetyScanner: React.FC = () => {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-white border border-slate-100 p-5 rounded-2xl text-left">
+                                    <div className="bg-white border border-slate-100 p-5 rounded-xl text-left">
                                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5 italic">Data Integrity</p>
                                         <p className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1.5">
                                             <div className="w-1 h-1 rounded-full bg-emerald-500" /> SYNC VERIFIED
                                         </p>
                                     </div>
-                                    <div className="bg-white border border-slate-100 p-5 rounded-2xl text-left">
+                                    <div className="bg-white border border-slate-100 p-5 rounded-xl text-left">
                                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5 italic">Clinical Drift</p>
                                         <p className="text-[10px] font-black text-slate-900 uppercase">NONE DETECTED</p>
                                     </div>
@@ -277,7 +277,7 @@ const MedicationSafetyScanner: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-6 opacity-30">
-                                <div className="w-24 h-24 border-4 border-dashed border-slate-200 rounded-[2rem] flex items-center justify-center text-slate-300">
+                                <div className="w-24 h-24 border-4 border-dashed border-slate-200 rounded-xl flex items-center justify-center text-slate-300">
                                     <ShieldAlert size={40} />
                                 </div>
                                 <div className="space-y-2">
@@ -293,9 +293,9 @@ const MedicationSafetyScanner: React.FC = () => {
                     <button
                         onClick={handleAnalyze}
                         disabled={isAnalyzing || meds.every(m => !m.trim())}
-                        className={`h-24 rounded-[2rem] font-black italic text-sm uppercase tracking-[0.3em] shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-4 ${isAnalyzing
+                        className={`h-24 rounded-xl font-black italic text-sm uppercase tracking-[0.3em] shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-4 ${isAnalyzing
                             ? 'bg-slate-800 text-slate-500'
-                            : 'bg-rose-600 text-white hover:bg-slate-900 shadow-rose-200'
+                            : 'bg-rose-600 text-white hover:bg-emerald-800 shadow-rose-200'
                             }`}
                     >
                         {isAnalyzing ? <Loader2 className="animate-spin" size={24} /> : <ShieldCheck size={24} />}

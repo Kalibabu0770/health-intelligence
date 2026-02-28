@@ -56,13 +56,13 @@ const MeditationLab: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                 <h2 className="text-xl font-black text-slate-900 uppercase">{t.mindfulness_lab || "Mindfulness Lab"}</h2>
             </div>
 
-            <div className="bg-white text-slate-900 p-10 rounded-[2.5rem] shadow-2xl text-center space-y-8 relative overflow-hidden">
+            <div className="bg-white text-slate-900 p-10 rounded-xl shadow-2xl text-center space-y-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-8 opacity-10"><Wind size={120} /></div>
 
                 {isActive ? (
                     <div className="space-y-6 relative z-10">
                         <div className="text-7xl font-black tabular-nums tracking-tighter text-emerald-400">{formatTime(timeLeft)}</div>
-                        <button onClick={stopTimer} className="w-full py-5 bg-slate-100 hover:bg-slate-100 rounded-2xl font-black uppercase text-xs border border-slate-100 transition-all active:scale-95">{t.cancel_session}</button>
+                        <button onClick={stopTimer} className="w-full py-5 bg-slate-100 hover:bg-slate-100 rounded-xl font-black uppercase text-xs border border-slate-100 transition-all active:scale-95">{t.cancel_session}</button>
                     </div>
                 ) : (
                     <div className="space-y-6 relative z-10">
@@ -76,26 +76,26 @@ const MeditationLab: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                 <button
                                     key={m}
                                     onClick={() => setMins(m)}
-                                    className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black transition-all ${mins === m ? 'bg-emerald-500 text-white shadow-lg scale-110' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+                                    className={`w-14 h-14 rounded-xl flex items-center justify-center font-black transition-all ${mins === m ? 'bg-emerald-500 text-white shadow-lg scale-110' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
                                 >
                                     {m}
                                 </button>
                             ))}
                         </div>
 
-                        <button onClick={startTimer} className="w-full py-6 bg-emerald-500 text-white rounded-[2rem] font-black uppercase text-xs shadow-[0_10px_30px_rgba(16,185,129,0.3)] active:scale-95 transition-all">
+                        <button onClick={startTimer} className="w-full py-6 bg-emerald-500 text-white rounded-xl font-black uppercase text-xs shadow-[0_10px_30px_rgba(16,185,129,0.3)] active:scale-95 transition-all">
                             {t.start_meditation || "Start Session"}
                         </button>
                     </div>
                 )}
             </div>
 
-            <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
+            <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm space-y-4">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-1">{t.recent_sessions}</h3>
                 <div className="space-y-3">
                     {meditationLogs && meditationLogs.length > 0 ? (
                         meditationLogs.slice(0, 5).map(m => (
-                            <div key={m.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div key={m.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl border border-slate-100">
                                 <div className="flex items-center gap-3">
                                     <div className="bg-white p-2.5 rounded-xl text-emerald-600 shadow-sm"><Wind size={18} /></div>
                                     <div>

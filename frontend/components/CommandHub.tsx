@@ -18,13 +18,13 @@ const CommandModule: React.FC<{
     statusColor?: string;
 }> = ({ title, subTitle, icon: Icon, color, gradient, onAnalysisClick, children, statusBadge, statusColor = 'emerald' }) => {
     return (
-        <div className="flex flex-col h-full rounded-[2.5rem] border border-slate-100 overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 bg-white group relative">
+        <div className="flex flex-col h-full rounded-xl border border-slate-100 overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 bg-white group relative">
             {/* Background Glow */}
             <div className={`absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br ${gradient} opacity-[0.03] rounded-full blur-3xl group-hover:opacity-[0.08] transition-opacity duration-700`} />
 
             <div className="p-6 shrink-0 flex items-center justify-between border-b border-slate-50 relative z-10">
                 <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-2xl flex items-center justify-center text-white shadow-xl shadow-slate-200 group-hover:scale-110 transition-transform duration-500`}>
+                    <div className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center text-white shadow-xl shadow-slate-200 group-hover:scale-110 transition-transform duration-500`}>
                         <Icon size={22} strokeWidth={2.5} />
                     </div>
                     <div>
@@ -77,11 +77,11 @@ const CommandHub: React.FC<{
         <div className="h-full flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700">
 
             {/* ═══ ZONE 01: MASTER BIO-COMMAND BAR ═══ */}
-            <div className="h-[12%] shrink-0 flex items-center justify-between px-10 rounded-[3rem] border border-white bg-white/70 backdrop-blur-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.05)] relative overflow-hidden">
+            <div className="h-[12%] shrink-0 flex items-center justify-between px-10 rounded-xl border border-white bg-white/70  shadow-[0_25px_60px_-15px_rgba(0,0,0,0.05)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-emerald-500/5 via-transparent to-blue-500/5 opacity-50" />
 
                 <div className="flex items-center gap-6 relative z-10">
-                    <div className="w-14 h-14 bg-emerald-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl shadow-emerald-200 relative group overflow-hidden">
+                    <div className="w-14 h-14 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-2xl shadow-emerald-200 relative group overflow-hidden">
                         <div className="absolute inset-0 bg-white/20 translate-y-20 group-hover:translate-y-0 transition-transform duration-500" />
                         <ShieldCheck size={28} strokeWidth={2.5} className="relative z-10" />
                     </div>
@@ -110,7 +110,7 @@ const CommandHub: React.FC<{
                     </div>
                     <button
                         onClick={onRefresh}
-                        className="w-14 h-14 rounded-2xl transition-all duration-300 active:scale-95 bg-emerald-600 text-white shadow-2xl shadow-slate-200 flex items-center justify-center hover:bg-emerald-700 group"
+                        className="w-14 h-14 rounded-xl transition-all duration-300 active:scale-95 bg-emerald-600 text-white shadow-2xl shadow-slate-200 flex items-center justify-center hover:bg-emerald-700 group"
                     >
                         <RefreshCcw size={22} className={`${isOrchestrating ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-700'}`} strokeWidth={2.5} />
                     </button>
@@ -134,18 +134,18 @@ const CommandHub: React.FC<{
                         >
                             <div className="flex flex-col h-full justify-between gap-4">
                                 <div className="space-y-4">
-                                    <div className="p-5 rounded-[1.8rem] border border-indigo-50 bg-indigo-50/20 relative group overflow-hidden">
-                                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform"><Brain size={40} className="text-indigo-600" /></div>
+                                    <div className="p-5 rounded-xl border border-indigo-50 bg-indigo-50/20 relative group overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform"><Brain size={40} className="text-emerald-600" /></div>
                                         <p className="text-[11px] font-bold text-indigo-900/70 leading-relaxed uppercase italic relative z-10">
                                             Clinical diagnostic engine operational. Neural-mapping active.
                                         </p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 flex items-center justify-center gap-3">
+                                        <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 flex items-center justify-center gap-3">
                                             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Logic: Active</span>
                                         </div>
-                                        <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 flex items-center justify-center gap-3">
+                                        <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 flex items-center justify-center gap-3">
                                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sync: 100%</span>
                                         </div>
@@ -153,7 +153,7 @@ const CommandHub: React.FC<{
                                 </div>
                                 <button
                                     onClick={() => onOpenAnalysis('symptoms')}
-                                    className="w-full py-4.5 bg-indigo-600 text-white rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all"
+                                    className="w-full py-4.5 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all"
                                 >
                                     Initialize Triage Protocol
                                 </button>
@@ -186,14 +186,14 @@ const CommandHub: React.FC<{
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4">
+                                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-4">
                                         <AlertTriangle size={16} className="text-rose-500" />
                                         <p className="text-[9px] font-black text-slate-500 uppercase italic">Predictive risk scanning enabled.</p>
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => onOpenAnalysis('medsafety')}
-                                    className="w-full py-4.5 bg-rose-600 text-white rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 shadow-xl shadow-rose-100 hover:bg-rose-700 transition-all"
+                                    className="w-full py-4.5 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 shadow-xl shadow-rose-100 hover:bg-rose-700 transition-all"
                                 >
                                     Execute Bio-Scan
                                 </button>
@@ -222,18 +222,18 @@ const CommandHub: React.FC<{
                                     </div>
                                     <div className="space-y-2.5 max-h-48 overflow-y-auto custom-scrollbar pr-2">
                                         {(todayMeds || []).length === 0 ? (
-                                            <div className="h-40 flex flex-col items-center justify-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 opacity-40">
+                                            <div className="h-40 flex flex-col items-center justify-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200 opacity-40">
                                                 <ClipboardList size={32} strokeWidth={1} />
                                                 <p className="text-[9px] mt-4 uppercase font-black tracking-widest">No active protocols</p>
                                             </div>
                                         ) : (
                                             todayMeds.slice(0, 5).map((m: any, idx: number) => (
-                                                <div key={idx} className="flex items-center justify-between p-5 rounded-[1.8rem] bg-white border border-slate-100 shadow-sm hover:border-blue-200 transition-all group">
+                                                <div key={idx} className="flex items-center justify-between p-5 rounded-xl bg-white border border-slate-100 shadow-sm hover:border-blue-200 transition-all group">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-[10px]"><Pill size={18} /></div>
+                                                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-[10px]"><Pill size={18} /></div>
                                                         <span className="text-[11px] font-black text-slate-900 truncate max-w-[120px] uppercase">{m.drugName}</span>
                                                     </div>
-                                                    <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-1.5 rounded-full uppercase tracking-widest">{m.times?.[0] || '--:--'}</span>
+                                                    <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-4 py-1.5 rounded-full uppercase tracking-widest">{m.times?.[0] || '--:--'}</span>
                                                 </div>
                                             ))
                                         )}
@@ -241,7 +241,7 @@ const CommandHub: React.FC<{
                                 </div>
                                 <button
                                     onClick={() => onOpenAnalysis('meds')}
-                                    className="w-full py-4.5 bg-emerald-600 text-white rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 hover:bg-emerald-700 transition-all shadow-xl"
+                                    className="w-full py-4.5 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 hover:bg-emerald-700 transition-all shadow-xl"
                                 >
                                     Full Adherence Schedule
                                 </button>
@@ -259,7 +259,7 @@ const CommandHub: React.FC<{
                             onAnalysisClick={() => onOpenAnalysis('lifeaudit')}
                         >
                             <div className="space-y-4">
-                                <div className="text-center bg-slate-50 p-4 rounded-3xl border border-slate-100">
+                                <div className="text-center bg-slate-50 p-4 rounded-xl border border-slate-100">
                                     <p className="text-2xl font-black text-slate-900 leading-none mb-1">{totalCal}</p>
                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Kcal In</p>
                                 </div>
@@ -289,10 +289,10 @@ const CommandHub: React.FC<{
                 <div className="col-span-12 lg:col-span-3 flex flex-col gap-8 min-h-0">
                     <div
                         onClick={() => onOpenAnalysis('reports')}
-                        className="flex-1 p-8 rounded-[3rem] border border-slate-100 bg-white flex flex-col justify-between cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden"
+                        className="flex-1 p-8 rounded-xl border border-slate-100 bg-white flex flex-col justify-between cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform"><FileText size={100} /></div>
-                        <div className="w-16 h-16 bg-blue-600 rounded-[1.8rem] flex items-center justify-center text-white shadow-2xl shadow-blue-100 relative z-10">
+                        <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-2xl shadow-blue-100 relative z-10">
                             <FileText size={28} />
                         </div>
                         <div className="relative z-10">
@@ -301,15 +301,15 @@ const CommandHub: React.FC<{
                                 {clinicalVault?.length || 0} SECURE NODES
                             </p>
                         </div>
-                        <ChevronRight size={20} className="ml-auto text-slate-300 group-hover:text-blue-600 transition-all opacity-40 group-hover:opacity-100" />
+                        <ChevronRight size={20} className="ml-auto text-slate-300 group-hover:text-emerald-600 transition-all opacity-40 group-hover:opacity-100" />
                     </div>
 
                     <div
                         onClick={() => onOpenAnalysis('profile')}
-                        className="flex-1 p-8 rounded-[3rem] border border-slate-100 bg-white flex flex-col justify-between cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden"
+                        className="flex-1 p-8 rounded-xl border border-slate-100 bg-white flex flex-col justify-between cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform"><UserCircle size={100} /></div>
-                        <div className="w-16 h-16 bg-emerald-600 rounded-[1.8rem] flex items-center justify-center text-white shadow-2xl shadow-emerald-100 relative z-10">
+                        <div className="w-16 h-16 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-2xl shadow-emerald-100 relative z-10">
                             <UserCircle size={28} />
                         </div>
                         <div className="relative z-10">
@@ -321,7 +321,7 @@ const CommandHub: React.FC<{
                         <ChevronRight size={20} className="ml-auto text-slate-300 group-hover:text-emerald-600 transition-all opacity-40 group-hover:opacity-100" />
                     </div>
 
-                    <div className="p-8 rounded-[3rem] border border-dashed border-slate-200 flex flex-col items-center justify-center text-center gap-4 opacity-50 hover:opacity-100 transition-opacity">
+                    <div className="p-8 rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center gap-4 opacity-50 hover:opacity-100 transition-opacity">
                         <ShieldCheck size={40} className="text-slate-300" />
                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.4em] italic">V2.8 SENTINEL PROTOCOL</p>
                     </div>

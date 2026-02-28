@@ -76,17 +76,17 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
 
                     {/* ═══ MEDICATION INVENTORY ═══ */}
                     <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
-                        <div className="flex-1 bg-white/60 backdrop-blur-xl rounded-[2.5rem] border border-white/80 shadow-sm overflow-hidden flex flex-col pt-6">
+                        <div className="flex-1 bg-white/60  rounded-xl border border-white/80 shadow-sm overflow-hidden flex flex-col pt-6">
                             <div className="px-8 mb-5 flex justify-between items-center">
                                 <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.active_protocol || 'Active Protocols'}</h3>
                                 <span className="bg-rose-500/10 text-rose-600 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">{medications.length} {t.rems || 'rems'}</span>
                             </div>
                             <div className="flex-1 overflow-y-auto custom-scrollbar px-6 pb-6 space-y-3">
                                 {medications.length > 0 ? medications.map(med => (
-                                    <div key={med.id} className="group relative bg-white/40 border border-slate-100 p-4 rounded-2xl hover:border-rose-500/20 transition-all flex items-center justify-between">
+                                    <div key={med.id} className="group relative bg-white/40 border border-slate-100 p-4 rounded-xl hover:border-rose-500/20 transition-all flex items-center justify-between">
                                         <div className="flex items-center gap-4">
                                             <div className={`w-11 h-11 rounded-xl flex items-center justify-center border ${med.color === 'red' ? 'bg-red-50 text-red-500 border-red-100' :
-                                                med.color === 'blue' ? 'bg-blue-50 text-blue-500 border-blue-100' :
+                                                med.color === 'blue' ? 'bg-emerald-50 text-blue-500 border-blue-100' :
                                                     med.color === 'green' ? 'bg-emerald-50 text-emerald-500 border-emerald-100' :
                                                         med.color === 'yellow' ? 'bg-yellow-50 text-yellow-600 border-yellow-100' :
                                                             med.color === 'purple' ? 'bg-purple-50 text-purple-500 border-purple-100' :
@@ -119,7 +119,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
 
                     {/* ═══ ADHERENCE & STATUS ═══ */}
                     <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
-                        <div className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/80 shadow-sm flex flex-col justify-between">
+                        <div className="bg-white/60  rounded-xl p-8 border border-white/80 shadow-sm flex flex-col justify-between">
                             <div className="flex justify-between items-start mb-6">
                                 <div className="space-y-1">
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.weekly_adherence || 'Adherence Ratio'}</p>
@@ -154,7 +154,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                             </div>
                         </div>
 
-                        <div className="bg-emerald-600 text-white rounded-[2.5rem] p-6 shadow-xl relative overflow-hidden group flex flex-col justify-between">
+                        <div className="bg-emerald-600 text-white rounded-xl p-6 shadow-xl relative overflow-hidden group flex flex-col justify-between">
                             <div className="absolute -right-2 -bottom-2 opacity-5 scale-90">
                                 <ShieldCheck size={100} />
                             </div>
@@ -175,8 +175,8 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
 
             {/* ═══ MODAL (Compacted) ═══ */}
             {showAdd && (
-                <div className="fixed inset-0 bg-slate-900/10 backdrop-blur-md z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-lg p-8 rounded-[2.5rem] shadow-2xl space-y-6 relative overflow-hidden border border-slate-100">
+                <div className="fixed inset-0 bg-emerald-800/10  z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-lg p-8 rounded-xl shadow-2xl space-y-6 relative overflow-hidden border border-slate-100">
                         <div className="flex justify-between items-center">
                             <div>
                                 <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight italic">{t.molecular_registration || 'Add Protocol'}</h3>
@@ -203,7 +203,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                             </div>
 
                             <div className="relative">
-                                <input className="w-full p-4 pr-20 bg-slate-50 border border-slate-100 rounded-2xl font-black text-[12px] outline-none focus:border-rose-500 transition-all uppercase" placeholder="COMPOUND NAME" value={newMed.drugName} onChange={e => setNewMed({ ...newMed, drugName: e.target.value })} />
+                                <input className="w-full p-4 pr-20 bg-slate-50 border border-slate-100 rounded-xl font-black text-[12px] outline-none focus:border-rose-500 transition-all uppercase" placeholder="COMPOUND NAME" value={newMed.drugName} onChange={e => setNewMed({ ...newMed, drugName: e.target.value })} />
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1.5">
                                     <button onClick={() => medPhotoRef.current?.click()} className="w-8 h-8 flex items-center justify-center text-rose-500 bg-white border border-slate-100 rounded-lg shadow-sm">
                                         {isIdentifying ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
@@ -216,8 +216,8 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <input className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-black text-[12px] outline-none focus:border-rose-500 uppercase" placeholder="DOSAGE (500MG)" value={newMed.dosage} onChange={e => setNewMed({ ...newMed, dosage: e.target.value })} />
-                                <select className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-black text-[12px] outline-none focus:border-rose-500 uppercase appearance-none" value={newMed.foodInstruction} onChange={e => setNewMed({ ...newMed, foodInstruction: e.target.value as any })}>
+                                <input className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl font-black text-[12px] outline-none focus:border-rose-500 uppercase" placeholder="DOSAGE (500MG)" value={newMed.dosage} onChange={e => setNewMed({ ...newMed, dosage: e.target.value })} />
+                                <select className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl font-black text-[12px] outline-none focus:border-rose-500 uppercase appearance-none" value={newMed.foodInstruction} onChange={e => setNewMed({ ...newMed, foodInstruction: e.target.value as any })}>
                                     <option value="none">NO FILTER</option>
                                     <option value="before">PRE-MEAL</option>
                                     <option value="after">POST-MEAL</option>
@@ -251,7 +251,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                                 setShowAdd(false);
                                 if (onBack) onBack();
                             }}
-                            className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-slate-100 active:scale-[0.98] transition-all"
+                            className="w-full bg-emerald-600 text-white py-5 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-slate-100 active:scale-[0.98] transition-all"
                         >
                             EXECUTE PROTOCOL
                         </button>

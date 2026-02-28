@@ -220,8 +220,8 @@ const StructuredSymptomChecker: React.FC = () => {
     const renderInputStage = () => (
         <div className="h-full flex flex-col p-8">
             <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full animate-in fade-in zoom-in-95 duration-700">
-                <div className="w-20 h-20 bg-blue-500/10 rounded-[2.5rem] flex items-center justify-center mb-8">
-                    <Brain size={42} className="text-blue-600" />
+                <div className="w-20 h-20 bg-blue-500/10 rounded-xl flex items-center justify-center mb-8">
+                    <Brain size={42} className="text-emerald-600" />
                 </div>
 
                 <h2 className="text-4xl font-black text-slate-900 mb-2 tracking-tight text-center">
@@ -232,8 +232,8 @@ const StructuredSymptomChecker: React.FC = () => {
                 </p>
 
                 <div className="w-full relative group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                    <div className="relative bg-white border border-slate-200 rounded-[2.2rem] p-3 shadow-2xl shadow-slate-200/50">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                    <div className="relative bg-white border border-slate-200 rounded-xl p-3 shadow-2xl shadow-slate-200/50">
                         <textarea
                             className="w-full bg-transparent border-none focus:ring-0 text-lg p-6 min-h-[160px] text-slate-800 placeholder:text-slate-300 font-medium resize-none"
                             placeholder={t.describe_symptoms}
@@ -241,11 +241,11 @@ const StructuredSymptomChecker: React.FC = () => {
                             onChange={(e) => setInput(e.target.value)}
                         />
 
-                        <div className="flex items-center justify-between p-4 bg-slate-50/80 rounded-[1.8rem] border border-slate-100">
+                        <div className="flex items-center justify-between p-4 bg-slate-50/80 rounded-xl border border-slate-100">
                             <button
                                 type="button"
                                 onClick={handleVoiceInput}
-                                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${isListening ? 'bg-rose-500 text-white animate-pulse shadow-lg shadow-rose-200' : 'bg-white text-slate-400 hover:text-blue-600 hover:shadow-md border border-slate-200'}`}
+                                className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isListening ? 'bg-rose-500 text-white animate-pulse shadow-lg shadow-rose-200' : 'bg-white text-slate-400 hover:text-emerald-600 hover:shadow-md border border-slate-200'}`}
                             >
                                 <Mic size={20} />
                             </button>
@@ -253,7 +253,7 @@ const StructuredSymptomChecker: React.FC = () => {
                             <button
                                 onClick={handleStartTriage}
                                 disabled={!input.trim()}
-                                className="bg-emerald-600 hover:bg-blue-600 disabled:opacity-20 disabled:hover:bg-emerald-600 text-white px-8 h-12 rounded-2xl font-black flex items-center gap-3 transition-all duration-500 hover:gap-5 group"
+                                className="bg-emerald-600 hover:bg-blue-600 disabled:opacity-20 disabled:hover:bg-emerald-600 text-white px-8 h-12 rounded-xl font-black flex items-center gap-3 transition-all duration-500 hover:gap-5 group"
                             >
                                 {t.initialize_protocol}
                                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -289,7 +289,7 @@ const StructuredSymptomChecker: React.FC = () => {
             <div className="h-full flex flex-col p-8 max-w-3xl mx-auto w-full animate-in slide-in-from-right-8 duration-500">
                 <div className="mb-12">
                     <div className="flex items-center justify-between mb-4">
-                        <span className="text-[11px] font-black uppercase tracking-widest text-blue-600">Captured Node {currentQuestionIndex + 1} of {questions.length}</span>
+                        <span className="text-[11px] font-black uppercase tracking-widest text-emerald-600">Captured Node {currentQuestionIndex + 1} of {questions.length}</span>
                         <span className="text-[11px] font-black text-slate-400">{Math.round(progress)}%</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
@@ -312,7 +312,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                     <button
                                         key={idx}
                                         onClick={() => handleAnswer(option)}
-                                        className="bg-white hover:bg-blue-50 border border-slate-200 p-6 rounded-[2rem] text-left text-lg font-bold text-slate-700 transition-all duration-300 hover:border-blue-300 hover:scale-[1.01] shadow-sm hover:shadow-xl hover:shadow-blue-100 flex items-center justify-between group"
+                                        className="bg-white hover:bg-emerald-50 border border-slate-200 p-6 rounded-xl text-left text-lg font-bold text-slate-700 transition-all duration-300 hover:border-blue-300 hover:scale-[1.01] shadow-sm hover:shadow-xl hover:shadow-blue-100 flex items-center justify-between group"
                                     >
                                         {option}
                                         <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -322,7 +322,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                 ))}
                                 <button
                                     onClick={() => setShowManual(true)}
-                                    className="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-colors flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-100 rounded-[2rem] hover:border-blue-200"
+                                    className="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-emerald-600 transition-colors flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-100 rounded-xl hover:border-blue-200"
                                 >
                                     <Plus size={14} /> {t.advanced_context || 'Custom Entry'}
                                 </button>
@@ -332,7 +332,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                 <div className="relative">
                                     <textarea
                                         id="manual-answer"
-                                        className="w-full bg-white border-2 border-slate-100 rounded-[2rem] p-8 text-lg font-bold text-slate-800 min-h-[180px] focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all outline-none shadow-inner"
+                                        className="w-full bg-white border-2 border-slate-100 rounded-xl p-8 text-lg font-bold text-slate-800 min-h-[180px] focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all outline-none shadow-inner"
                                         placeholder={t.advanced_context || "Enter manual clinical context..."}
                                         autoFocus
                                     />
@@ -350,7 +350,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                                 if (textarea) textarea.value = text;
                                             }, () => setIsListening(false));
                                         }}
-                                        className={`absolute right-6 bottom-6 w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-50 text-slate-400 hover:text-blue-600 border border-slate-100 shadow-sm'}`}
+                                        className={`absolute right-6 bottom-6 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-50 text-slate-400 hover:text-emerald-600 border border-slate-100 shadow-sm'}`}
                                     >
                                         <Mic size={20} />
                                     </button>
@@ -359,7 +359,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                     {showManual && currentQ.options && currentQ.options.length > 0 && (
                                         <button
                                             onClick={() => setShowManual(false)}
-                                            className="flex-1 bg-white border-2 border-slate-100 text-slate-400 h-16 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all"
+                                            className="flex-1 bg-white border-2 border-slate-100 text-slate-400 h-16 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all"
                                         >
                                             {t.go_back || 'Back'}
                                         </button>
@@ -373,7 +373,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                                 handleAnswer("No specific detail provided.");
                                             }
                                         }}
-                                        className="flex-[2] bg-emerald-600 text-white h-16 rounded-[1.5rem] font-black tracking-[0.2em] uppercase text-[10px] hover:bg-blue-600 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
+                                        className="flex-[2] bg-emerald-600 text-white h-16 rounded-xl font-black tracking-[0.2em] uppercase text-[10px] hover:bg-blue-600 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
                                     >
                                         {t.next_step || 'Continue Capture'}
                                         <ArrowRight size={14} />
@@ -390,7 +390,7 @@ const StructuredSymptomChecker: React.FC = () => {
     const renderReviewStage = () => (
         <div className="h-full flex flex-col p-8 max-w-2xl mx-auto w-full animate-in fade-in zoom-in-95 duration-500 overflow-hidden">
             <div className="flex-1 flex flex-col items-center justify-center text-center">
-                <div className="w-20 h-20 bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center mb-8">
+                <div className="w-20 h-20 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-8">
                     <CheckCircle2 size={42} className="text-emerald-600" />
                 </div>
                 <h3 className="text-3xl font-black text-slate-900 mb-4 uppercase tracking-tight">
@@ -400,7 +400,7 @@ const StructuredSymptomChecker: React.FC = () => {
                     All clinical data nodes have been captured. Execute clinical synthesis for the hybrid diagnostic output.
                 </p>
 
-                <div className="w-full bg-slate-50 rounded-[2.5rem] p-8 text-left border border-slate-100 mb-10 overflow-hidden">
+                <div className="w-full bg-slate-50 rounded-xl p-8 text-left border border-slate-100 mb-10 overflow-hidden">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Manifest Summary</span>
                     <div className="space-y-4 max-h-[160px] overflow-y-auto pr-2 scrollbar-none">
                         <div className="flex items-start gap-4">
@@ -422,13 +422,13 @@ const StructuredSymptomChecker: React.FC = () => {
                             setCurrentQuestionIndex(questions.length - 1);
                             setStage('questions');
                         }}
-                        className="flex-1 h-16 rounded-[1.5rem] border-2 border-slate-100 text-slate-400 font-black uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all"
+                        className="flex-1 h-16 rounded-xl border-2 border-slate-100 text-slate-400 font-black uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all"
                     >
                         {t.go_back || 'Back'}
                     </button>
                     <button
                         onClick={executeSynthesis}
-                        className="flex-[2] bg-emerald-600 hover:bg-blue-600 text-white h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 transition-all duration-500 shadow-2xl shadow-slate-200"
+                        className="flex-[2] bg-emerald-600 hover:bg-blue-600 text-white h-16 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 transition-all duration-500 shadow-2xl shadow-slate-200"
                     >
                         {t.submit_analysis || 'Execute Synthesis'}
                         <Sparkles size={16} />
@@ -443,9 +443,9 @@ const StructuredSymptomChecker: React.FC = () => {
             <div className="relative mb-12">
                 <div className="absolute inset-0 bg-blue-500 blur-3xl opacity-10 animate-pulse"></div>
                 <div className="relative w-28 h-28 flex items-center justify-center">
-                    <div className="absolute inset-0 border-2 border-slate-100 rounded-[2.5rem]"></div>
-                    <div className="absolute inset-0 border-2 border-blue-600 rounded-[2.5rem] border-t-transparent animate-spin"></div>
-                    <Brain className="text-blue-600" size={42} />
+                    <div className="absolute inset-0 border-2 border-slate-100 rounded-xl"></div>
+                    <div className="absolute inset-0 border-2 border-blue-600 rounded-xl border-t-transparent animate-spin"></div>
+                    <Brain className="text-emerald-600" size={42} />
                 </div>
             </div>
 
@@ -471,7 +471,7 @@ const StructuredSymptomChecker: React.FC = () => {
 
         const severityConfigs = {
             low: { color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
-            moderate: { color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+            moderate: { color: 'text-emerald-600', bg: 'bg-blue-50', border: 'border-blue-100' },
             high: { color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
             critical: { color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' }
         };
@@ -513,7 +513,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                     {t.core_clinical_assessment}
                                 </h2>
 
-                                <div className="bg-slate-50 rounded-[3rem] p-10 relative overflow-hidden group hover:bg-white hover:shadow-2xl transition-all duration-700 border border-transparent hover:border-slate-100">
+                                <div className="bg-slate-50 rounded-xl p-10 relative overflow-hidden group hover:bg-white hover:shadow-2xl transition-all duration-700 border border-transparent hover:border-slate-100">
                                     <MessageSquare className="absolute -top-6 -left-6 text-blue-500/5 group-hover:text-blue-500/10 transition-colors" size={160} />
                                     <p className="text-2xl font-medium text-slate-700 leading-relaxed italic relative z-10">
                                         "{analysis.assessment}"
@@ -521,7 +521,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                 </div>
 
                                 {analysis.red_flags.length > 0 && (
-                                    <div className="mt-8 flex items-center gap-6 p-6 bg-rose-50 rounded-[2rem] border border-rose-100">
+                                    <div className="mt-8 flex items-center gap-6 p-6 bg-rose-50 rounded-xl border border-rose-100">
                                         <AlertCircle className="text-rose-500 shrink-0" size={28} />
                                         <div>
                                             <h4 className="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-1">{t.red_flags}</h4>
@@ -539,7 +539,7 @@ const StructuredSymptomChecker: React.FC = () => {
                         <div className="flex-1 p-10 flex flex-col justify-center animate-in slide-in-from-right-8 duration-700">
                             <div className="max-w-4xl mx-auto w-full">
                                 <h2 className="text-4xl font-black text-slate-900 mb-10 flex items-center gap-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center text-white">
+                                    <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center text-white">
                                         <Layers size={24} />
                                     </div>
                                     {t.differential_diagnosis_path}
@@ -547,13 +547,13 @@ const StructuredSymptomChecker: React.FC = () => {
 
                                 <div className="grid grid-cols-1 gap-4">
                                     {analysis.differential_diagnosis.map((item, idx) => (
-                                        <div key={idx} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex items-center justify-between shadow-sm hover:shadow-2xl transition-all group">
+                                        <div key={idx} className="bg-white border border-slate-100 p-8 rounded-xl flex items-center justify-between shadow-sm hover:shadow-2xl transition-all group">
                                             <div className="flex items-center gap-6">
                                                 <div className="text-4xl font-black text-slate-50 group-hover:text-blue-50 transition-colors">0{idx + 1}</div>
                                                 <div>
                                                     <p className="text-2xl font-black text-slate-900 mb-1">{item.condition}</p>
                                                     <div className="flex items-center gap-3">
-                                                        <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 px-3 py-1 bg-blue-50 rounded-lg">{item.specialist}</span>
+                                                        <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 px-3 py-1 bg-emerald-50 rounded-lg">{item.specialist}</span>
                                                         <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">Target</span>
                                                     </div>
                                                 </div>
@@ -572,9 +572,9 @@ const StructuredSymptomChecker: React.FC = () => {
                     {resultPage === 2 && (
                         <div className="flex-1 px-8 py-4 flex flex-col animate-in slide-in-from-right-8 duration-700 overflow-hidden bg-slate-50/30">
                             <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col min-h-0">
-                                <div className="flex items-center justify-between mb-4 shrink-0 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                                <div className="flex items-center justify-between mb-4 shrink-0 bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                                        <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
                                             <Leaf size={24} />
                                         </div>
                                         <div>
@@ -582,7 +582,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1 italic">Clinical Ayurveda Node v4.1</p>
                                         </div>
                                     </div>
-                                    <div className="bg-emerald-50 px-5 py-2.5 rounded-2xl border border-emerald-100 flex items-center gap-4 transition-all hover:bg-emerald-100/50">
+                                    <div className="bg-emerald-50 px-5 py-2.5 rounded-xl border border-emerald-100 flex items-center gap-4 transition-all hover:bg-emerald-100/50">
                                         <div className="text-right">
                                             <p className="text-[7px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1">{t.dosha_insight_label || 'DOSHA INSIGHT'}</p>
                                             <p className="text-sm font-black text-emerald-700 uppercase italic leading-none">{analysis.ayurvedic_strategy.dosha_impact.split(' ')[0]}</p>
@@ -598,7 +598,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                         { id: '03', title: t.yoga_vihaar || 'Yoga & Vihaar', items: analysis.ayurvedic_strategy.lifestyle_vihaar, color: 'amber', icon: Activity },
                                         { id: '04', title: t.pranayama_mind || 'Pranayama & Mind', items: analysis.ayurvedic_strategy.pranayama, color: 'indigo', icon: Sparkles }
                                     ].map(block => (
-                                        <div key={block.id} className="bg-white rounded-[2rem] p-5 border border-slate-100 flex flex-col shadow-sm hover:shadow-xl transition-all duration-500 group overflow-hidden h-fit lg:h-full">
+                                        <div key={block.id} className="bg-white rounded-xl p-5 border border-slate-100 flex flex-col shadow-sm hover:shadow-xl transition-all duration-500 group overflow-hidden h-fit lg:h-full">
                                             <div className="flex items-center justify-between mb-4 shrink-0">
                                                 <div className="flex items-center gap-3">
                                                     <div className={`w-9 h-9 rounded-xl bg-${block.color}-50 flex items-center justify-center text-${block.color}-600 border border-${block.color}-100/30 group-hover:scale-110 transition-transform`}>
@@ -612,7 +612,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                             </div>
                                             <div className="space-y-3 flex-1">
                                                 {block.items.length > 0 ? block.items.map((item, i) => (
-                                                    <div key={i} className="flex items-start gap-3 p-3 bg-slate-50/50 rounded-2xl border border-slate-100 shadow-none hover:bg-white hover:shadow-sm transition-all group/item">
+                                                    <div key={i} className="flex items-start gap-3 p-3 bg-slate-50/50 rounded-xl border border-slate-100 shadow-none hover:bg-white hover:shadow-sm transition-all group/item">
                                                         <div className={`w-1 h-1 rounded-full bg-${block.color}-400 mt-2 shrink-0 group-hover/item:scale-150 transition-transform`} />
                                                         <span className="text-[10px] font-bold text-slate-600 leading-tight uppercase italic">{item}</span>
                                                     </div>
@@ -626,7 +626,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                     ))}
                                 </div>
 
-                                <div className="bg-emerald-600 rounded-[1.5rem] p-4 flex items-center justify-between shadow-xl shrink-0">
+                                <div className="bg-emerald-600 rounded-xl p-4 flex items-center justify-between shadow-xl shrink-0">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-emerald-400"><ShieldCheck size={16} /></div>
                                         <div>
@@ -654,7 +654,7 @@ const StructuredSymptomChecker: React.FC = () => {
                         {resultPage > 0 && (
                             <button
                                 onClick={() => setResultPage(prev => prev - 1)}
-                                className="h-14 px-8 rounded-2xl border-2 border-slate-50 text-slate-400 font-black uppercase tracking-widest text-[9px] hover:bg-slate-50 transition-all flex items-center gap-3"
+                                className="h-14 px-8 rounded-xl border-2 border-slate-50 text-slate-400 font-black uppercase tracking-widest text-[9px] hover:bg-slate-50 transition-all flex items-center gap-3"
                             >
                                 <ArrowLeft size={16} />
                                 {t.go_back || 'Back'}
@@ -665,7 +665,7 @@ const StructuredSymptomChecker: React.FC = () => {
                                 if (resultPage < 2) setResultPage(prev => prev + 1);
                                 else resetTriage();
                             }}
-                            className="h-14 px-10 rounded-2xl bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] hover:bg-blue-600 transition-all flex items-center gap-3 shadow-2xl shadow-slate-200"
+                            className="h-14 px-10 rounded-xl bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] hover:bg-blue-600 transition-all flex items-center gap-3 shadow-2xl shadow-slate-200"
                         >
                             {resultPage < 2 ? (t.next_step || 'Next') : (t.start_new_triage || 'Exit')}
                             {resultPage < 2 && <ArrowRight size={16} />}
@@ -686,7 +686,7 @@ const StructuredSymptomChecker: React.FC = () => {
     const SparklesIcon = Sparkles;
 
     return (
-        <div className="h-full bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-200 flex flex-col">
+        <div className="h-full bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col">
             <style>{`
                 .custom-thin-scrollbar::-webkit-scrollbar {
                     width: 4px;

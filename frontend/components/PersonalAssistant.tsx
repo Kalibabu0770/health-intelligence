@@ -38,12 +38,12 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
     }, [messages, loading]);
 
     return (
-        <div className="fixed bottom-6 right-6 w-[95vw] sm:w-[420px] h-[600px] max-h-[85vh] z-[1000] bg-white flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-500 shadow-[0_40px_100px_-15px_rgba(15,23,42,0.25)] rounded-[2.5rem] overflow-hidden border border-slate-100 ring-4 ring-slate-50/50">
+        <div className="fixed bottom-6 right-6 w-[95vw] sm:w-[420px] h-[600px] max-h-[85vh] z-[1000] bg-white flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-500 shadow-[0_40px_100px_-15px_rgba(15,23,42,0.25)] rounded-xl overflow-hidden border border-slate-100 ring-4 ring-slate-50/50">
 
             {/* Header: Mission Control Aesthetic */}
             <div className="bg-emerald-600 px-8 py-6 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20">
+                    <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20">
                         <Bot size={24} strokeWidth={2.5} />
                     </div>
                     <div>
@@ -71,7 +71,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                                 <Bot size={14} />
                             </div>
                         )}
-                        <div className={`max-w-[85%] p-5 rounded-[1.8rem] text-[12px] font-bold leading-relaxed shadow-sm ${m.role === 'user'
+                        <div className={`max-w-[85%] p-5 rounded-xl text-[12px] font-bold leading-relaxed shadow-sm ${m.role === 'user'
                             ? 'bg-emerald-600 text-white rounded-tr-none'
                             : 'bg-white text-slate-800 rounded-tl-none border border-slate-100'
                             }`}>
@@ -82,7 +82,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                 {loading && (
                     <div className="flex justify-start animate-in fade-in duration-300">
                         <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 mr-3 shrink-0"><Bot size={14} /></div>
-                        <div className="bg-white p-5 rounded-[1.5rem] rounded-tl-none border border-slate-100 flex gap-1.5 items-center">
+                        <div className="bg-white p-5 rounded-xl rounded-tl-none border border-slate-100 flex gap-1.5 items-center">
                             <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                             <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                             <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce"></div>
@@ -96,7 +96,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                 <div className="relative group/input">
                     <input
                         type="text"
-                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 pr-24 rounded-2xl font-black text-xs outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-inner placeholder:text-slate-300 placeholder:uppercase"
+                        className="w-full bg-slate-50 border-2 border-slate-100 p-5 pr-24 rounded-xl font-black text-xs outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-inner placeholder:text-slate-300 placeholder:uppercase"
                         placeholder={t.ask_me_anything || "Ask me anything about your health..."}
                         value={input}
                         onChange={e => setInput(e.target.value)}

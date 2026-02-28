@@ -48,9 +48,9 @@ const Dashboard: React.FC<{
         <div className="h-full w-full bg-[#fcfdfe] p-4 lg:p-6 flex flex-col gap-5 font-sans overflow-hidden relative">
 
             {/* ═══ CENTRAL INTELLIGENCE HEADER ═══ */}
-            <header className="flex justify-between items-center bg-white border border-slate-200 p-4 rounded-[1.8rem] shadow-sm shrink-0">
+            <header className="flex justify-between items-center bg-white border border-slate-200 p-4 rounded-xl shadow-sm shrink-0">
                 <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-xl relative overflow-hidden group">
+                    <div className="w-12 h-12 bg-emerald-800 rounded-xl flex items-center justify-center text-white shadow-xl relative overflow-hidden group">
                         <div className="absolute inset-0 bg-emerald-500/20 animate-pulse" />
                         <BrainCircuit size={24} className="relative z-10" />
                     </div>
@@ -61,7 +61,7 @@ const Dashboard: React.FC<{
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button onClick={onOpenCheckIn} className="h-10 px-6 rounded-xl bg-slate-900 text-white shadow-lg flex items-center gap-3 active:scale-95 transition-all group">
+                    <button onClick={onOpenCheckIn} className="h-10 px-6 rounded-xl bg-emerald-800 text-white shadow-lg flex items-center gap-3 active:scale-95 transition-all group">
                         <Target size={14} className="text-emerald-400 group-hover:animate-spin" />
                         <span className="text-[8px] font-black uppercase tracking-widest italic">{t.check_symptoms || 'Run Triage'}</span>
                     </button>
@@ -75,7 +75,7 @@ const Dashboard: React.FC<{
 
                 {/* BIOMETRIC CORE (Classic Widget Mix) */}
                 <div className="col-span-12 lg:col-span-4 flex flex-col gap-5 min-h-0">
-                    <section className="flex-1 bg-white border border-slate-100 rounded-[2.2rem] p-6 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                    <section className="flex-1 bg-white border border-slate-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden group">
                         <div className="absolute top-0 inset-x-0 h-1 bg-emerald-500 opacity-20" />
                         <h3 className="text-[8px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6 italic">{t.molecular_readiness || 'Molecular Readiness'}</h3>
 
@@ -102,14 +102,14 @@ const Dashboard: React.FC<{
                     </section>
 
                     <div className="grid grid-cols-2 gap-4 shrink-0">
-                        <div className="bg-slate-900 rounded-[1.8rem] p-5 flex flex-col justify-between aspect-square group overflow-hidden">
+                        <div className="bg-emerald-800 rounded-xl p-5 flex flex-col justify-between aspect-square group overflow-hidden">
                             <ActivitySquare size={20} className="text-emerald-500 transition-transform group-hover:scale-110" />
                             <div className="mt-2">
                                 <p className="text-2xl font-black italic text-white leading-none">{totalCal}<span className="text-[10px] ml-1.5 text-slate-500">KCAL</span></p>
                                 <p className="text-[7px] font-black uppercase tracking-widest text-slate-500 mt-2 italic">{t.intake_node || 'Intake Node'}</p>
                             </div>
                         </div>
-                        <div onClick={onOpenMeds} className="bg-white border border-slate-100 rounded-[1.8rem] p-5 flex flex-col justify-between aspect-square group cursor-pointer hover:border-emerald-500 transition-all">
+                        <div onClick={onOpenMeds} className="bg-white border border-slate-100 rounded-xl p-5 flex flex-col justify-between aspect-square group cursor-pointer hover:border-emerald-500 transition-all">
                             <Pill size={20} className="text-rose-500 transition-transform group-hover:scale-110" />
                             <div className="mt-2">
                                 <p className="text-2xl font-black italic text-slate-900 leading-none">{medications.length}<span className="text-[10px] ml-1.5 text-slate-300">PROTO</span></p>
@@ -128,7 +128,7 @@ const Dashboard: React.FC<{
                             <button
                                 key={mod.id}
                                 onClick={() => onSetScreen?.(mod.screen)}
-                                className="bg-white border border-slate-100 rounded-[1.5rem] p-4 flex items-center gap-4 group hover:shadow-xl hover:border-emerald-100 transition-all"
+                                className="bg-white border border-slate-100 rounded-xl p-4 flex items-center gap-4 group hover:shadow-xl hover:border-emerald-100 transition-all"
                             >
                                 <div className={`w-10 h-10 rounded-xl bg-${mod.color}-50 text-${mod.color}-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
                                     <mod.icon size={18} />
@@ -142,13 +142,13 @@ const Dashboard: React.FC<{
                     </section>
 
                     {/* ACTIVITY FEED (Refined Classic) */}
-                    <section className="flex-1 bg-white border border-slate-100 rounded-[2.2rem] shadow-sm flex flex-col overflow-hidden min-h-0">
+                    <section className="flex-1 bg-white border border-slate-100 rounded-xl shadow-sm flex flex-col overflow-hidden min-h-0">
                         <header className="px-6 py-4 border-b border-slate-50 flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-3">
                                 <Activity size={16} className="text-slate-900" />
                                 <h3 className="text-[10px] font-black uppercase tracking-tight italic uppercase">{t.protocol_activity_feed || 'Protocol Activity Feed'}</h3>
                             </div>
-                            <button onClick={onOpenFoodLog} className="h-7 px-4 rounded-lg bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">+ {t.register_intake || 'REGISTER INTAKE'}</button>
+                            <button onClick={onOpenFoodLog} className="h-7 px-4 rounded-lg bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest hover:bg-emerald-800 transition-all">+ {t.register_intake || 'REGISTER INTAKE'}</button>
                         </header>
 
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-2">
@@ -159,7 +159,7 @@ const Dashboard: React.FC<{
                                 </div>
                             ) : (
                                 activities.map((act, i) => (
-                                    <div key={i} className="flex items-center gap-4 p-3 rounded-[1.2rem] bg-slate-50 border border-transparent hover:border-slate-100 hover:bg-white transition-all group">
+                                    <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-slate-50 border border-transparent hover:border-slate-100 hover:bg-white transition-all group">
                                         <div className={`w-9 h-9 rounded-xl bg-white text-${act.color}-600 flex items-center justify-center shadow-sm shrink-0`}>
                                             <act.icon size={16} />
                                         </div>
@@ -192,7 +192,7 @@ const Dashboard: React.FC<{
                         { label: t.lung || 'Lung', score: 12, color: 'slate', icon: Target },
                         { label: t.bio_7d || '7D Bio', score: (100 - (riskScores?.projection7Day || 0)), color: 'emerald', icon: TrendingUp }
                     ].map(node => (
-                        <div key={node.label} className="bg-white border border-slate-100 rounded-[1.5rem] p-4 shadow-sm flex flex-col justify-between group">
+                        <div key={node.label} className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex flex-col justify-between group">
                             <div className="flex justify-between items-center mb-3">
                                 <div className={`w-8 h-8 rounded-lg bg-${node.color}-50 text-${node.color}-600 flex items-center justify-center`}>
                                     <node.icon size={14} />

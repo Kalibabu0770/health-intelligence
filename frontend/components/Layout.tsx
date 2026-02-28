@@ -59,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
     <div className="h-screen w-screen bg-slate-50 overflow-hidden flex font-sans text-slate-900 border-4 border-emerald-600 box-border p-2">
 
       {/* Sidebar Navigation */}
-      <div className="w-72 bg-white rounded-2xl shadow-xl border border-slate-100 flex flex-col h-full mr-2 p-6 overflow-y-auto">
+      <div className="w-72 bg-white rounded-xl shadow-xl border border-slate-100 flex flex-col h-full mr-2 p-6 overflow-y-auto">
         <div className="flex items-center gap-4 mb-8 shrink-0">
           <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-md">
             <ShieldCheck size={28} />
@@ -107,7 +107,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
       </div>
 
       {/* Main Content Area (No Scrolling) */}
-      <div className="flex-1 bg-white rounded-2xl shadow-xl border border-slate-100 h-full flex flex-col items-stretch overflow-hidden relative">
+      <div className="flex-1 bg-white rounded-xl shadow-xl border border-slate-100 h-full flex flex-col items-stretch overflow-hidden relative">
 
         {/* Global Alerts Overlay inside the Content Area */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[500] w-full max-w-lg pointer-events-none flex flex-col items-center gap-2">
