@@ -23,7 +23,8 @@ import PersonalAssistant from './components/PersonalAssistant';
 import WorkoutLogScreen from './components/WorkoutLogScreen';
 import FoodLogScreen from './components/FoodLogScreen';
 import TabletCheckerForm from './components/TabletCheckerForm';
-import MedicationSafetyScanner from './components/MedicationSafetyScanner'; // Added import for MedicationSafetyScanner
+import MedicationSafetyScanner from './components/MedicationSafetyScanner';
+import DoctorDashboard from './components/DoctorDashboard'; // Added DoctorDashboard
 import { ShieldAlert, Bot, MessageSquare } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -116,6 +117,10 @@ const App: React.FC = () => {
         onRegister={() => setIsAuthenticated(true)}
       />
     );
+  }
+
+  if (profile?.role === 'doctor') {
+    return <DoctorDashboard onLogout={handleLogout} />;
   }
 
   const renderScreen = () => {

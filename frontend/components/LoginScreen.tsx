@@ -15,7 +15,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
     // Auth Mode: 'register' | 'questions' | 'select' | 'reset' | 'portal'
     const [mode, setMode] = useState<'register' | 'questions' | 'select' | 'reset' | 'portal'>('portal');
-    const [selectedPortalRole, setSelectedPortalRole] = useState<'citizen' | 'officer' | 'doctor' | null>(null);
+    const [selectedPortalRole, setSelectedPortalRole] = useState<'citizen' | 'doctor' | null>(null);
     const [regStep, setRegStep] = useState(1);
     const [resetStep, setResetStep] = useState(1);
     const [resetData, setResetData] = useState({ location: '', dob: '', nickname: '', newPassword: '' });
@@ -197,11 +197,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
     return (
         <div className="fixed inset-0 z-[100] h-screen w-full flex items-center justify-center bg-[#F1F5F9] font-sans selection:bg-emerald-100 selection:text-emerald-900 px-4">
 
-            {/* Minimalist Background Gradients */}
-            <div className="absolute inset-0 z-0 opacity-40 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-200/50 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-100/50 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2" />
-            </div>
+            
 
             <div className="relative z-10 w-full max-w-[440px] bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-500 max-h-[90vh]">
 
@@ -249,35 +245,21 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
                                         <button
                                             onClick={() => { setSelectedPortalRole('doctor'); setMode('select'); }}
-                                            className="group relative bg-white border-2 border-slate-100 p-6 rounded-[2rem] flex items-center gap-5 hover:border-indigo-500 hover:shadow-2xl transition-all duration-500"
+                                            className="group relative bg-white border-2 border-slate-100 p-6 rounded-[2rem] flex items-center gap-5 hover:border-emerald-500 hover:shadow-2xl transition-all duration-500"
                                         >
-                                            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
+                                            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
                                                 <Activity size={28} />
                                             </div>
                                             <div className="text-left">
                                                 <h3 className="text-md font-black text-slate-900 uppercase tracking-tight leading-none">Medical Doctor</h3>
                                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2 italic shadow-sm">Clinical Synapse • ID Intelligence</p>
                                             </div>
-                                            <div className="absolute right-6 text-slate-100 group-hover:text-indigo-100 transition-colors">
+                                            <div className="absolute right-6 text-slate-100 group-hover:text-emerald-100 transition-colors">
                                                 <Brain size={32} strokeWidth={1} />
                                             </div>
                                         </button>
 
-                                        <button
-                                            onClick={() => { setSelectedPortalRole('officer'); setMode('select'); }}
-                                            className="group relative bg-slate-900 border-2 border-slate-800 p-6 rounded-[2rem] flex items-center gap-5 hover:border-blue-500 hover:shadow-2xl transition-all duration-500"
-                                        >
-                                            <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                                                <ShieldCheck size={28} />
-                                            </div>
-                                            <div className="text-left">
-                                                <h3 className="text-md font-black text-white uppercase tracking-tight leading-none">Officer Node</h3>
-                                                <p className="text-[8px] font-black text-blue-400 uppercase tracking-widest mt-2 italic shadow-sm">Population AHIMS • EHR Synchronizer</p>
-                                            </div>
-                                            <div className="absolute right-6 text-white/5 group-hover:text-blue-500/10 transition-colors">
-                                                <Globe size={32} strokeWidth={1} />
-                                            </div>
-                                        </button>
+                                        
                                     </div>
                                 </div>
                             )}
@@ -336,13 +318,13 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex flex-col">
-                                                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">{selectedPortalRole === 'officer' ? 'Officer Personnel' : 'Authorized Citizens'}</h3>
+                                                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">{selectedPortalRole === 'doctor' ? 'Clinical Doctors' : 'Authorized Citizens'}</h3>
                                                     <button onClick={() => { setMode('portal'); setSelectedPortalRole(null); }} className="text-[8px] font-black text-emerald-500 uppercase tracking-widest mt-1 hover:underline flex items-center gap-1">
                                                         <ArrowLeft size={8} /> Switch Gateway
                                                     </button>
                                                 </div>
                                                 <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline flex items-center gap-1">
-                                                    <Plus size={12} /> New {selectedPortalRole === 'officer' ? 'Node' : 'Link'}
+                                                    <Plus size={12} /> New {selectedPortalRole === 'doctor' ? 'Doctor Node' : 'Link'}
                                                 </button>
                                             </div>
                                             {(() => {
@@ -368,9 +350,9 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 } else {
                                                     return (
                                                         <div className="py-12 text-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-100">
-                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">No Authorized {selectedPortalRole === 'officer' ? 'Personnel' : 'Citizen'} Nodes Detected</p>
+                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">No Authorized {selectedPortalRole === 'doctor' ? 'Clinical' : 'Citizen'} Nodes Detected</p>
                                                             <div className="flex flex-col gap-3 px-8">
-                                                                <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="bg-emerald-600 text-white w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100">Initialize New {selectedPortalRole === 'officer' ? 'Officer Node' : 'Guardian Link'}</button>
+                                                                <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="bg-emerald-600 text-white w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100">Initialize New {selectedPortalRole === 'doctor' ? 'Doctor Node' : 'Guardian Link'}</button>
                                                                 <button onClick={() => { setMode('portal'); setSelectedPortalRole(null); }} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-emerald-500 py-2 italic flex items-center justify-center gap-2">
                                                                     <ArrowLeft size={10} /> Switch Gateway Protocol
                                                                 </button>
@@ -390,7 +372,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex flex-col">
                                             <h3 className="text-xs font-black text-emerald-600 uppercase tracking-widest pl-1">
-                                                {selectedPortalRole === 'officer' ? 'Officer Personnel Registry' : 'Guardian Link Setup'}
+                                                {selectedPortalRole === 'doctor' ? 'Doctor Personnel Registry' : 'Guardian Link Setup'}
                                             </h3>
                                             <button onClick={() => setMode('select')} className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1 hover:underline flex items-center gap-1">
                                                 <ArrowLeft size={8} /> Return to Accounts
