@@ -53,7 +53,7 @@ const WorkoutLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = (
                     <div className="text-6xl font-black tabular-nums tracking-tighter">{steps}</div>
                     <p className="text-[9px] font-bold uppercase text-slate-400">{t.steps_detected}</p>
 
-                    <button onClick={() => setIsTracking(!isTracking)} className={`w-full py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all ${isTracking ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-500 hover:bg-emerald-600'}`}>
+                    <button onClick={() => setIsTracking(!isTracking)} className={`w-full py-6 rounded-xl font-black uppercase text-[11px] shadow-xl active:scale-95 transition-all ${isTracking ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-100 hover:bg-emerald-100 border-2 border-emerald-500'}`}>
                         {isTracking ? t.stop_sync : t.initialize_sensor}
                     </button>
                 </div>
@@ -86,7 +86,7 @@ const WorkoutLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = (
                         <Mic size={18} />
                     </button>
                 </div>
-                <button onClick={() => { if (type && mins) { logWorkout({ id: Date.now().toString(), type, durationMinutes: Number(mins), intensity: 'medium', timestamp: Date.now() }); setType(''); setMins(''); } }} className="w-full bg-blue-600 text-white font-black py-6 rounded-xl shadow-xl active:scale-95 text-[11px] uppercase italic tracking-wider">{t.log_effort || "Log Effort"}</button>
+                <button onClick={() => { if (type && mins) { logWorkout({ id: Date.now().toString(), type, durationMinutes: Number(mins), intensity: 'medium', timestamp: Date.now() }); setType(''); setMins(''); } }} className="w-full bg-blue-600 text-slate-900 font-black py-6 rounded-xl shadow-xl active:scale-95 text-[11px] uppercase italic tracking-wider">{t.log_effort || "Log Effort"}</button>
             </div>
 
             <div className="space-y-3">

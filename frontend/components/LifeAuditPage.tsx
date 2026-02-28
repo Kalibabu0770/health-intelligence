@@ -262,7 +262,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                 ))}
                             </div>
                             <div className="bg-white p-10 rounded-xl border border-slate-50 shadow-sm flex flex-col items-center justify-center text-center space-y-4">
-                                <div className="w-14 h-14 bg-emerald-600 text-white rounded-xl flex items-center justify-center shadow-lg"><ClipboardList size={26} /></div>
+                                <div className="w-14 h-14 bg-emerald-100 border-2 border-emerald-500 text-slate-900 rounded-xl flex items-center justify-center shadow-lg"><ClipboardList size={26} /></div>
                                 <h4 className="text-xl font-black uppercase text-slate-900 italic tracking-tight">{t.maintenance_console || 'Precision Monitor Console'}</h4>
                                 <p className="text-xs font-bold text-slate-500 uppercase leading-relaxed italic max-w-sm">
                                     {t.maintenance_console_desc || 'Document your metabolic intake, kinetic output, and neural rest phases to strengthen your bio-profile.'}
@@ -310,7 +310,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                     <button
                                         disabled={isProcessingVision}
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="flex items-center justify-center gap-2 bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest py-5 rounded-xl active:scale-95 transition-all disabled:opacity-50 shadow-lg"
+                                        className="flex items-center justify-center gap-2 bg-orange-600 text-slate-900 font-black uppercase text-[10px] tracking-widest py-5 rounded-xl active:scale-95 transition-all disabled:opacity-50 shadow-lg"
                                     >
                                         <Camera size={16} /> {isProcessingVision ? 'Scanning...' : (t.vision_ai || 'Vision AI')}
                                     </button>
@@ -324,7 +324,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                     />
                                     <button
                                         onClick={handleLogEntry}
-                                        className="flex items-center justify-center gap-2 bg-emerald-600 text-white font-black uppercase text-[9px] tracking-widest py-4 rounded-xl active:scale-95 transition-all"
+                                        className="flex items-center justify-center gap-2 bg-emerald-100 border-2 border-emerald-500 text-slate-900 font-black uppercase text-[9px] tracking-widest py-4 rounded-xl active:scale-95 transition-all"
                                     >
                                         <Plus size={14} /> {t.log_entry || 'Log Entry'}
                                     </button>
@@ -360,7 +360,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Calibrated for {profile?.location || 'Your Region'}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <div className={`w-1.5 h-1.5 rounded-full ${isAnalyzing ? 'bg-orange-500 animate-pulse' : 'bg-emerald-500'}`} />
+                                        <div className={`w-1.5 h-1.5 rounded-full ${isAnalyzing ? 'bg-orange-500 animate-pulse' : 'bg-emerald-100'}`} />
                                         <span className="text-[7px] font-black uppercase text-slate-400">{isAnalyzing ? 'Syncing...' : 'Stable'}</span>
                                     </div>
                                 </div>
@@ -406,7 +406,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="bg-emerald-600 rounded-xl p-5 text-white relative overflow-hidden group">
+                                            <div className="bg-emerald-100 border-2 border-emerald-500 rounded-xl p-5 text-slate-900 relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-4 opacity-10"><Brain size={32} /></div>
                                                 <p className="text-[7px] font-black text-emerald-400 uppercase tracking-widest mb-1 italic">Diagnostic Insight</p>
                                                 <p className="text-[10px] font-medium leading-relaxed uppercase italic opacity-90">
@@ -428,7 +428,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                                 <p className="text-[9px] font-black uppercase tracking-[0.2em]">Awaiting Bio-Link...</p>
                                                 <button
                                                     onClick={triggerNutritionAnalysis}
-                                                    className="mt-3 px-6 py-2 bg-emerald-600 text-white rounded-lg text-[8px] font-black uppercase tracking-widest"
+                                                    className="mt-3 px-6 py-2 bg-emerald-100 border-2 border-emerald-500 text-slate-900 rounded-lg text-[8px] font-black uppercase tracking-widest"
                                                 >
                                                     Tap to Sync
                                                 </button>
@@ -438,11 +438,11 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                 </div>
                             </div>
 
-                            <div className="bg-emerald-600 p-7 rounded-xl border border-slate-100 flex justify-between items-center group shadow-2xl">
+                            <div className="bg-emerald-100 border-2 border-emerald-500 p-7 rounded-xl border border-slate-100 flex justify-between items-center group shadow-2xl">
                                 <div className="flex items-center gap-5">
                                     <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-orange-500 transition-transform group-hover:scale-110"><TrendingUp size={24} /></div>
                                     <div>
-                                        <p className="text-xs font-black text-white uppercase tracking-tight">{t.metabolic_efficiency || 'Metabolic Sync'}</p>
+                                        <p className="text-xs font-black text-slate-900 uppercase tracking-tight">{t.metabolic_efficiency || 'Metabolic Sync'}</p>
                                         <p className="text-[10px] font-black text-slate-500 uppercase mt-0.5 italic">Real-time Analysis active</p>
                                     </div>
                                 </div>
@@ -510,7 +510,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                                 (document.getElementById('duration-input') as HTMLInputElement).value = '';
                                             }
                                         }}
-                                        className="w-full bg-blue-600 text-white font-black uppercase text-[9px] tracking-widest py-4 rounded-xl active:scale-[0.98] transition-all"
+                                        className="w-full bg-blue-600 text-slate-900 font-black uppercase text-[9px] tracking-widest py-4 rounded-xl active:scale-[0.98] transition-all"
                                     >
                                         {t.log_movement || 'Log Kinetic Phase'}
                                     </button>
@@ -555,7 +555,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                             <button
                                                 key={m}
                                                 onClick={() => setFocusMinutes(m)}
-                                                className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${focusMinutes === m ? 'bg-teal-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                                                className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${focusMinutes === m ? 'bg-teal-600 text-slate-900 shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                                             >
                                                 {m}m
                                             </button>
@@ -589,7 +589,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                                 </div>
                                 <button
                                     onClick={handleInitializeFocus}
-                                    className={`w-full font-black uppercase text-[10px] tracking-widest py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 ${isActive ? 'bg-rose-500 text-white shadow-rose-100' : 'bg-teal-600 text-white shadow-teal-100'
+                                    className={`w-full font-black uppercase text-[10px] tracking-widest py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 ${isActive ? 'bg-rose-500 text-slate-900 shadow-rose-100' : 'bg-teal-600 text-slate-900 shadow-teal-100'
                                         }`}
                                 >
                                     {isActive ? <Square size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" />}
@@ -675,7 +675,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
                     </div>
                 </div>
 
-                <div className="col-span-12 lg:col-span-5 bg-indigo-600 rounded-xl p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between group">
+                <div className="col-span-12 lg:col-span-5 bg-indigo-600 rounded-xl p-6 text-slate-900 shadow-xl relative overflow-hidden flex flex-col justify-between group">
                     <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-1000"><Brain size={120} /></div>
                     <div className="relative z-10">
                         <div className="flex justify-between items-center mb-4">
@@ -701,7 +701,7 @@ const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ 
         <div className={`h-full w-full flex flex-col overflow-hidden bg-white text-slate-900 font-sans`}>
             <div className="bg-white border-b border-slate-50 px-8 py-4 flex flex-col lg:flex-row justify-between items-center shrink-0 gap-4">
                 <div className="flex items-center gap-5">
-                    <div className="w-11 h-11 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200 transition-transform hover:scale-105">
+                    <div className="w-11 h-11 bg-emerald-100 border-2 border-emerald-500 rounded-xl flex items-center justify-center text-slate-900 shadow-lg shadow-emerald-200 transition-transform hover:scale-105">
                         <Activity size={22} />
                     </div>
                     <div>

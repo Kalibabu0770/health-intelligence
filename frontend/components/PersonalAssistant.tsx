@@ -41,22 +41,22 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
         <div className="fixed bottom-6 right-6 w-[95vw] sm:w-[420px] h-[600px] max-h-[85vh] z-[1000] bg-white flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-500 shadow-[0_40px_100px_-15px_rgba(15,23,42,0.25)] rounded-xl overflow-hidden border border-slate-100 ring-4 ring-slate-50/50">
 
             {/* Header: Mission Control Aesthetic */}
-            <div className="bg-emerald-600 px-8 py-6 flex justify-between items-center shrink-0">
+            <div className="bg-emerald-100 border-2 border-emerald-500 px-8 py-6 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20">
+                    <div className="w-12 h-12 bg-emerald-100 border-2 border-emerald-500 rounded-xl flex items-center justify-center text-slate-900 shadow-xl shadow-emerald-500/20">
                         <Bot size={24} strokeWidth={2.5} />
                     </div>
                     <div>
-                        <h3 className="font-black text-sm text-white uppercase tracking-tight leading-none">{t.ai_health_guardian || 'AI Health Guardian'}</h3>
+                        <h3 className="font-black text-sm text-slate-900 uppercase tracking-tight leading-none">{t.ai_health_guardian || 'AI Health Guardian'}</h3>
                         <div className="flex items-center gap-1.5 mt-1.5 font-black uppercase text-[8px] text-emerald-500 tracking-widest">
-                            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                            <span className="w-1.5 h-1.5 bg-emerald-100 rounded-full animate-pulse" />
                             {t.secure_link_active || 'Secure Link Active'}
                         </div>
                     </div>
                 </div>
                 <button
                     onClick={onClose}
-                    className="w-10 h-10 flex items-center justify-center bg-white/5 text-white hover:bg-white/10 rounded-xl transition-all active:scale-90"
+                    className="w-10 h-10 flex items-center justify-center bg-white/5 text-slate-900 hover:bg-white/10 rounded-xl transition-all active:scale-90"
                 >
                     <X size={18} />
                 </button>
@@ -72,7 +72,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                             </div>
                         )}
                         <div className={`max-w-[85%] p-5 rounded-xl text-[12px] font-bold leading-relaxed shadow-sm ${m.role === 'user'
-                            ? 'bg-emerald-600 text-white rounded-tr-none'
+                            ? 'bg-emerald-100 border-2 border-emerald-500 text-slate-900 rounded-tr-none'
                             : 'bg-white text-slate-800 rounded-tl-none border border-slate-100'
                             }`}>
                             {m.text}
@@ -111,14 +111,14 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                                 setIsListening(true);
                                 startListening(language, (text) => setInput(text), () => setIsListening(false));
                             }}
-                            className={`w-10 h-10 flex items-center justify-center rounded-xl border border-slate-100 shadow-sm transition-all active:scale-95 ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-white text-slate-400 hover:text-emerald-600'}`}
+                            className={`w-10 h-10 flex items-center justify-center rounded-xl border border-slate-100 shadow-sm transition-all active:scale-95 ${isListening ? 'bg-rose-500 text-slate-900 animate-pulse' : 'bg-white text-slate-400 hover:text-emerald-600'}`}
                         >
                             <Mic size={18} />
                         </button>
                         <button
                             onClick={handleSend}
                             disabled={!input.trim() || loading}
-                            className="w-10 h-10 flex items-center justify-center bg-emerald-600 text-white rounded-xl shadow-lg active:scale-95 disabled:opacity-50 transition-all hover:bg-emerald-700"
+                            className="w-10 h-10 flex items-center justify-center bg-emerald-100 border-2 border-emerald-500 text-slate-900 rounded-xl shadow-lg active:scale-95 disabled:opacity-50 transition-all hover:bg-emerald-700"
                         >
                             {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                         </button>

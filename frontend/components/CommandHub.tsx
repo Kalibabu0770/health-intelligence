@@ -24,7 +24,7 @@ const CommandModule: React.FC<{
 
             <div className="p-6 shrink-0 flex items-center justify-between border-b border-slate-50 relative z-10">
                 <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center text-white shadow-xl shadow-slate-200 group-hover:scale-110 transition-transform duration-500`}>
+                    <div className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center text-slate-900 shadow-xl shadow-slate-200 group-hover:scale-110 transition-transform duration-500`}>
                         <Icon size={22} strokeWidth={2.5} />
                     </div>
                     <div>
@@ -81,7 +81,7 @@ const CommandHub: React.FC<{
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-emerald-500/5 via-transparent to-blue-500/5 opacity-50" />
 
                 <div className="flex items-center gap-6 relative z-10">
-                    <div className="w-14 h-14 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-2xl shadow-emerald-200 relative group overflow-hidden">
+                    <div className="w-14 h-14 bg-emerald-100 border-2 border-emerald-500 rounded-xl flex items-center justify-center text-slate-900 shadow-2xl shadow-emerald-200 relative group overflow-hidden">
                         <div className="absolute inset-0 bg-white/20 translate-y-20 group-hover:translate-y-0 transition-transform duration-500" />
                         <ShieldCheck size={28} strokeWidth={2.5} className="relative z-10" />
                     </div>
@@ -90,8 +90,8 @@ const CommandHub: React.FC<{
                             <h1 className="text-[14px] font-black uppercase tracking-tight text-slate-900 leading-none">
                                 {t.integrated_command || "Integrated Command"} <span className="text-emerald-600 italic">{t.sentinel || "Sentinel"}</span>
                             </h1>
-                            <div className="flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10B981]" />
+                            <div className="flex items-center gap-1.5 bg-emerald-100/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                                <span className="w-1.5 h-1.5 bg-emerald-100 rounded-full animate-pulse shadow-[0_0_8px_#10B981]" />
                                 <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">{t.quantum_bio_sync || "Quantum Bio-Sync"}</span>
                             </div>
                         </div>
@@ -110,7 +110,7 @@ const CommandHub: React.FC<{
                     </div>
                     <button
                         onClick={onRefresh}
-                        className="w-14 h-14 rounded-xl transition-all duration-300 active:scale-95 bg-emerald-600 text-white shadow-2xl shadow-slate-200 flex items-center justify-center hover:bg-emerald-700 group"
+                        className="w-14 h-14 rounded-xl transition-all duration-300 active:scale-95 bg-emerald-100 border-2 border-emerald-500 text-slate-900 shadow-2xl shadow-slate-200 flex items-center justify-center hover:bg-emerald-700 group"
                     >
                         <RefreshCcw size={22} className={`${isOrchestrating ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-700'}`} strokeWidth={2.5} />
                     </button>
@@ -142,7 +142,7 @@ const CommandHub: React.FC<{
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 flex items-center justify-center gap-3">
-                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                                            <div className="w-1.5 h-1.5 bg-emerald-100 rounded-full" />
                                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Logic: Active</span>
                                         </div>
                                         <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 flex items-center justify-center gap-3">
@@ -153,7 +153,7 @@ const CommandHub: React.FC<{
                                 </div>
                                 <button
                                     onClick={() => onOpenAnalysis('symptoms')}
-                                    className="w-full py-4.5 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all"
+                                    className="w-full py-4.5 bg-indigo-600 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all"
                                 >
                                     Initialize Triage Protocol
                                 </button>
@@ -193,7 +193,7 @@ const CommandHub: React.FC<{
                                 </div>
                                 <button
                                     onClick={() => onOpenAnalysis('medsafety')}
-                                    className="w-full py-4.5 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 shadow-xl shadow-rose-100 hover:bg-rose-700 transition-all"
+                                    className="w-full py-4.5 bg-rose-600 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 shadow-xl shadow-rose-100 hover:bg-rose-700 transition-all"
                                 >
                                     Execute Bio-Scan
                                 </button>
@@ -241,7 +241,7 @@ const CommandHub: React.FC<{
                                 </div>
                                 <button
                                     onClick={() => onOpenAnalysis('meds')}
-                                    className="w-full py-4.5 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 hover:bg-emerald-700 transition-all shadow-xl"
+                                    className="w-full py-4.5 bg-emerald-100 border-2 border-emerald-500 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 hover:bg-emerald-700 transition-all shadow-xl"
                                 >
                                     Full Adherence Schedule
                                 </button>
@@ -292,7 +292,7 @@ const CommandHub: React.FC<{
                         className="flex-1 p-8 rounded-xl border border-slate-100 bg-white flex flex-col justify-between cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform"><FileText size={100} /></div>
-                        <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-2xl shadow-blue-100 relative z-10">
+                        <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center text-slate-900 shadow-2xl shadow-blue-100 relative z-10">
                             <FileText size={28} />
                         </div>
                         <div className="relative z-10">
@@ -309,7 +309,7 @@ const CommandHub: React.FC<{
                         className="flex-1 p-8 rounded-xl border border-slate-100 bg-white flex flex-col justify-between cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform"><UserCircle size={100} /></div>
-                        <div className="w-16 h-16 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-2xl shadow-emerald-100 relative z-10">
+                        <div className="w-16 h-16 bg-emerald-100 border-2 border-emerald-500 rounded-xl flex items-center justify-center text-slate-900 shadow-2xl shadow-emerald-100 relative z-10">
                             <UserCircle size={28} />
                         </div>
                         <div className="relative z-10">

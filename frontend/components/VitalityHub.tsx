@@ -23,7 +23,7 @@ const QuickActionCard: React.FC<{
 
             <div>
                 <div className="flex justify-between items-start mb-8">
-                    <div className={`w-16 h-16 bg-${color}-50 text-${color}-600 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-${color}-600 group-hover:text-white group-hover:shadow-2xl group-hover:shadow-${color}-200 transition-all duration-500`}>
+                    <div className={`w-16 h-16 bg-${color}-50 text-${color}-600 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-${color}-600 group-hover:text-slate-900 group-hover:shadow-2xl group-hover:shadow-${color}-200 transition-all duration-500`}>
                         <Icon size={28} strokeWidth={2.5} />
                     </div>
                     {statusBadge && (
@@ -45,7 +45,7 @@ const QuickActionCard: React.FC<{
                     <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest italic">{stats || 'Action Required'}</p>
                     <p className="text-[8px] font-bold text-slate-300 uppercase mt-1 tracking-widest">Protocol Node Confirmed</p>
                 </div>
-                <div className={`w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 shadow-xl`}>
+                <div className={`w-10 h-10 rounded-xl bg-emerald-100 border-2 border-emerald-500 text-slate-900 flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 shadow-xl`}>
                     <ChevronRight size={20} />
                 </div>
             </div>

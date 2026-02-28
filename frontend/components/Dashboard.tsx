@@ -47,26 +47,25 @@ const Dashboard: React.FC<{
     return (
         <div className="h-full w-full bg-[#fcfdfe] p-4 lg:p-6 flex flex-col gap-5 font-sans overflow-hidden relative">
 
-            {/* ═══ CENTRAL INTELLIGENCE HEADER ═══ */}
-            <header className="flex justify-between items-center bg-white border border-slate-200 p-4 rounded-xl shadow-sm shrink-0">
-                <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 bg-emerald-800 rounded-xl flex items-center justify-center text-white shadow-xl relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-emerald-500/20 animate-pulse" />
-                        <BrainCircuit size={24} className="relative z-10" />
+            {/* ═══ SIMPLE GUIDANCE HEADER ═══ */}
+            <header className="flex flex-col gap-4 bg-white border-2 border-emerald-500 p-5 rounded-xl shadow-sm shrink-0">
+                <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 shadow-sm shrink-0">
+                        <Heart size={32} />
                     </div>
-                    <div>
-                        <h1 className="text-xl font-black italic tracking-tighter text-slate-900 leading-none uppercase">{t.dashboard || 'DASHBOARD'}</h1>
-                        <p className="text-[9px] font-black text-emerald-600 uppercase tracking-[0.4em] italic mt-1 leading-none">{t.central_intelligence || 'CENTRAL INTELLIGENCE'}</p>
+                    <div className="flex-1">
+                        <h1 className="text-xl font-black text-slate-900 leading-tight">Hello! Welcome to your Health Guardian.</h1>
+                        <p className="text-sm font-bold text-slate-600 mt-1">This screen shows your daily health. If you feel sick or need to log your food, tap the big buttons below. We are here to help you stay healthy.</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <button onClick={onOpenCheckIn} className="h-10 px-6 rounded-xl bg-emerald-800 text-white shadow-lg flex items-center gap-3 active:scale-95 transition-all group">
-                        <Target size={14} className="text-emerald-400 group-hover:animate-spin" />
-                        <span className="text-[8px] font-black uppercase tracking-widest italic">{t.check_symptoms || 'Run Triage'}</span>
+                <div className="flex items-center gap-3 pt-2 border-t border-slate-100 mt-2">
+                    <button onClick={onOpenCheckIn} className="flex-1 h-12 rounded-xl bg-emerald-600 text-white shadow-md flex items-center justify-center gap-3 active:scale-95 transition-all text-sm font-black uppercase tracking-wide">
+                        <Stethoscope size={20} />
+                        I Feel Sick (Check Symptoms)
                     </button>
-                    <button onClick={onRefresh} className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm hover:bg-slate-50">
-                        <RefreshCcw size={18} className={isOrchestrating ? 'animate-spin' : ''} strokeWidth={2.5} />
+                    <button onClick={onRefresh} className="w-12 h-12 rounded-xl bg-white border-2 border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:bg-slate-50">
+                        <RefreshCcw size={20} className={isOrchestrating ? 'animate-spin' : ''} strokeWidth={2.5} />
                     </button>
                 </div>
             </header>
@@ -76,7 +75,7 @@ const Dashboard: React.FC<{
                 {/* BIOMETRIC CORE (Classic Widget Mix) */}
                 <div className="col-span-12 lg:col-span-4 flex flex-col gap-5 min-h-0">
                     <section className="flex-1 bg-white border border-slate-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden group">
-                        <div className="absolute top-0 inset-x-0 h-1 bg-emerald-500 opacity-20" />
+                        <div className="absolute top-0 inset-x-0 h-1 bg-emerald-100 opacity-20" />
                         <h3 className="text-[8px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6 italic">{t.molecular_readiness || 'Molecular Readiness'}</h3>
 
                         <div className="relative w-36 h-36 p-4 rounded-full border-4 border-slate-50 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
@@ -96,24 +95,24 @@ const Dashboard: React.FC<{
                         </div>
 
                         <div className="mt-6 flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-100 animate-pulse" />
                             <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">{t.optimal_sync_active || 'Optimal Sync Active'}</span>
                         </div>
                     </section>
 
                     <div className="grid grid-cols-2 gap-4 shrink-0">
-                        <div className="bg-emerald-800 rounded-xl p-5 flex flex-col justify-between aspect-square group overflow-hidden">
-                            <ActivitySquare size={20} className="text-emerald-500 transition-transform group-hover:scale-110" />
+                        <div className="bg-white border-2 border-emerald-200 rounded-xl p-5 flex flex-col justify-between aspect-square group overflow-hidden">
+                            <Apple size={28} className="text-emerald-500 transition-transform group-hover:scale-110" />
                             <div className="mt-2">
-                                <p className="text-2xl font-black italic text-white leading-none">{totalCal}<span className="text-[10px] ml-1.5 text-slate-500">KCAL</span></p>
-                                <p className="text-[7px] font-black uppercase tracking-widest text-slate-500 mt-2 italic">{t.intake_node || 'Intake Node'}</p>
+                                <p className="text-2xl font-black text-slate-900 leading-none">{totalCal}<span className="text-[10px] ml-1.5 text-slate-500">KCAL</span></p>
+                                <p className="text-xs font-bold text-slate-500 mt-2">Food Eaten Today</p>
                             </div>
                         </div>
-                        <div onClick={onOpenMeds} className="bg-white border border-slate-100 rounded-xl p-5 flex flex-col justify-between aspect-square group cursor-pointer hover:border-emerald-500 transition-all">
-                            <Pill size={20} className="text-rose-500 transition-transform group-hover:scale-110" />
+                        <div onClick={onOpenMeds} className="bg-white border-2 border-emerald-200 rounded-xl p-5 flex flex-col justify-between aspect-square group cursor-pointer hover:border-emerald-500 transition-all">
+                            <Pill size={28} className="text-emerald-500 transition-transform group-hover:scale-110" />
                             <div className="mt-2">
-                                <p className="text-2xl font-black italic text-slate-900 leading-none">{medications.length}<span className="text-[10px] ml-1.5 text-slate-300">PROTO</span></p>
-                                <p className="text-[7px] font-black uppercase tracking-widest text-slate-400 mt-2 italic">{t.pharmacy_node || 'Pharmacy Node'}</p>
+                                <p className="text-2xl font-black text-slate-900 leading-none">{medications.length}<span className="text-[10px] ml-1.5 text-slate-400">MEDS</span></p>
+                                <p className="text-xs font-bold text-slate-500 mt-2">Your Medicines</p>
                             </div>
                         </div>
                     </div>
@@ -128,15 +127,12 @@ const Dashboard: React.FC<{
                             <button
                                 key={mod.id}
                                 onClick={() => onSetScreen?.(mod.screen)}
-                                className="bg-white border border-slate-100 rounded-xl p-4 flex items-center gap-4 group hover:shadow-xl hover:border-emerald-100 transition-all"
+                                className="bg-white border-2 border-emerald-100 rounded-xl p-4 flex flex-col items-center justify-center text-center gap-3 group hover:shadow-lg hover:border-emerald-300 transition-all"
                             >
-                                <div className={`w-10 h-10 rounded-xl bg-${mod.color}-50 text-${mod.color}-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
-                                    <mod.icon size={18} />
+                                <div className={`w-12 h-12 rounded-full bg-${mod.color}-50 text-${mod.color}-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
+                                    <mod.icon size={24} />
                                 </div>
-                                <div className="text-left">
-                                    <h4 className="text-[10px] font-black italic text-slate-900 leading-none uppercase">{mod.title}</h4>
-                                    <p className="text-[6px] font-black text-slate-400 mt-1 uppercase tracking-widest">{t.access_node || 'Access Node'}</p>
-                                </div>
+                                <h4 className="text-xs font-black text-slate-900 leading-tight uppercase">{mod.title}</h4>
                             </button>
                         ))}
                     </section>
@@ -148,7 +144,7 @@ const Dashboard: React.FC<{
                                 <Activity size={16} className="text-slate-900" />
                                 <h3 className="text-[10px] font-black uppercase tracking-tight italic uppercase">{t.protocol_activity_feed || 'Protocol Activity Feed'}</h3>
                             </div>
-                            <button onClick={onOpenFoodLog} className="h-7 px-4 rounded-lg bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest hover:bg-emerald-800 transition-all">+ {t.register_intake || 'REGISTER INTAKE'}</button>
+                            <button onClick={onOpenFoodLog} className="h-7 px-4 rounded-lg bg-emerald-100 border-2 border-emerald-500 text-slate-900 text-[7px] font-black uppercase tracking-widest hover:bg-white border-2 border-emerald-500 transition-all">+ {t.register_intake || 'REGISTER INTAKE'}</button>
                         </header>
 
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-2">

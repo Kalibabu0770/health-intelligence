@@ -64,9 +64,9 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
         const isDanger = result.status === 'DANGER';
         const isSafe = result.status === 'SAFE';
         const statusColor = isDanger ? 'text-red-400' : isSafe ? 'text-emerald-400' : 'text-amber-400';
-        const statusBg = isDanger ? 'bg-red-500/15' : isSafe ? 'bg-emerald-500/15' : 'bg-amber-500/15';
+        const statusBg = isDanger ? 'bg-red-500/15' : isSafe ? 'bg-emerald-100/15' : 'bg-amber-500/15';
         const statusBdr = isDanger ? 'border-red-500/30' : isSafe ? 'border-emerald-500/30' : 'border-amber-500/30';
-        const barColor = isDanger ? 'bg-red-500' : isSafe ? 'bg-emerald-500' : 'bg-amber-500';
+        const barColor = isDanger ? 'bg-red-500' : isSafe ? 'bg-emerald-100' : 'bg-amber-500';
         const barPct = isDanger ? 90 : isSafe ? 15 : 50;
 
         return (
@@ -111,7 +111,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-0.5">
                     {medicines.map((med, idx) => (
                         <div key={idx} className="flex gap-2 items-center">
-                            <span className="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-400 text-[8px] font-black flex items-center justify-center shrink-0 border border-emerald-500/30">{idx + 1}</span>
+                            <span className="w-5 h-5 rounded-md bg-emerald-100/20 text-emerald-400 text-[8px] font-black flex items-center justify-center shrink-0 border border-emerald-500/30">{idx + 1}</span>
                             <div className="flex-1 relative">
                                 <input
                                     className="w-full py-2.5 pl-3 pr-16 bg-slate-50 border border-slate-100 rounded-xl font-bold text-xs text-slate-900 outline-none focus:border-emerald-500/50 focus:bg-white/8 transition-all placeholder:text-slate-900/20 placeholder:text-[9px] placeholder:uppercase"
@@ -122,7 +122,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
                                 <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex gap-0.5">
                                     <button
                                         onClick={() => { setTargetIdx(idx); fileInputRef.current?.click(); }}
-                                        className="p-1.5 text-slate-900/20 hover:text-emerald-400 active:scale-90 transition-all rounded-lg hover:bg-emerald-500/10"
+                                        className="p-1.5 text-slate-900/20 hover:text-emerald-400 active:scale-90 transition-all rounded-lg hover:bg-emerald-100/10"
                                         title="Scan medicine from photo"
                                     >
                                         {isIdentifying && targetIdx === idx ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
@@ -132,7 +132,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
                                             setIsListeningMed(idx);
                                             startListening(language, text => { updateMedicine(idx, text); setIsListeningMed(null); });
                                         }}
-                                        className={`p-1.5 transition-all rounded-lg active:scale-90 ${isListeningMed === idx ? 'bg-emerald-500 text-white animate-pulse' : 'text-slate-900/20 hover:text-emerald-400 hover:bg-emerald-500/10'}`}
+                                        className={`p-1.5 transition-all rounded-lg active:scale-90 ${isListeningMed === idx ? 'bg-emerald-100 text-slate-900 animate-pulse' : 'text-slate-900/20 hover:text-emerald-400 hover:bg-emerald-100/10'}`}
                                         title="Voice input"
                                     >
                                         <Mic size={12} />
@@ -152,7 +152,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
                 </div>
                 <button
                     onClick={addMedicine}
-                    className="w-full mt-2 py-2 rounded-xl bg-white/3 border border-dashed border-slate-100 text-slate-900/30 font-black text-[8px] uppercase hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/5 transition-all flex items-center justify-center gap-1.5"
+                    className="w-full mt-2 py-2 rounded-xl bg-white/3 border border-dashed border-slate-100 text-slate-900/30 font-black text-[8px] uppercase hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-100/5 transition-all flex items-center justify-center gap-1.5"
                 >
                     <Plus size={10} /> {t.add_medicine || 'Add Medicine'}
                 </button>
@@ -174,7 +174,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
                             setIsListeningSymptom(true);
                             startListening(language, text => { setProblem(text); setIsListeningSymptom(false); });
                         }}
-                        className={`absolute right-2 top-2.5 p-1.5 rounded-lg transition-all ${isListeningSymptom ? 'bg-emerald-500 text-white animate-pulse' : 'text-slate-900/20 hover:text-emerald-400 hover:bg-emerald-500/10'}`}
+                        className={`absolute right-2 top-2.5 p-1.5 rounded-lg transition-all ${isListeningSymptom ? 'bg-emerald-100 text-slate-900 animate-pulse' : 'text-slate-900/20 hover:text-emerald-400 hover:bg-emerald-100/10'}`}
                     >
                         <Mic size={13} />
                     </button>
@@ -185,7 +185,7 @@ const TabletCheckerForm: React.FC<{ onRefresh?: () => void }> = ({ onRefresh }) 
                 <button
                     onClick={handleCheck}
                     disabled={loading || medicines.filter(m => m.trim()).length === 0 || !problem.trim()}
-                    className="col-span-2 py-4 rounded-xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-emerald-700 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                    className="col-span-2 py-4 rounded-xl bg-emerald-100 border-2 border-emerald-500 text-slate-900 font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-emerald-700 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                     {loading ? <Loader2 size={16} className="animate-spin" /> : 'Analyze Safety'}
                 </button>

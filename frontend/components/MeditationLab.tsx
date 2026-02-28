@@ -76,14 +76,14 @@ const MeditationLab: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                 <button
                                     key={m}
                                     onClick={() => setMins(m)}
-                                    className={`w-14 h-14 rounded-xl flex items-center justify-center font-black transition-all ${mins === m ? 'bg-emerald-500 text-white shadow-lg scale-110' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+                                    className={`w-14 h-14 rounded-xl flex items-center justify-center font-black transition-all ${mins === m ? 'bg-emerald-100 text-slate-900 shadow-lg scale-110' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
                                 >
                                     {m}
                                 </button>
                             ))}
                         </div>
 
-                        <button onClick={startTimer} className="w-full py-6 bg-emerald-500 text-white rounded-xl font-black uppercase text-xs shadow-[0_10px_30px_rgba(16,185,129,0.3)] active:scale-95 transition-all">
+                        <button onClick={startTimer} className="w-full py-6 bg-emerald-100 text-slate-900 rounded-xl font-black uppercase text-xs shadow-[0_10px_30px_rgba(16,185,129,0.3)] active:scale-95 transition-all">
                             {t.start_meditation || "Start Session"}
                         </button>
                     </div>

@@ -101,7 +101,7 @@ const MedicationSafetyScanner: React.FC = () => {
             {/* ═══ COCKPIT HEADER ═══ */}
             <header className="flex justify-between items-center bg-white border border-slate-200 p-6 rounded-xl shadow-sm shrink-0">
                 <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 bg-rose-600 rounded-xl flex items-center justify-center text-white shadow-xl">
+                    <div className="w-14 h-14 bg-rose-600 rounded-xl flex items-center justify-center text-slate-900 shadow-xl">
                         <Pill size={28} />
                     </div>
                     <div>
@@ -114,7 +114,7 @@ const MedicationSafetyScanner: React.FC = () => {
                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Neural Analysis Status</p>
                         <p className="text-[10px] font-black text-emerald-600 uppercase">System Calibrated</p>
                     </div>
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <div className="w-2 h-2 rounded-full bg-emerald-100 animate-pulse" />
                 </div>
             </header>
 
@@ -211,7 +211,7 @@ const MedicationSafetyScanner: React.FC = () => {
                                 setIsListening(true);
                                 startListening(language, text => setProblemContext(text), () => setIsListening(false));
                             }}
-                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-50 text-slate-400 hover:text-emerald-600'}`}
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isListening ? 'bg-rose-500 text-slate-900 animate-pulse' : 'bg-slate-50 text-slate-400 hover:text-emerald-600'}`}
                         >
                             <Mic size={18} />
                         </button>
@@ -266,7 +266,7 @@ const MedicationSafetyScanner: React.FC = () => {
                                     <div className="bg-white border border-slate-100 p-5 rounded-xl text-left">
                                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5 italic">Data Integrity</p>
                                         <p className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1.5">
-                                            <div className="w-1 h-1 rounded-full bg-emerald-500" /> SYNC VERIFIED
+                                            <div className="w-1 h-1 rounded-full bg-emerald-100" /> SYNC VERIFIED
                                         </p>
                                     </div>
                                     <div className="bg-white border border-slate-100 p-5 rounded-xl text-left">
@@ -294,8 +294,8 @@ const MedicationSafetyScanner: React.FC = () => {
                         onClick={handleAnalyze}
                         disabled={isAnalyzing || meds.every(m => !m.trim())}
                         className={`h-24 rounded-xl font-black italic text-sm uppercase tracking-[0.3em] shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-4 ${isAnalyzing
-                            ? 'bg-slate-800 text-slate-500'
-                            : 'bg-rose-600 text-white hover:bg-emerald-800 shadow-rose-200'
+                            ? 'bg-white border-2 border-slate-300 text-slate-500'
+                            : 'bg-rose-600 text-slate-900 hover:bg-white border-2 border-emerald-500 shadow-rose-200'
                             }`}
                     >
                         {isAnalyzing ? <Loader2 className="animate-spin" size={24} /> : <ShieldCheck size={24} />}

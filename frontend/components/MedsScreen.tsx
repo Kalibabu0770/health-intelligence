@@ -50,7 +50,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
             {/* ═══ STREAMLINED HEADER ═══ */}
             <div className="bg-white border-b border-slate-50 px-8 py-5 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-5">
-                    <div className="w-11 h-11 bg-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <div className="w-11 h-11 bg-rose-600 rounded-xl flex items-center justify-center text-slate-900 shadow-lg">
                         <Pill size={22} />
                     </div>
                     <div>
@@ -60,7 +60,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                 </div>
 
                 <div className="flex gap-3">
-                    <button onClick={() => setShowAdd(true)} className="bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-lg active:scale-95 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-colors">
+                    <button onClick={() => setShowAdd(true)} className="bg-emerald-100 border-2 border-emerald-500 text-slate-900 px-6 py-3 rounded-xl shadow-lg active:scale-95 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-white border-2 border-slate-300 transition-colors">
                         <Plus size={14} /> {t.register_protocol || 'Register Protocol'}
                     </button>
                     {onBack && (
@@ -154,7 +154,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                             </div>
                         </div>
 
-                        <div className="bg-emerald-600 text-white rounded-xl p-6 shadow-xl relative overflow-hidden group flex flex-col justify-between">
+                        <div className="bg-emerald-100 border-2 border-emerald-500 text-slate-900 rounded-xl p-6 shadow-xl relative overflow-hidden group flex flex-col justify-between">
                             <div className="absolute -right-2 -bottom-2 opacity-5 scale-90">
                                 <ShieldCheck size={100} />
                             </div>
@@ -165,7 +165,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                                 </p>
                             </div>
                             <div className="mt-5 flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-100 animate-pulse" />
                                 <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Node Sync Active</span>
                             </div>
                         </div>
@@ -175,7 +175,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
 
             {/* ═══ MODAL (Compacted) ═══ */}
             {showAdd && (
-                <div className="fixed inset-0 bg-emerald-800/10  z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 bg-white border-2 border-emerald-500/10  z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="bg-white w-full max-w-lg p-8 rounded-xl shadow-2xl space-y-6 relative overflow-hidden border border-slate-100">
                         <div className="flex justify-between items-center">
                             <div>
@@ -193,11 +193,11 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                                         onClick={() => setNewMed({ ...newMed, color })}
                                         className={`flex-1 h-9 rounded-xl transition-all relative ${color === 'red' ? 'bg-red-500' :
                                             color === 'blue' ? 'bg-blue-500' :
-                                                color === 'green' ? 'bg-emerald-500' :
+                                                color === 'green' ? 'bg-emerald-100' :
                                                     color === 'yellow' ? 'bg-yellow-400' : 'bg-purple-500'
                                             } ${newMed.color === color ? 'ring-2 ring-slate-900 ring-offset-2' : 'opacity-40'}`}
                                     >
-                                        {newMed.color === color && <Check size={14} className="mx-auto text-white stroke-[4]" />}
+                                        {newMed.color === color && <Check size={14} className="mx-auto text-slate-900 stroke-[4]" />}
                                     </button>
                                 ))}
                             </div>
@@ -251,7 +251,7 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                                 setShowAdd(false);
                                 if (onBack) onBack();
                             }}
-                            className="w-full bg-emerald-600 text-white py-5 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-slate-100 active:scale-[0.98] transition-all"
+                            className="w-full bg-emerald-100 border-2 border-emerald-500 text-slate-900 py-5 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-slate-100 active:scale-[0.98] transition-all"
                         >
                             EXECUTE PROTOCOL
                         </button>

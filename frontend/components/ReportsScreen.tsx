@@ -72,7 +72,7 @@ const ReportsScreen: React.FC<{ analysis?: any, isAnalyzing?: boolean, onRefresh
             <div className="flex justify-between items-end shrink-0">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 bg-blue-600 rounded-xl text-white shadow-lg"><Database size={20} /></div>
+                        <div className="p-2 bg-blue-600 rounded-xl text-slate-900 shadow-lg"><Database size={20} /></div>
                         <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">Integrated Clinical Vault</p>
                     </div>
                     <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Health Record Synthesis</h1>
@@ -100,13 +100,13 @@ const ReportsScreen: React.FC<{ analysis?: any, isAnalyzing?: boolean, onRefresh
                     >
                         <Sparkles size={15} className={`${currentTab === 'analysis' ? 'text-emerald-600' : ''}`} />
                         <span>AI Analysis</span>
-                        {currentTab === 'analysis' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                        {currentTab === 'analysis' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-100 animate-pulse" />}
                     </button>
                 </div>
 
                 <div className="flex gap-4">
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*,application/pdf" onChange={handleReportUpload} />
-                    <button onClick={() => fileInputRef.current?.click()} className="bg-emerald-600 text-white px-8 py-4 rounded-xl shadow-xl active:scale-95 text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
+                    <button onClick={() => fileInputRef.current?.click()} className="bg-emerald-100 border-2 border-emerald-500 text-slate-900 px-8 py-4 rounded-xl shadow-xl active:scale-95 text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
                         {localIsAnalyzing ? <Loader2 className="animate-spin" size={16} /> : <FilePlus size={16} />} Ingest Node
                     </button>
                     <button onClick={handleRefresh} className="bg-white text-slate-900 border border-slate-200 px-6 py-4 rounded-xl shadow-lg active:scale-95 text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
@@ -184,7 +184,7 @@ const ReportsScreen: React.FC<{ analysis?: any, isAnalyzing?: boolean, onRefresh
                                 </p>
                                 <button
                                     onClick={() => setCurrentTab('analysis')}
-                                    className="px-10 py-5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
+                                    className="px-10 py-5 bg-blue-600 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
                                 >
                                     Switch to AI Analysis
                                 </button>
@@ -241,7 +241,7 @@ const ReportsScreen: React.FC<{ analysis?: any, isAnalyzing?: boolean, onRefresh
                                     <div className="space-y-4">
                                         {activeAnalysis?.actionableSteps?.map((step: string, i: number) => (
                                             <div key={i} className="flex gap-4 items-center bg-white p-5 rounded-xl border border-slate-100 shadow-sm hover:scale-[1.02] transition-all">
-                                                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-black shrink-0">{i + 1}</div>
+                                                <div className="w-8 h-8 rounded-full bg-blue-600 text-slate-900 flex items-center justify-center text-[10px] font-black shrink-0">{i + 1}</div>
                                                 <p className="text-[10px] font-black text-slate-900 uppercase leading-snug">{step}</p>
                                             </div>
                                         ))}

@@ -147,7 +147,7 @@ const ProfileScreen: React.FC = () => {
                                         const prefs = edited.foodPreferences || [];
                                         if (prefs.includes(diet.label)) setEdited({ ...edited, foodPreferences: prefs.filter(p => p !== diet.label) });
                                         else setEdited({ ...edited, foodPreferences: [...prefs, diet.label] });
-                                    }} className={`px-3 py-2 rounded-lg text-[9px] font-black uppercase border transition-all ${edited.foodPreferences?.includes(diet.label) ? 'bg-emerald-600 border-emerald-600 text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-400'}`}>
+                                    }} className={`px-3 py-2 rounded-lg text-[9px] font-black uppercase border transition-all ${edited.foodPreferences?.includes(diet.label) ? 'bg-emerald-100 border-2 border-emerald-500 border-emerald-600 text-slate-900 shadow-md' : 'bg-slate-50 border-slate-100 text-slate-400'}`}>
                                         {t[diet.key] || diet.label}
                                     </button>
                                 ))}
@@ -168,7 +168,7 @@ const ProfileScreen: React.FC = () => {
                                     <button
                                         key={cond.id}
                                         onClick={() => setEdited({ ...edited, [cond.id]: !(edited as any)[cond.id] })}
-                                        className={`p-2 rounded-lg text-[8px] font-black uppercase border transition-all ${(edited as any)[cond.id] ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
+                                        className={`p-2 rounded-lg text-[8px] font-black uppercase border transition-all ${(edited as any)[cond.id] ? 'bg-emerald-100 border-2 border-emerald-500 border-emerald-600 text-slate-900' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
                                     >
                                         {cond.label}
                                     </button>
@@ -177,7 +177,7 @@ const ProfileScreen: React.FC = () => {
                             {edited.gender === 'female' && (
                                 <button
                                     onClick={() => setEdited({ ...edited, isPregnant: !edited.isPregnant })}
-                                    className={`w-full p-2 rounded-lg text-[8px] font-black uppercase border transition-all ${edited.isPregnant ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
+                                    className={`w-full p-2 rounded-lg text-[8px] font-black uppercase border transition-all ${edited.isPregnant ? 'bg-emerald-100 border-2 border-emerald-500 border-emerald-600 text-slate-900' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
                                 >
                                     {t.pregnant}: {edited.isPregnant ? t.confirm || 'YES' : t.no || 'NO'}
                                 </button>
@@ -191,7 +191,7 @@ const ProfileScreen: React.FC = () => {
 
                         {(profile.location || (profile.foodPreferences && profile.foodPreferences.length > 0)) && (
                             <div className="mt-6 pt-6 border-t border-slate-50 space-y-3">
-                                {profile.location && <p className="text-xs font-black text-emerald-800 uppercase tracking-tight flex items-center justify-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div> {profile.location}</p>}
+                                {profile.location && <p className="text-xs font-black text-emerald-800 uppercase tracking-tight flex items-center justify-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-100 animate-pulse"></div> {profile.location}</p>}
                                 {profile.foodPreferences && profile.foodPreferences.length > 0 && (
                                     <div className="flex flex-wrap gap-2 justify-center">
                                         {profile.foodPreferences.map(p => <span key={p} className="px-3 py-1 bg-slate-50 border border-slate-100 rounded-lg text-[9px] font-black text-slate-500 uppercase">{p}</span>)}

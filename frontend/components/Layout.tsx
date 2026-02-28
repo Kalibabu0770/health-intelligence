@@ -45,7 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
     return (
       <button
         onClick={() => setActiveScreen(item.id)}
-        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold tracking-widest text-[10px] uppercase ${isActive ? 'bg-emerald-600 text-white shadow-lg' : 'bg-transparent text-slate-500 hover:bg-emerald-50 hover:text-emerald-700'}`}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold tracking-widest text-[10px] uppercase ${isActive ? 'bg-emerald-100 border-2 border-emerald-500 text-slate-900 shadow-lg' : 'bg-transparent text-slate-500 hover:bg-emerald-50 hover:text-emerald-700'}`}
       >
         <IconComp size={18} />
         <div className="flex flex-col text-left">
@@ -56,12 +56,12 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
   };
 
   return (
-    <div className="h-screen w-screen bg-slate-50 overflow-hidden flex font-sans text-slate-900 border-4 border-emerald-600 box-border p-2">
+    <div className="h-screen w-screen bg-slate-50 overflow-hidden flex font-sans text-slate-900 border-8 border-emerald-100 bg-white box-border p-2">
 
       {/* Sidebar Navigation */}
       <div className="w-72 bg-white rounded-xl shadow-xl border border-slate-100 flex flex-col h-full mr-2 p-6 overflow-y-auto">
         <div className="flex items-center gap-4 mb-8 shrink-0">
-          <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-md">
+          <div className="w-12 h-12 bg-emerald-100 border-2 border-emerald-500 rounded-xl flex items-center justify-center text-slate-900 shadow-md">
             <ShieldCheck size={28} />
           </div>
           <div>
@@ -88,13 +88,13 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
 
         <div className="mt-6 shrink-0 space-y-3">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 shadow-sm">
-            <div className="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-black text-xs shrink-0">
+            <div className="w-9 h-9 bg-emerald-100 border-2 border-emerald-500 rounded-lg flex items-center justify-center text-slate-900 font-black text-xs shrink-0">
               {(profile?.name?.charAt(0) || 'U').toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[11px] font-black uppercase truncate text-slate-900 leading-none">{profile?.name || 'USER'}</p>
               <div className="flex items-center gap-1 mt-1">
-                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                <div className="w-1.5 h-1.5 bg-emerald-100 rounded-full animate-pulse" />
                 <p className="text-[7px] font-black text-emerald-600 uppercase tracking-widest leading-none">{t.secured_link || 'Secured Link'}</p>
               </div>
             </div>
@@ -156,7 +156,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
                   {languages.map((lang) => (
                     <button key={lang.code} onClick={() => { setLanguage(lang.code); setShowLanguageMenu(false); }} className={`px-4 py-3 text-[10px] font-black uppercase text-left transition-colors flex justify-between items-center tracking-widest ${language === lang.code ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600 hover:bg-slate-50'}`}>
                       <span>{lang.flag} {lang.name}</span>
-                      {language === lang.code && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />}
+                      {language === lang.code && <div className="w-1.5 h-1.5 bg-emerald-100 rounded-full" />}
                     </button>
                   ))}
                 </div>

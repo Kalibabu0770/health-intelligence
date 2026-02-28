@@ -119,7 +119,7 @@ const AYUSHHealthSystem: React.FC = () => {
                     <button
                         key={s.id}
                         onClick={() => setStep(s.id as any)}
-                        className={`px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 flex items-center gap-3 ${step === s.id ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20 scale-105' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
+                        className={`px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 flex items-center gap-3 ${step === s.id ? 'bg-emerald-100 border-2 border-emerald-500 text-slate-900 shadow-xl shadow-emerald-600/20 scale-105' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
                     >
                         <s.icon size={14} />
                         {s.label}
@@ -130,12 +130,12 @@ const AYUSHHealthSystem: React.FC = () => {
     };
 
     return (
-        <div className="h-full w-full bg-[#f0f2f5] text-slate-900 flex flex-col p-4 overflow-hidden font-inter selection:bg-emerald-500/20">
+        <div className="h-full w-full bg-[#f0f2f5] text-slate-900 flex flex-col p-4 overflow-hidden font-inter selection:bg-emerald-100/20">
             {/* Header */}
             <header className="flex justify-between items-center mb-3 shrink-0 bg-white/40  p-3 rounded-xl border border-white/60 shadow-sm">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-emerald-800 rounded-xl flex items-center justify-center shadow-lg transform rotate-3">
-                        <Cpu className="text-white" size={20} />
+                    <div className="w-10 h-10 bg-white border-2 border-emerald-500 rounded-xl flex items-center justify-center shadow-lg transform rotate-3">
+                        <Cpu className="text-slate-900" size={20} />
                     </div>
                     <div>
                         <h1 className="text-lg font-black italic tracking-tighter uppercase leading-none text-slate-900">SENTINEL AI <span className="text-emerald-600">AYUSH</span></h1>
@@ -143,8 +143,8 @@ const AYUSHHealthSystem: React.FC = () => {
                     </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-2 bg-emerald-800/5 px-3 py-1.5 rounded-xl border border-white/20">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <div className="flex items-center gap-2 bg-white border-2 border-emerald-500/5 px-3 py-1.5 rounded-xl border border-white/20">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-100 animate-pulse" />
                         <span className="text-[8px] font-black uppercase tracking-widest text-slate-600">ID: LS-SAI-2101</span>
                     </div>
                     <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest italic">{new Date().toLocaleTimeString('en-US', { hour12: true })} • AP_NODE_CORE</p>
@@ -169,7 +169,7 @@ const AYUSHHealthSystem: React.FC = () => {
                                         {ayushResult?.forecast?.z_score_deviation < 1.0 ? 'AREA RATED SAFE' : 'CAUTION ADVISED'}
                                     </h2>
                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">REGIONAL BIO-STABILITY: {ayushResult?.forecast?.z_score_deviation < 1.0 ? 'OPTIMAL' : 'FLUCTUATING'}</p>
-                                    <div className="inline-block px-4 py-2 bg-emerald-800 text-white rounded-xl text-[8px] font-black uppercase tracking-widest shadow-lg">
+                                    <div className="inline-block px-4 py-2 bg-white border-2 border-emerald-500 text-slate-900 rounded-xl text-[8px] font-black uppercase tracking-widest shadow-lg">
                                         CURRENT NODE: {profile.district || 'HUB'}
                                     </div>
                                 </div>
@@ -201,13 +201,13 @@ const AYUSHHealthSystem: React.FC = () => {
                                             <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex flex-col items-center justify-center gap-0.5 shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
                                                 <span className="text-[10px] font-black text-slate-900">{Math.round(risk.probability * 100)}%</span>
                                                 <div className={`w-full h-1 mt-1 ${risk.probability > 0.5 ? 'bg-amber-100' : 'bg-emerald-100'} rounded-full overflow-hidden`}>
-                                                    <div className={`h-full ${risk.probability > 0.5 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${risk.probability * 100}%` }} />
+                                                    <div className={`h-full ${risk.probability > 0.5 ? 'bg-amber-500' : 'bg-emerald-100'}`} style={{ width: `${risk.probability * 100}%` }} />
                                                 </div>
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-0.5">
                                                     <h4 className="text-[11px] font-black italic uppercase text-slate-900 truncate">{risk.disease_name}</h4>
-                                                    <span className={`px-1 rounded text-[6px] font-black uppercase tracking-tighter shrink-0 ${risk.probability > 0.5 ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                                                    <span className={`px-1 rounded text-[6px] font-black uppercase tracking-tighter shrink-0 ${risk.probability > 0.5 ? 'bg-amber-500 text-slate-900' : 'bg-emerald-100 text-slate-900'}`}>
                                                         {risk.probability > 0.5 ? 'CAUTION' : 'PRIMARY RISK'}
                                                     </span>
                                                 </div>
@@ -225,7 +225,7 @@ const AYUSHHealthSystem: React.FC = () => {
 
                         {/* Column 3: Ancient Wisdom Hub */}
                         <div className="col-span-12 lg:col-span-4 flex flex-col h-full gap-3">
-                            <div className="flex-1 bg-emerald-800 rounded-xl p-5 text-white shadow-2xl relative overflow-hidden group min-h-0 border border-slate-800">
+                            <div className="flex-1 bg-white border-2 border-emerald-500 rounded-xl p-5 text-slate-900 shadow-2xl relative overflow-hidden group min-h-0 border border-slate-200">
                                 <div className="absolute top-0 right-0 p-6 opacity-[0.03] rotate-12 transform group-hover:rotate-45 transition-transform duration-1000">
                                     <Sparkles size={120} />
                                 </div>
@@ -242,7 +242,7 @@ const AYUSHHealthSystem: React.FC = () => {
                                                 {ayushResult?.ritucharya?.map((item: string, i: number) => (
                                                     <div key={i} className="flex items-center gap-2">
                                                         <div className="w-1 h-1 rounded-full bg-emerald-400 shrink-0" />
-                                                        <span className="text-[9px] font-bold uppercase tracking-tight text-white/80">{item}</span>
+                                                        <span className="text-[9px] font-bold uppercase tracking-tight text-slate-900/80">{item}</span>
                                                     </div>
                                                 )) || <span className="text-[8px] opacity-40">Syncing Node...</span>}
                                             </div>
@@ -260,12 +260,12 @@ const AYUSHHealthSystem: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className="mt-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20 p-4 flex flex-col items-center justify-center text-center shrink-0">
+                                    <div className="mt-4 bg-emerald-100/10 rounded-xl border border-emerald-500/20 p-4 flex flex-col items-center justify-center text-center shrink-0">
                                         <p className="text-[7px] font-black text-emerald-400 uppercase tracking-widest mb-1">PRAKRITI</p>
                                         <div className="text-xl font-black italic uppercase mb-1 text-emerald-400">{ayushResult?.prakriti || 'VATA-PITTA'}</div>
                                         <div className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                            <p className="text-[7px] font-black text-white/40 uppercase tracking-widest italic">REAL-TIME AYUSH SCAN...</p>
+                                            <p className="text-[7px] font-black text-slate-900/40 uppercase tracking-widest italic">REAL-TIME AYUSH SCAN...</p>
                                         </div>
                                     </div>
                                 </div>
@@ -287,8 +287,8 @@ const AYUSHHealthSystem: React.FC = () => {
                                         </h3>
                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2 italic">Multi-Sector Population Risk Registry</p>
                                     </div>
-                                    <div className="bg-emerald-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    <div className="bg-white border-2 border-emerald-500 text-slate-900 px-5 py-2.5 rounded-xl text-[10px] font-black flex items-center gap-3">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-100 animate-pulse" />
                                         FEDERATED SYNC ACTIVE
                                     </div>
                                 </div>
@@ -321,7 +321,7 @@ const AYUSHHealthSystem: React.FC = () => {
                                                 <tr key={i} className="bg-slate-50 hover:bg-white border border-slate-100 group transition-all duration-300">
                                                     <td className="px-6 py-4 rounded-l-2xl border-l-[4px] border-emerald-500/10 group-hover:border-emerald-500 transition-all">
                                                         <div className="flex items-center gap-4">
-                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${acc.role === 'officer' ? 'bg-blue-600' : acc.role === 'doctor' ? 'bg-indigo-600' : 'bg-emerald-600'} text-white`}>
+                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${acc.role === 'officer' ? 'bg-blue-600' : acc.role === 'doctor' ? 'bg-indigo-600' : 'bg-emerald-100 border-2 border-emerald-500'} text-slate-900`}>
                                                                 {acc.name?.charAt(0).toUpperCase()}
                                                             </div>
                                                             <div>
@@ -347,19 +347,19 @@ const AYUSHHealthSystem: React.FC = () => {
 
                             {/* Population Insights Dashboard */}
                             <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
-                                <div className="flex-1 bg-emerald-800 border border-slate-800 rounded-xl p-10 flex flex-col shadow-2xl relative overflow-hidden group min-h-[500px]">
-                                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:scale-125 transition-transform duration-1000 rotate-12"><Globe size={200} className="text-white" /></div>
+                                <div className="flex-1 bg-white border-2 border-emerald-500 border border-slate-200 rounded-xl p-10 flex flex-col shadow-2xl relative overflow-hidden group min-h-[500px]">
+                                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:scale-125 transition-transform duration-1000 rotate-12"><Globe size={200} className="text-slate-900" /></div>
                                     <div className="relative z-10 space-y-8 h-full flex flex-col">
                                         <div className="w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center border border-white/10"><TrendingUp size={28} className="text-emerald-500" /></div>
-                                        <h4 className="text-2xl font-black italic uppercase text-white tracking-tighter leading-none">Global Sector Insights</h4>
+                                        <h4 className="text-2xl font-black italic uppercase text-slate-900 tracking-tighter leading-none">Global Sector Insights</h4>
                                         <div className="space-y-6 flex-1">
                                             <div className="bg-white/5 p-6 rounded-xl border border-white/5">
                                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Monitored Nodes</p>
-                                                <p className="text-3xl font-black text-white italic">PROD_NODES_LIVE <span className="text-[10px] text-emerald-500 ml-2">↑ 0.4%</span></p>
+                                                <p className="text-3xl font-black text-slate-900 italic">PROD_NODES_LIVE <span className="text-[10px] text-emerald-500 ml-2">↑ 0.4%</span></p>
                                             </div>
                                             <div className="bg-white/5 p-6 rounded-xl border border-white/5">
                                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">System Stability Score</p>
-                                                <p className="text-3xl font-black text-white italic">84.2% <span className="text-[10px] text-emerald-500 ml-2">VERIFIED</span></p>
+                                                <p className="text-3xl font-black text-slate-900 italic">84.2% <span className="text-[10px] text-emerald-500 ml-2">VERIFIED</span></p>
                                             </div>
                                             <div className="pt-4 border-t border-white/10">
                                                 <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-4 italic">Critical Bio-Governance Action</p>
@@ -371,7 +371,7 @@ const AYUSHHealthSystem: React.FC = () => {
                                                             window.location.reload();
                                                         }
                                                     }}
-                                                    className="w-full bg-rose-600/20 border border-rose-500/50 text-rose-500 font-black py-4 rounded-xl text-[10px] uppercase tracking-[0.2em] hover:bg-rose-600 hover:text-white transition-all shadow-lg flex items-center justify-center gap-3"
+                                                    className="w-full bg-rose-600/20 border border-rose-500/50 text-rose-500 font-black py-4 rounded-xl text-[10px] uppercase tracking-[0.2em] hover:bg-rose-600 hover:text-slate-900 transition-all shadow-lg flex items-center justify-center gap-3"
                                                 >
                                                     <RefreshCcw size={14} /> PURGE NATIONAL REGISTRY
                                                 </button>
@@ -391,7 +391,7 @@ const AYUSHHealthSystem: React.FC = () => {
                         <div className="col-span-12 lg:col-span-4 flex flex-col h-full">
                             <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col shadow-xl shadow-slate-200/50 flex-1 min-h-0">
                                 <div className="flex items-center gap-4 mb-6 shrink-0">
-                                    <div className="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center shadow-lg"><User size={20} /></div>
+                                    <div className="w-10 h-10 bg-emerald-100 border-2 border-emerald-500 text-slate-900 rounded-xl flex items-center justify-center shadow-lg"><User size={20} /></div>
                                     <div>
                                         <h3 className="text-sm font-black uppercase tracking-tight text-slate-900 leading-none">Patient Intelligence Hub</h3>
                                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1.5">Access Centralized Patient IDs</p>
@@ -409,7 +409,7 @@ const AYUSHHealthSystem: React.FC = () => {
                                         />
                                         <button
                                             onClick={handlePatientSearch}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-emerald-800 text-white rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-all"
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white border-2 border-emerald-500 text-slate-900 rounded-xl flex items-center justify-center hover:bg-emerald-100 border-2 border-emerald-500 transition-all"
                                         >
                                             {isAnalyzing ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
                                         </button>
@@ -485,14 +485,14 @@ const AYUSHHealthSystem: React.FC = () => {
                             <div className="flex-1 bg-white rounded-xl border border-slate-200 p-8 flex flex-col shadow-xl shadow-slate-200/50 min-h-0">
                                 <div className="flex justify-between items-center mb-6 shrink-0">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-emerald-800 text-white rounded-xl flex items-center justify-center shadow-lg"><MessageSquare size={20} /></div>
+                                        <div className="w-10 h-10 bg-white border-2 border-emerald-500 text-slate-900 rounded-xl flex items-center justify-center shadow-lg"><MessageSquare size={20} /></div>
                                         <div>
                                             <h3 className="text-lg font-black uppercase italic tracking-tight text-slate-900">Dr-Patient Voice Synapse</h3>
                                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 italic">Real-Time Transcription & Diagnostic Analysis</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-4">
-                                        <button className="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:bg-emerald-600 hover:text-white transition-all shadow-sm flex items-center gap-2">
+                                        <button className="px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:bg-emerald-100 border-2 border-emerald-500 hover:text-slate-900 transition-all shadow-sm flex items-center gap-2">
                                             <Link size={14} /> CONNECT TO HIS
                                         </button>
                                     </div>
@@ -504,7 +504,7 @@ const AYUSHHealthSystem: React.FC = () => {
                                         {clinicalAnalysis ? (
                                             <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-xl animate-in fade-in zoom-in-95 duration-700">
                                                 <div className="flex items-center gap-4 mb-8">
-                                                    <div className="w-14 h-14 bg-emerald-600 text-white rounded-xl flex items-center justify-center shadow-2xl shadow-emerald-500/20"><Brain size={32} /></div>
+                                                    <div className="w-14 h-14 bg-emerald-100 border-2 border-emerald-500 text-slate-900 rounded-xl flex items-center justify-center shadow-2xl shadow-emerald-500/20"><Brain size={32} /></div>
                                                     <div>
                                                         <h4 className="text-xl font-black uppercase italic text-slate-900">CLINICAL TREATMENT PLAN</h4>
                                                         <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mt-1">Severity Assessment: <span className="text-slate-900 underline font-black">{clinicalAnalysis.severity}</span></p>
@@ -519,7 +519,7 @@ const AYUSHHealthSystem: React.FC = () => {
                                                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4 italic">Actionable Protocol</p>
                                                             <ul className="space-y-3">
                                                                 {clinicalAnalysis.immediateActions?.slice(0, 3).map((a: string, i: number) => (
-                                                                    <li key={i} className="text-[10px] font-black text-slate-900 uppercase flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {a}</li>
+                                                                    <li key={i} className="text-[10px] font-black text-slate-900 uppercase flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-100" /> {a}</li>
                                                                 ))}
                                                             </ul>
                                                         </div>
@@ -554,7 +554,7 @@ const AYUSHHealthSystem: React.FC = () => {
                                                 setIsListening(true);
                                                 startListening(language, setTranscript, () => setIsListening(false));
                                             }}
-                                            className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-95 ${isListening ? 'bg-rose-500 text-white animate-pulse' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
+                                            className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-95 ${isListening ? 'bg-rose-500 text-slate-900 animate-pulse' : 'bg-emerald-100 border-2 border-emerald-500 text-slate-900 hover:bg-emerald-700'}`}
                                         >
                                             <Mic size={28} />
                                         </button>
@@ -569,7 +569,7 @@ const AYUSHHealthSystem: React.FC = () => {
                                         <button
                                             onClick={handleDoctorConsultation}
                                             disabled={!transcript || isAnalyzing}
-                                            className="w-16 h-16 bg-emerald-800 text-white rounded-xl flex items-center justify-center shadow-2xl hover:bg-emerald-600 transition-all active:scale-95 disabled:opacity-30 disabled:grayscale"
+                                            className="w-16 h-16 bg-white border-2 border-emerald-500 text-slate-900 rounded-xl flex items-center justify-center shadow-2xl hover:bg-emerald-100 border-2 border-emerald-500 transition-all active:scale-95 disabled:opacity-30 disabled:grayscale"
                                         >
                                             {isAnalyzing ? <Loader2 className="animate-spin" size={24} /> : <Send size={24} />}
                                         </button>

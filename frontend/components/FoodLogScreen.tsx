@@ -131,7 +131,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-emerald-100 rounded-full animate-pulse"></div>
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">AI Diagnostics Active</span>
                     </div>
                 </div>
@@ -175,7 +175,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                     input.value = '';
                                 }
                             }}
-                            className="w-full bg-emerald-600 text-white py-5 rounded-xl font-black uppercase text-[11px] shadow-xl flex justify-center items-center gap-4 active:scale-95 hover:bg-emerald-700 transition-all"
+                            className="w-full bg-emerald-100 border-2 border-emerald-500 text-slate-900 py-5 rounded-xl font-black uppercase text-[11px] shadow-xl flex justify-center items-center gap-4 active:scale-95 hover:bg-emerald-700 transition-all"
                         >
                             <Plus size={20} />
                             Execute Intake Log
@@ -195,7 +195,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={analyzing}
-                            className="w-full bg-orange-600 text-white font-black py-6 rounded-xl shadow-xl hover:bg-orange-700 active:scale-95 disabled:opacity-50 transition-all text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 relative z-10"
+                            className="w-full bg-orange-600 text-slate-900 font-black py-6 rounded-xl shadow-xl hover:bg-orange-700 active:scale-95 disabled:opacity-50 transition-all text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 relative z-10"
                         >
                             {analyzing ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
                             {analyzing ? "Synthesizing Data" : "Launch AI Bio-Scanner"}
@@ -215,7 +215,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                     <div className="relative z-10 grid grid-cols-12 gap-8 items-center">
                                         <div className="col-span-12 lg:col-span-5 space-y-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="bg-emerald-600 p-3 rounded-xl text-white shadow-lg"><Apple size={20} /></div>
+                                                <div className="bg-emerald-100 border-2 border-emerald-500 p-3 rounded-xl text-slate-900 shadow-lg"><Apple size={20} /></div>
                                                 <div>
                                                     <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{lt.energy_predictor || "Labor Energy Predictor"}</p>
                                                     <h3 className="font-black text-2xl uppercase tracking-tighter text-slate-900">{profile.profession || "General Public"}</h3>
@@ -243,7 +243,7 @@ const FoodLogScreen: React.FC<{ onBack: () => void; embedded?: boolean }> = ({ o
                                                             </div>
                                                             <div className="bg-slate-100 h-3 w-full rounded-full overflow-hidden flex shadow-inner">
                                                                 <div className="h-full bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]" style={{ width: rec.macronutrients.protein }}></div>
-                                                                <div className="h-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]" style={{ width: rec.macronutrients.carbs }}></div>
+                                                                <div className="h-full bg-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.3)]" style={{ width: rec.macronutrients.carbs }}></div>
                                                                 <div className="h-full bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)]" style={{ width: rec.macronutrients.fat }}></div>
                                                             </div>
                                                             <div className="flex flex-wrap gap-2">

@@ -186,7 +186,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
     const Header = () => (
         <div className="flex flex-col items-center mb-8 shrink-0">
-            <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg mb-4">
+            <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-slate-900 shadow-lg mb-4">
                 <ShieldCheck size={28} />
             </div>
             <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">Health Intelligence <span className="text-emerald-500">AI</span></h1>
@@ -229,14 +229,14 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                             onClick={() => { setSelectedPortalRole('citizen'); setMode('select'); }}
                                             className="group relative bg-white border-2 border-slate-100 p-6 rounded-xl flex items-center gap-5 hover:border-emerald-500 hover:shadow-2xl transition-all duration-500"
                                         >
-                                            <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">
+                                            <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-100 group-hover:text-slate-900 transition-all duration-500">
                                                 <User size={28} />
                                             </div>
                                             <div className="text-left">
                                                 <h3 className="text-md font-black text-slate-900 uppercase tracking-tight leading-none">Citizen Guardian</h3>
                                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2 italic shadow-sm">AI Health Triage • AYUSH Wisdom</p>
                                             </div>
-                                            <div className="absolute right-6 text-slate-100 group-hover:text-emerald-100 transition-colors">
+                                            <div className="absolute right-6 text-slate-100 group-hover:text-emerald-700 transition-colors">
                                                 <Fingerprint size={32} strokeWidth={1} />
                                             </div>
                                         </button>
@@ -245,14 +245,14 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                             onClick={() => { setSelectedPortalRole('doctor'); setMode('select'); }}
                                             className="group relative bg-white border-2 border-slate-100 p-6 rounded-xl flex items-center gap-5 hover:border-emerald-500 hover:shadow-2xl transition-all duration-500"
                                         >
-                                            <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
+                                            <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-100 border-2 border-emerald-500 group-hover:text-slate-900 transition-all duration-500">
                                                 <Activity size={28} />
                                             </div>
                                             <div className="text-left">
                                                 <h3 className="text-md font-black text-slate-900 uppercase tracking-tight leading-none">Medical Doctor</h3>
                                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2 italic shadow-sm">Clinical Synapse • ID Intelligence</p>
                                             </div>
-                                            <div className="absolute right-6 text-slate-100 group-hover:text-emerald-100 transition-colors">
+                                            <div className="absolute right-6 text-slate-100 group-hover:text-emerald-700 transition-colors">
                                                 <Brain size={32} strokeWidth={1} />
                                             </div>
                                         </button>
@@ -292,7 +292,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 <button
                                                     onClick={handlePinSubmit}
                                                     disabled={pin.length !== 4}
-                                                    className="w-full bg-emerald-500 text-white py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 transition-all disabled:opacity-30 disabled:shadow-none"
+                                                    className="w-full bg-emerald-100 text-slate-900 py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-100 border-2 border-emerald-500 transition-all disabled:opacity-30 disabled:shadow-none"
                                                 >
                                                     Verify Access
                                                 </button>
@@ -330,14 +330,14 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 if (filtered.length > 0) {
                                                     return filtered.map((acc, i) => (
                                                         <button key={i} onClick={() => setSelectedAccount(acc)} className="group w-full bg-slate-50 border border-slate-100 p-5 rounded-xl flex items-center gap-5 hover:bg-white hover:border-emerald-500 hover:shadow-xl transition-all">
-                                                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm border border-slate-50">
+                                                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-emerald-100 group-hover:text-slate-900 transition-all shadow-sm border border-slate-50">
                                                                 <User size={24} />
                                                             </div>
                                                             <div className="text-left flex-1">
                                                                 <p className="text-sm font-black text-slate-800 uppercase leading-none mb-1.5">{acc.name}</p>
                                                                 <div className="flex items-center gap-2">
                                                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[200px]">ID: {acc.patientId || 'PENDING'} • {acc.location}</p>
-                                                                    <span className={`px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest ${acc.role === 'officer' ? 'bg-blue-600 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
+                                                                    <span className={`px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest ${acc.role === 'officer' ? 'bg-blue-600 text-slate-900' : 'bg-emerald-100 text-emerald-600'}`}>
                                                                         {acc.role || 'citizen'}
                                                                     </span>
                                                                 </div>
@@ -350,7 +350,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                         <div className="py-12 text-center bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-100">
                                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">No Authorized {selectedPortalRole === 'doctor' ? 'Clinical' : 'Citizen'} Nodes Detected</p>
                                                             <div className="flex flex-col gap-3 px-8">
-                                                                <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="bg-emerald-600 text-white w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100">Initialize New {selectedPortalRole === 'doctor' ? 'Doctor Node' : 'Guardian Link'}</button>
+                                                                <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="bg-emerald-100 border-2 border-emerald-500 text-slate-900 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100">Initialize New {selectedPortalRole === 'doctor' ? 'Doctor Node' : 'Guardian Link'}</button>
                                                                 <button onClick={() => { setMode('portal'); setSelectedPortalRole(null); }} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-emerald-500 py-2 italic flex items-center justify-center gap-2">
                                                                     <ArrowLeft size={10} /> Switch Gateway Protocol
                                                                 </button>
@@ -476,7 +476,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 </select>
                                                 <button
                                                     onClick={() => setRegData({ ...regData, isTribal: !regData.isTribal })}
-                                                    className={`p-5 rounded-xl font-bold text-[10px] uppercase border-2 transition-all ${regData.isTribal ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
+                                                    className={`p-5 rounded-xl font-bold text-[10px] uppercase border-2 transition-all ${regData.isTribal ? 'bg-amber-500 text-slate-900 border-amber-500' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
                                                 >
                                                     {regData.isTribal ? 'Tribal Node ✅' : 'Tribal Initial?'}
                                                 </button>
@@ -550,7 +550,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                                 input.value = '';
                                                             }
                                                         }}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-blue-500 text-slate-900 rounded-lg hover:bg-blue-600 transition-colors"
                                                     >
                                                         <Plus size={14} />
                                                     </button>
@@ -578,12 +578,12 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Surgical History</p>
                                                 <div className="flex flex-wrap gap-2">
                                                     {['Heart', 'Appendix', 'Hernia', 'Gallbladder', 'Knee'].map(s => (
-                                                        <button key={s} onClick={() => toggleTag('surgeries', s)} className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${regData.surgeries.includes(s) ? 'bg-emerald-600 border-slate-200 text-white shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{s}</button>
+                                                        <button key={s} onClick={() => toggleTag('surgeries', s)} className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${regData.surgeries.includes(s) ? 'bg-emerald-100 border-2 border-emerald-500 border-slate-200 text-slate-900 shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{s}</button>
                                                     ))}
                                                     {/* Render custom surgeries that aren't in the preset list */}
                                                     {regData.surgeries.filter(s => !['Heart', 'Appendix', 'Hernia', 'Gallbladder', 'Knee'].includes(s)).map(s => (
-                                                        <button key={s} onClick={() => toggleTag('surgeries', s)} className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 bg-emerald-600 border-slate-200 text-white shadow-md flex items-center gap-2">
-                                                            {s} <X size={10} className="text-slate-400 hover:text-white" />
+                                                        <button key={s} onClick={() => toggleTag('surgeries', s)} className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 bg-emerald-100 border-2 border-emerald-500 border-slate-200 text-slate-900 shadow-md flex items-center gap-2">
+                                                            {s} <X size={10} className="text-slate-400 hover:text-slate-900" />
                                                         </button>
                                                     ))}
                                                 </div>
@@ -611,7 +611,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                                 input.value = '';
                                                             }
                                                         }}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-emerald-100 text-slate-900 rounded-lg hover:bg-emerald-100 border-2 border-emerald-500 transition-colors"
                                                     >
                                                         <Plus size={14} />
                                                     </button>
@@ -623,7 +623,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Genetic Markers</p>
                                                 <div className="grid grid-cols-2 gap-2">
                                                     {['Diabetes', 'Cancer', 'Stroke', 'Cardiac'].map(f => (
-                                                        <button key={f} onClick={() => toggleTag('familyHistory', f)} className={`p-4 rounded-xl text-[10px] font-black uppercase border-2 text-center transition-all ${regData.familyHistory.includes(f) ? 'bg-rose-500 border-rose-500 text-white shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{f}</button>
+                                                        <button key={f} onClick={() => toggleTag('familyHistory', f)} className={`p-4 rounded-xl text-[10px] font-black uppercase border-2 text-center transition-all ${regData.familyHistory.includes(f) ? 'bg-rose-500 border-rose-500 text-slate-900 shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{f}</button>
                                                     ))}
                                                 </div>
                                                 {/* Render custom family history items */}
@@ -661,7 +661,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                                 input.value = '';
                                                             }
                                                         }}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-rose-500 text-slate-900 rounded-lg hover:bg-rose-600 transition-colors"
                                                     >
                                                         <Plus size={14} />
                                                     </button>
@@ -698,12 +698,12 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Clinical Habits</p>
                                                 <div className="flex flex-wrap gap-2">
                                                     {['Smoking', 'Alcohol', 'Tobacco', 'Betel Nut'].map(h => (
-                                                        <button key={h} onClick={() => toggleTag('habits', h)} className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${regData.habits.includes(h) ? 'bg-emerald-600 border-slate-200 text-white shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{h}</button>
+                                                        <button key={h} onClick={() => toggleTag('habits', h)} className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${regData.habits.includes(h) ? 'bg-emerald-100 border-2 border-emerald-500 border-slate-200 text-slate-900 shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{h}</button>
                                                     ))}
                                                     {/* Render custom habits */}
                                                     {regData.habits.filter(h => !['Smoking', 'Alcohol', 'Tobacco', 'Betel Nut'].includes(h)).map(h => (
-                                                        <button key={h} onClick={() => toggleTag('habits', h)} className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 bg-emerald-600 border-slate-200 text-white shadow-md flex items-center gap-2">
-                                                            {h} <X size={10} className="text-slate-400 hover:text-white" />
+                                                        <button key={h} onClick={() => toggleTag('habits', h)} className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 bg-emerald-100 border-2 border-emerald-500 border-slate-200 text-slate-900 shadow-md flex items-center gap-2">
+                                                            {h} <X size={10} className="text-slate-400 hover:text-slate-900" />
                                                         </button>
                                                     ))}
                                                 </div>
@@ -731,7 +731,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                                 input.value = '';
                                                             }
                                                         }}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-blue-500 text-slate-900 rounded-lg hover:bg-blue-600 transition-colors"
                                                     >
                                                         <Plus size={14} />
                                                     </button>
@@ -743,12 +743,12 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Allergies (Drug/Food)</p>
                                                 <div className="flex flex-wrap gap-2">
                                                     {['Penicillin', 'Sulfa', 'Peanuts', 'Dairy', 'Gluten'].map(a => (
-                                                        <button key={a} onClick={() => toggleTag('allergies', a)} className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${regData.allergies.includes(a) ? 'bg-rose-500 border-rose-500 text-white shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{a}</button>
+                                                        <button key={a} onClick={() => toggleTag('allergies', a)} className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${regData.allergies.includes(a) ? 'bg-rose-500 border-rose-500 text-slate-900 shadow-md' : 'bg-slate-50 border-transparent text-slate-400'}`}>{a}</button>
                                                     ))}
                                                     {/* Render custom allergies */}
                                                     {regData.allergies.filter(a => !['Penicillin', 'Sulfa', 'Peanuts', 'Dairy', 'Gluten'].includes(a)).map(a => (
-                                                        <button key={a} onClick={() => toggleTag('allergies', a)} className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 bg-rose-500 border-rose-500 text-white shadow-md flex items-center gap-2">
-                                                            {a} <X size={10} className="text-white hover:text-slate-200" />
+                                                        <button key={a} onClick={() => toggleTag('allergies', a)} className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border-2 bg-rose-500 border-rose-500 text-slate-900 shadow-md flex items-center gap-2">
+                                                            {a} <X size={10} className="text-slate-900 hover:text-slate-200" />
                                                         </button>
                                                     ))}
                                                 </div>
@@ -776,7 +776,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                                 input.value = '';
                                                             }
                                                         }}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-rose-500 text-slate-900 rounded-lg hover:bg-rose-600 transition-colors"
                                                     >
                                                         <Plus size={14} />
                                                     </button>
@@ -789,7 +789,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1 text-center">Neural Stress Load</p>
                                                     <div className="grid grid-cols-3 gap-2">
                                                         {['low', 'mid', 'high'].map(s => (
-                                                            <button key={s} onClick={() => setRegData({ ...regData, stressLevel: s as any })} className={`py-4 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${regData.stressLevel === s ? 'bg-emerald-600 border-slate-200 text-white' : 'bg-slate-50 border-transparent text-slate-400'}`}>{s}</button>
+                                                            <button key={s} onClick={() => setRegData({ ...regData, stressLevel: s as any })} className={`py-4 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${regData.stressLevel === s ? 'bg-emerald-100 border-2 border-emerald-500 border-slate-200 text-slate-900' : 'bg-slate-50 border-transparent text-slate-400'}`}>{s}</button>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -808,7 +808,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                     {/* Step 5: Finalize & Password Creation */}
                                     {regStep === 5 && (
                                         <div className="space-y-6 text-center py-6">
-                                            <div className="w-24 h-24 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-2xl mx-auto shadow-emerald-200 animate-bounce-slow">
+                                            <div className="w-24 h-24 bg-emerald-100 rounded-xl flex items-center justify-center text-slate-900 shadow-2xl mx-auto shadow-emerald-200 animate-bounce-slow">
                                                 <Lock size={48} />
                                             </div>
                                             <div className="space-y-2">
@@ -841,7 +841,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                         )}
                                         <button
                                             onClick={nextProtocol}
-                                            className="flex-1 bg-emerald-600 text-white py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                                            className="flex-1 bg-emerald-100 border-2 border-emerald-500 text-slate-900 py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                                         >
                                             {regStep === 5 ? 'Establish Node' : 'Continue Protocol'}
                                             <ArrowRight size={18} />
@@ -858,7 +858,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                             </div>
                                             <button
                                                 onClick={() => setMode('select')}
-                                                className="w-full bg-emerald-800 text-white py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                                                className="w-full bg-white border-2 border-emerald-500 text-slate-900 py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg hover:bg-white transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                                             >
                                                 <ShieldCheck size={18} />
                                                 Existing Node? Protocol Login
@@ -916,7 +916,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                         </button>
                                         <button
                                             onClick={handleResetProtocol}
-                                            className={`flex-1 ${resetStep === 1 ? 'bg-rose-500 shadow-rose-200' : 'bg-emerald-500 shadow-emerald-200'} text-white py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg transition-all active:scale-[0.98]`}
+                                            className={`flex-1 ${resetStep === 1 ? 'bg-rose-500 shadow-rose-200' : 'bg-emerald-100 shadow-emerald-200'} text-slate-900 py-5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg transition-all active:scale-[0.98]`}
                                         >
                                             {resetStep === 1 ? 'Verify Identity' : 'Update PIN'}
                                         </button>

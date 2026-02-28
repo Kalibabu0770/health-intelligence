@@ -38,7 +38,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">{t.daily_vitals_saved || 'Your daily vitals & mood have been saved.'}</p>
                 <button
                     onClick={() => setSubmitted(false)}
-                    className="mt-6 px-6 py-2.5 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 active:scale-95 transition-all"
+                    className="mt-6 px-6 py-2.5 bg-emerald-100 border-2 border-emerald-500 text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 active:scale-95 transition-all"
                 >{t.check_in_again || 'Check In Again'}</button>
             </div>
         );
@@ -102,7 +102,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
 
             <button
                 onClick={handleSubmit}
-                className="w-full py-5 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-xs rounded-xl shadow-xl active:scale-95 transition-all"
+                className="w-full py-5 bg-emerald-100 border-2 border-emerald-500 hover:bg-emerald-700 text-slate-900 font-black uppercase text-xs rounded-xl shadow-xl active:scale-95 transition-all"
             >
                 {t.log_daily_status || t.submit_checkin || "Log Daily Status"}
             </button>
@@ -122,7 +122,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
     if (embedded) {
         return (
             <div className="p-8">
-                <div className="bg-emerald-600 p-8 text-white relative rounded-t-[2.5rem]">
+                <div className="bg-emerald-100 border-2 border-emerald-500 p-8 text-slate-900 relative rounded-t-[2.5rem]">
                     <div className="absolute top-0 right-0 p-8 opacity-10"><Heart size={80} /></div>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80 mb-2">{t.daily_checkin || "Daily Health Check-in"}</p>
                     <h2 className="text-2xl font-black leading-tight italic">{t.how_is_health || "How is your day like?"}</h2>
@@ -135,7 +135,7 @@ const DailyCheckInModal: React.FC<{ onClose: () => void; embedded?: boolean }> =
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-white/60  animate-in fade-in duration-300">
             <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500">
-                <div className="bg-emerald-600 p-8 text-white relative">
+                <div className="bg-emerald-100 border-2 border-emerald-500 p-8 text-slate-900 relative">
                     <div className="absolute top-0 right-0 p-8 opacity-10"><Heart size={80} /></div>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80 mb-2">{t.daily_checkin || "Daily Health Check-in"}</p>
                     <h2 className="text-2xl font-black leading-tight italic">{t.how_is_health || "How is your day like?"}</h2>
