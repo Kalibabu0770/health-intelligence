@@ -165,15 +165,22 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                                 <h2 className="text-2xl font-black text-emerald-800 uppercase tracking-tighter">Voice EHR Console</h2>
                                 <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-1">Multilingual Transcription to AHMIS Schema</p>
                             </div>
-                            <button onClick={() => setIsRecording(!isRecording)} className={`flex items-center gap-3 px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest text-white transition-all ${isRecording ? 'bg-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.5)] animate-pulse' : 'bg-emerald-600 hover:bg-emerald-700'}`}>
-                                <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget, selector: 'textarea' } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={18} /></span>
-                                {isRecording ? 'Recording Active...' : 'Initialize Audio Capture'}
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget, selector: '#ehr-textarea' } }));
+                                }}
+                                className="flex items-center gap-3 px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest text-white transition-all bg-emerald-600 hover:bg-emerald-700 shadow-md active:scale-95"
+                            >
+                                <span className="inline-flex z-50 relative pointer-events-none" title="Voice Input"><Mic size={18} /></span>
+                                Initialize Audio Capture
                             </button>
                         </div>
                         <div className="flex-1 grid grid-cols-2 gap-8">
                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col">
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Live Transcription (English / Regional)</h3>
                                 <textarea
+                                    id="ehr-textarea"
                                     value={ehrText}
                                     onChange={(e) => setEhrText(e.target.value)}
                                     placeholder="Click the mic icon above to start speaking. Transcribed text will securely paste here..."
