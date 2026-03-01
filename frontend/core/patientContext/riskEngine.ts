@@ -50,11 +50,9 @@ export const calculateComprehensiveRisk = (
     let breathing = { score: 0, trends: [] as string[], contributors: [] as string[] };
     let alerts: string[] = [];
 
-    // --- 1. Medication & Drug Interaction Analysis ---
-    medications.filter(m => m.isActive).forEach(med => {
-        // Basic heuristics since we don't have a real drug database lookup for all names
-        // In a real app, this would use the DRUG_DATABASE properly
-        // Check for NSAIDs
+    const medicationsList = Array.isArray(medications) ? medications : [];
+    medicationsList.filter(m => m && m.isActive).forEach(med => {
+        if (!med.drugName) return;
         const lowerName = med.drugName.toLowerCase();
 
         if (lowerName.includes('ibuprofen') || lowerName.includes('aspirin') || lowerName.includes('diclofenac') || lowerName.includes('naproxen')) {
@@ -104,8 +102,9 @@ export const calculateComprehensiveRisk = (
     if (profile.hasAsthma) { breathing.score += 20; breathing.contributors.push("Asthma Diagnosis"); }
 
     // --- 3. Lifestyle Habits Analysis ---
-    if (profile.habits) {
+    if (profile.habits && Array.isArray(profile.habits)) {
         profile.habits.forEach(habit => {
+            if (!habit.name) return;
             const lowerHabit = habit.name.toLowerCase();
             const freqMultiplier = habit.frequency === 'daily' ? 1.5 : 0.6;
 
@@ -155,7 +154,9 @@ export const calculateComprehensiveRisk = (
 
     // Nutrition Impact (Simple logic: Low protein/high sugar inference not possible without detail, using simplified logic)
     // Check for recent high-fat/sugar foods if descriptions match
-    const recentHighRiskFood = nutrition.filter(f => {
+    const nutritionList = Array.isArray(nutrition) ? nutrition : [];
+    const recentHighRiskFood = nutritionList.filter(f => {
+        if (!f.description) return false;
         const d = f.description.toLowerCase();
         return d.includes('burger') || d.includes('fry') || d.includes('pizza') || d.includes('sugar') || d.includes('cake');
     }).length;
@@ -166,8 +167,8 @@ export const calculateComprehensiveRisk = (
     }
 
     // --- 4. Activity modifiers (Protective factors) ---
-    const recentWorkouts = activity.filter(w => (Date.now() - w.timestamp) < 7 * 24 * 60 * 60 * 1000); // Last 7 days
-    const activeMinutes = recentWorkouts.reduce((sum, w) => sum + w.durationMinutes, 0);
+    const recentWorkouts = (activity || []).filter(w => w && w.timestamp && (Date.now() - w.timestamp) < 7 * 24 * 60 * 60 * 1000); // Last 7 days
+    const activeMinutes = recentWorkouts.reduce((sum, w) => sum + (w.durationMinutes || 0), 0);
 
     if (activeMinutes > 150) {
         heart.score = Math.max(0, heart.score - 15);
@@ -180,7 +181,7 @@ export const calculateComprehensiveRisk = (
 
     // --- 5. Symptom Analysis (Immediate Triage) ---
     symptoms.slice(-3).forEach(s => {
-        const input = s.complaint.toLowerCase();
+        const input = (s.complaint || '').toLowerCase();
         if (input.includes('chest pain') || input.includes('heart')) {
             heart.score += 50;
             alerts.push("URGENT: Recent chest pain reported.");
@@ -231,7 +232,7 @@ export const calculateComprehensiveRisk = (
     const projection7Day = Math.round(Math.min(100, Math.max(0, maxOrganRisk + riskMomentum)));
 
     // --- 7. Longevity Engine (Biological Health Age) ---
-    let longevityAge = profile.age;
+    let longevityAge = parseInt(profile.age?.toString() || '30') || 30;
     const scoreDiff = 75 - healthScore;
     longevityAge += scoreDiff / 4;
 

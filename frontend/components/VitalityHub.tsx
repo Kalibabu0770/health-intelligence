@@ -62,7 +62,7 @@ const VitalityHub: React.FC<{
     const { nutritionLogs, medications } = usePatientContext();
 
     const today = new Date().toDateString();
-    const todayFood = (nutritionLogs || []).filter((l: any) => new Date(l.timestamp).toDateString() === today);
+    const todayFood = (nutritionLogs || []).filter((l: any) => l.timestamp && new Date(l.timestamp).toDateString() === today);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 animate-in fade-in slide-in-from-bottom-10 duration-1000">

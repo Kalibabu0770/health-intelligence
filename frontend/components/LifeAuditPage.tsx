@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { usePatientContext } from '../core/patientContext/patientStore';
 import { analyzeNutritionDeficiencies, getComprehensiveHealthAnalysis, analyzeFoodImage } from '../services/ai';
+import { startListening } from '../services/speech';
 
 const LifeAuditPage: React.FC<{ embedded?: boolean, onBack?: () => void }> = ({ embedded, onBack }) => {
     const {

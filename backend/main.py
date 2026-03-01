@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from models import UnifiedRequest, UnifiedResponse
@@ -5,9 +8,6 @@ from orchestrator import HealthIntelligenceOrchestrator
 import uvicorn
 import os
 import httpx
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = FastAPI(
     title="Health Intelligence",
@@ -77,7 +77,6 @@ async def transcribe(audio: UploadFile = File(...), language: str = Form("en-IN"
     data = {
         'model': 'whisper-large-v3',
         'response_format': 'json',
-        'language': language_code
     }
     headers = {
         "Authorization": f"Bearer {key}"

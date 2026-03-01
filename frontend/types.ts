@@ -174,3 +174,122 @@ export interface DailyCheckIn {
   symptoms: string[];
   note?: string;
 }
+
+// --- Longitudinal Clinical Master Health Document (LCMHD) ---
+
+export interface PatientMasterProfile {
+  patient_global_id: string;
+  demographic_information: {
+    full_name: string;
+    age: number;
+    gender: string;
+    date_of_birth: string;
+    blood_group: string;
+    phone_number: string;
+    address: string;
+    pincode: string;
+    district: string;
+    state: string;
+    tribal_status: boolean;
+  };
+  professional_details: {
+    occupation: string;
+    work_type: string;
+    stress_level: string;
+  };
+  biometric_profile: {
+    height_cm: number;
+    weight_kg: number;
+    bmi: number;
+    sleep_hours: number;
+  };
+}
+
+export interface ChronicConditionEntry {
+  disease_name: string;
+  duration: string;
+  current_status: string;
+}
+
+export interface SurgeryEntry {
+  surgery_name: string;
+  year: number;
+  complications: string;
+}
+
+export interface AllergyEntry {
+  allergy_type: string;
+  severity: string;
+  reaction_description: string;
+}
+
+export interface FamilyHistoryEntry {
+  disease_name: string;
+  relation: string;
+}
+
+export interface MedicalHistory {
+  patient_global_id: string;
+  chronic_conditions: ChronicConditionEntry[];
+  past_surgeries: SurgeryEntry[];
+  allergies: AllergyEntry[];
+  family_history: FamilyHistoryEntry[];
+  lifestyle_risks: {
+    smoking: boolean;
+    alcohol: boolean;
+    tobacco: boolean;
+    betel_nut: boolean;
+  };
+}
+
+export interface ClinicalEncounter {
+  encounter_id: string;
+  patient_global_id: string;
+  doctor_id: string;
+  visit_date: string;
+  visit_type: string;
+  chief_complaint: string;
+  history_of_present_illness: string;
+  vitals: {
+    blood_pressure: string;
+    pulse: number;
+    temperature: number;
+    oxygen_saturation: number;
+    weight: number;
+  };
+  physical_examination: string;
+  ayush_assessment: {
+    prakriti_type: string;
+    vata_score: number;
+    pitta_score: number;
+    kapha_score: number;
+  };
+  diagnosis: {
+    primary_diagnosis: string;
+    secondary_diagnosis: string;
+    icd_code: string;
+  };
+  treatment_plan: {
+    herbal_prescription: { name: string; dosage: string; rationale: string }[];
+    diet_plan: string[];
+    yoga_recommendation: string[];
+    lifestyle_advice: string;
+  };
+  follow_up_date: string;
+  doctor_notes: string;
+}
+
+export interface PatientMasterHealthDocument {
+  patient_global_id: string;
+  version_number: number;
+  last_updated_timestamp: string;
+  profile: PatientMasterProfile;
+  history: MedicalHistory;
+  encounters: ClinicalEncounter[];
+  ai_risk_analysis: {
+    disease_risk_scores: Record<string, number>;
+    organ_stress_index: number;
+    complication_probability: number;
+    confidence_score: number;
+  };
+}

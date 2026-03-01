@@ -67,11 +67,11 @@ const CommandHub: React.FC<{
     const { nutritionLogs, activityLogs, medications, clinicalVault, profile, t } = usePatientContext();
     const today = new Date().toDateString();
 
-    const todayFood = (nutritionLogs || []).filter((l: any) => new Date(l.timestamp).toDateString() === today);
+    const todayFood = (nutritionLogs || []).filter((l: any) => l.timestamp && new Date(l.timestamp).toDateString() === today);
     const totalCal = todayFood.reduce((s: number, l: any) => s + (l.calories || 0), 0);
-    const todayWorkout = (activityLogs || []).filter((l: any) => new Date(l.timestamp || l.date).toDateString() === today);
-    const totalWorkMin = todayWorkout.reduce((s: number, l: any) => s + (l.duration || l.minutes || 0), 0);
-    const todayMeds = (medications || []).filter((m: any) => m.times);
+    const todayWorkout = (activityLogs || []).filter((l: any) => (l.timestamp || l.date) && new Date(l.timestamp || l.date).toDateString() === today);
+    const totalWorkMin = todayWorkout.reduce((s: number, l: any) => s + (l.durationMinutes || l.duration || l.minutes || 0), 0);
+    const todayMeds = (medications || []).filter((m: any) => m && m.times);
 
     return (
         <div className="h-full flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700">

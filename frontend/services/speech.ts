@@ -8,6 +8,7 @@ export const startListening = (
     onTranscript: (text: string) => void,
     onEnd?: () => void
 ) => {
+    let latestNativeTranscript = '';
     // Stop any existing
     if (currentRecognition && currentRecognition.state === 'recording') {
         try { currentRecognition.stop(); } catch (e) { }
@@ -79,7 +80,10 @@ export const startListening = (
                     }
                 }
                 const text = (finalTxt + " " + interimTxt).trim();
-                if (text && transcriptEl) transcriptEl.textContent = text;
+                if (text && transcriptEl) {
+                    transcriptEl.textContent = text;
+                    latestNativeTranscript = text; // Track to fallback if Groq API fails
+                }
             };
 
             recognition.onerror = (e: any) => console.warn("Native speech error setup:", e.error);
@@ -120,13 +124,25 @@ export const startListening = (
                 const { transcribeAudio } = await import('./ai');
                 const text = await transcribeAudio(audioBlob, language);
 
-                if (text && transcriptEl) {
-                    transcriptEl.textContent = text;
+                if (text && text.trim().length > 0) {
+                    if (transcriptEl) transcriptEl.textContent = text;
                     onTranscript(text);
+                } else {
+                    // Fallback to native Chrome layer if Whisper returns empty
+                    if (latestNativeTranscript && transcriptEl) {
+                        transcriptEl.textContent = latestNativeTranscript;
+                        onTranscript(latestNativeTranscript);
+                    }
                 }
             } catch (error) {
                 console.error("Transcription Failed:", error);
-                if (transcriptEl) transcriptEl.textContent = "Transcription failed. Please try again.";
+                // Fallback to native layer
+                if (latestNativeTranscript && transcriptEl) {
+                    transcriptEl.textContent = latestNativeTranscript;
+                    onTranscript(latestNativeTranscript);
+                } else if (transcriptEl) {
+                    transcriptEl.textContent = "Transcription failed. Please try again.";
+                }
             } finally {
                 setTimeout(cleanup, 1000);
             }

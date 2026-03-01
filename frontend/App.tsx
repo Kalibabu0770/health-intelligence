@@ -46,7 +46,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     checkAIStatus().then(setAIStatus);
-    if (profile?.id) {
+    if (profile) {
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
@@ -60,6 +60,9 @@ const App: React.FC = () => {
     const checkInterval = setInterval(() => {
       const now = new Date();
       const currentHHmm = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+      // Safety check for profile.age before use
+      const longevityAge = parseInt(profile?.age?.toString() || '30', 10) || 30; // Sanitize and fallback
 
       context.medications.forEach(med => {
         if (med.times.includes(currentHHmm)) {
@@ -83,8 +86,7 @@ const App: React.FC = () => {
     }
 
     return () => clearInterval(checkInterval);
-  }, [isAuthenticated, context.medications]);
-
+  }, [isAuthenticated, context.medications, profile?.age]); // Added profile.age to dependencies
 
   const handleRefresh = async () => {
     setIsOrchestrating(true);
@@ -121,7 +123,30 @@ const App: React.FC = () => {
   }
 
   if (profile?.role === 'doctor') {
-    return <DoctorDashboard onLogout={handleLogout} />;
+    return (
+      <>
+        <DoctorDashboard onLogout={handleLogout} />
+        {showAssistant && (
+          <PersonalAssistant
+            onClose={() => setShowAssistant(false)}
+            analysis={analysis}
+          />
+        )}
+        {!showAssistant && (
+          <div className="fixed bottom-8 right-8 z-[100] animate-in fade-in zoom-in duration-500">
+            <button
+              onClick={() => setShowAssistant(true)}
+              className="w-16 h-16 bg-emerald-600 text-white rounded-full shadow-[0_20px_50px_rgba(5,150,105,0.3)] hover:shadow-[0_25px_60px_rgba(5,150,105,0.4)] flex items-center justify-center transition-all hover:scale-110 active:scale-90 group relative"
+            >
+              <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500" />
+              <Bot size={28} className="relative z-10" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 border-2 border-white rounded-full animate-pulse" />
+            </button>
+          </div>
+        )}
+        <GlobalDictate />
+      </>
+    );
   }
 
   const renderScreen = () => {

@@ -157,7 +157,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
 
         {/* Actual Screen Render */}
         <div className="flex-1 overflow-hidden relative w-full h-full p-2">
-          <div className="w-full h-full bg-slate-50 rounded-xl overflow-hidden shadow-inner border border-slate-100">
+          <div className="w-full h-full bg-slate-50 rounded-xl overflow-y-auto shadow-inner border border-slate-100 custom-scrollbar">
             {children}
           </div>
         </div>

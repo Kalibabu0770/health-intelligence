@@ -80,16 +80,17 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const savedDocs = localStorage.getItem('hi_docs');
             const savedLang = localStorage.getItem('hi_lang');
 
-            const profile = savedProfile ? JSON.parse(savedProfile) : null;
-            const medications = savedMeds ? JSON.parse(savedMeds) : [];
-            const symptoms = savedSymptoms ? JSON.parse(savedSymptoms) : [];
-            const nutritionLogs = savedFoods ? JSON.parse(savedFoods) : [];
-            const activityLogs = savedWorkouts ? JSON.parse(savedWorkouts) : [];
-            const meditationLogs = savedMeditations ? JSON.parse(savedMeditations) : [];
-            const dailyCheckIns = savedCheckIns ? JSON.parse(savedCheckIns) : [];
-            const clinicalVault = savedDocs ? JSON.parse(savedDocs) : [];
+            const profile = (savedProfile && savedProfile !== 'null') ? JSON.parse(savedProfile) : null;
+            const medications = (savedMeds && savedMeds !== 'null') ? JSON.parse(savedMeds) : [];
+            const symptoms = (savedSymptoms && savedSymptoms !== 'null') ? JSON.parse(savedSymptoms) : [];
+            const nutritionLogs = (savedFoods && savedFoods !== 'null') ? JSON.parse(savedFoods) : [];
+            const activityLogs = (savedWorkouts && savedWorkouts !== 'null') ? JSON.parse(savedWorkouts) : [];
+            const meditationLogs = (savedMeditations && savedMeditations !== 'null') ? JSON.parse(savedMeditations) : [];
+            const dailyCheckIns = (savedCheckIns && savedCheckIns !== 'null') ? JSON.parse(savedCheckIns) : [];
+            const clinicalVault = (savedDocs && savedDocs !== 'null') ? JSON.parse(savedDocs) : [];
             const language = (savedLang as Language) || 'en';
             const theme = 'light';
+            const t = translations[language] || translations['en'] || {};
 
             // Calculate initial risk
             const riskAnalysis = calculateComprehensiveRisk(profile, medications, symptoms, nutritionLogs, activityLogs);
@@ -154,8 +155,10 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const risk = calculateComprehensiveRisk(p, prev.medications, prev.symptoms, prev.nutritionLogs, prev.activityLogs);
 
             if (p) {
+                localStorage.setItem('hi_profile', JSON.stringify(p));
                 // Sync multiple accounts for the login screen
-                const currentAccounts = JSON.parse(localStorage.getItem('hi_accounts') || '[]');
+                const saved = localStorage.getItem('hi_accounts');
+                const currentAccounts = (saved && saved !== 'null') ? JSON.parse(saved) : [];
                 const existingIdx = currentAccounts.findIndex((a: any) => a.name === p.name);
                 if (existingIdx >= 0) {
                     currentAccounts[existingIdx] = p;
@@ -163,6 +166,8 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     currentAccounts.push(p);
                 }
                 localStorage.setItem('hi_accounts', JSON.stringify(currentAccounts));
+            } else {
+                localStorage.removeItem('hi_profile');
             }
 
             return {

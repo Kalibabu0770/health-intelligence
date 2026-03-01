@@ -22,16 +22,19 @@ const Dashboard: React.FC<{
     const { nutritionLogs, activityLogs, profile, riskScores, medications, meditationLogs, t, language } = usePatientContext();
 
     const today = new Date().toDateString();
-    const todayFood = (nutritionLogs || []).filter((l: any) => new Date(l.timestamp).toDateString() === today);
-    const todayWorkout = (activityLogs || []).filter((l: any) => new Date(l.timestamp || l.date).toDateString() === today);
-    const todayMed = (meditationLogs || []).filter((l: any) => new Date(l.timestamp).toDateString() === today);
+    const todayFood = (nutritionLogs || []).filter((l: any) => l.timestamp && new Date(l.timestamp).toDateString() === today);
+    const todayWorkout = (activityLogs || []).filter((l: any) => (l.timestamp || l.date) && new Date(l.timestamp || l.date).toDateString() === today);
+    const recentWorkouts = (activityLogs || []).filter(w => w && w.timestamp && (Date.now() - new Date(w.timestamp).getTime()) < 7 * 24 * 60 * 60 * 1000); // Last 7 days
+    const activeMinutes = recentWorkouts.reduce((sum, w) => sum + (w.durationMinutes || 0), 0);
+    const todayMed = (meditationLogs || []).filter((l: any) => l.timestamp && new Date(l.timestamp).toDateString() === today);
 
     const activities = [
         ...todayFood.map(l => ({ type: 'food', time: l.timestamp, title: l.name || t.nutrition_logged || 'Intake', detail: `${l.calories} kcal`, icon: Apple, color: 'emerald' })),
-        ...todayWorkout.map(l => ({ type: 'workout', time: l.timestamp || l.date, title: l.type || t.activity_node || 'Activity', detail: `${l.duration || l.minutes} mins`, icon: Dumbbell, color: 'blue' })),
-        ...todayMed.map(l => ({ type: 'meditation', time: l.timestamp, title: t.neural_sync || 'Sync', detail: `${l.duration} mins`, icon: Zap, color: 'indigo' }))
+        ...todayWorkout.map(l => ({ type: 'workout', time: l.timestamp || l.date, title: l.type || t.activity_node || 'Activity', detail: `${l.durationMinutes || 0} mins`, icon: Dumbbell, color: 'blue' })),
+        ...todayMed.map(l => ({ type: 'meditation', time: l.timestamp, title: t.neural_sync || 'Sync', detail: `${l.durationMinutes || 0} mins`, icon: Zap, color: 'indigo' }))
     ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
+    const safeMedications = medications || [];
     const healthScoreVal = riskScores?.healthScore || 85;
     const totalCal = todayFood.reduce((s, l) => s + (l.calories || 0), 0);
 
@@ -111,7 +114,7 @@ const Dashboard: React.FC<{
                         <div onClick={onOpenMeds} className="bg-white border-2 border-emerald-200 rounded-xl p-5 flex flex-col justify-between aspect-square group cursor-pointer hover:border-emerald-500 transition-all">
                             <Pill size={28} className="text-emerald-500 transition-transform group-hover:scale-110" />
                             <div className="mt-2">
-                                <p className="text-2xl font-black text-slate-900 leading-none">{medications.length}<span className="text-[10px] ml-1.5 text-slate-400">MEDS</span></p>
+                                <p className="text-2xl font-black text-slate-900 leading-none">{safeMedications.length}<span className="text-[10px] ml-1.5 text-slate-400">MEDS</span></p>
                                 <p className="text-xs font-bold text-slate-500 mt-2">Your Medicines</p>
                             </div>
                         </div>

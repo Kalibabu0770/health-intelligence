@@ -73,178 +73,185 @@ const ReportsScreen: React.FC<{ analysis?: any, isAnalyzing?: boolean, onRefresh
                 <div>
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 bg-blue-600 rounded-xl text-slate-900 shadow-lg"><Database size={20} /></div>
-                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">Integrated Clinical Vault</p>
+                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em]">Medical Records</p>
                     </div>
-                    <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Health Record Synthesis</h1>
+                    <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight">{currentTab === 'vault' ? 'Health Data Records' : 'Comprehensive Health Summary'}</h1>
                 </div>
 
                 {/* MODE SWITCHER */}
-                <div className="flex bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+                <div className="flex bg-slate-50 p-1 rounded-lg border border-slate-100">
                     <button
                         onClick={() => setCurrentTab('vault')}
-                        className={`flex items-center gap-3 px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500 relative ${currentTab === 'vault'
-                            ? `bg-white shadow-xl shadow-slate-200 text-slate-900`
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all duration-500 relative ${currentTab === 'vault'
+                            ? `bg-white shadow-md shadow-slate-200 text-slate-900`
                             : 'text-slate-400 hover:text-slate-600'
                             }`}
                     >
-                        <Database size={15} className={`${currentTab === 'vault' ? 'text-emerald-600' : ''}`} />
+                        <Database size={13} className={`${currentTab === 'vault' ? 'text-emerald-600' : ''}`} />
                         <span>Data Vault</span>
-                        {currentTab === 'vault' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
+                        {currentTab === 'vault' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-500 animate-pulse" />}
                     </button>
                     <button
                         onClick={() => setCurrentTab('analysis')}
-                        className={`flex items-center gap-3 px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500 relative ${currentTab === 'analysis'
-                            ? `bg-white shadow-xl shadow-slate-200 text-slate-900`
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all duration-500 relative ${currentTab === 'analysis'
+                            ? `bg-white shadow-md shadow-slate-200 text-slate-900`
                             : 'text-slate-400 hover:text-slate-600'
                             }`}
                     >
-                        <Sparkles size={15} className={`${currentTab === 'analysis' ? 'text-emerald-600' : ''}`} />
+                        <Sparkles size={13} className={`${currentTab === 'analysis' ? 'text-emerald-600' : ''}`} />
                         <span>AI Analysis</span>
-                        {currentTab === 'analysis' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-100 animate-pulse" />}
+                        {currentTab === 'analysis' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-100 animate-pulse" />}
                     </button>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*,application/pdf" onChange={handleReportUpload} />
-                    <button onClick={() => fileInputRef.current?.click()} className="bg-emerald-100 border-2 border-emerald-500 text-slate-900 px-8 py-4 rounded-xl shadow-xl active:scale-95 text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
-                        {localIsAnalyzing ? <Loader2 className="animate-spin" size={16} /> : <FilePlus size={16} />} Ingest Node
+                    <button onClick={() => fileInputRef.current?.click()} className="bg-emerald-100 border border-emerald-500 text-slate-900 px-5 py-2.5 rounded-lg shadow-sm active:scale-95 text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
+                        {localIsAnalyzing ? <Loader2 className="animate-spin" size={14} /> : <FilePlus size={14} />} Upload Document
                     </button>
-                    <button onClick={handleRefresh} className="bg-white text-slate-900 border border-slate-200 px-6 py-4 rounded-xl shadow-lg active:scale-95 text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
-                        {isGlobalAnalyzing ? <Loader2 className="animate-spin" size={16} /> : <RefreshCcw size={16} />} Sync
+                    <button onClick={handleRefresh} className="bg-white text-slate-900 border border-slate-200 px-5 py-2.5 rounded-lg shadow-sm active:scale-95 text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
+                        {isGlobalAnalyzing ? <Loader2 className="animate-spin" size={14} /> : <RefreshCcw size={14} />} Refresh Analysis
                     </button>
                 </div>
             </div>
 
             <div className="flex-1 min-h-0">
                 {currentTab === 'vault' ? (
-                    <div className="h-full w-full grid grid-cols-12 gap-8 animate-in fade-in slide-in-from-left duration-500">
-                        {/* ═══ DATA VAULT (GENERAL) ═══ */}
-                        <div className="col-span-12 lg:col-span-5 flex flex-col gap-8 min-h-0">
-                            <div className="bg-slate-50 rounded-xl p-8 border border-slate-100 flex items-center justify-between">
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Database Density</p>
-                                    <p className="text-3xl font-black text-slate-900">{clinicalVault.length}<span className="text-sm opacity-30 ml-2">Active Indices</span></p>
+                    <div className="h-full w-full flex flex-col gap-6 animate-in fade-in slide-in-from-left duration-500">
+                        {/* ═══ DATA MANAGEMENT BANNER ═══ */}
+                        <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6 flex flex-col md:flex-row items-start md:items-center justify-between shadow-sm gap-6">
+                            <div className="flex items-center gap-6">
+                                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center shadow-inner shrink-0">
+                                    <Database size={24} />
                                 </div>
-                                <div className="flex gap-2">
-                                    <div className="w-1.5 h-10 bg-blue-500 rounded-full" />
-                                    <div className="w-1.5 h-10 bg-blue-500/50 rounded-full" />
-                                    <div className="w-1.5 h-10 bg-blue-500/20 rounded-full" />
-                                </div>
-                            </div>
-
-                            <div className="flex-1 bg-white rounded-xl border border-slate-100 shadow-xl overflow-hidden flex flex-col pt-8">
-                                <div className="px-8 mb-6 flex justify-between items-center">
-                                    <h3 className="text-xs font-black uppercase tracking-widest">Ingested Molecular Data</h3>
-                                    <button className="text-blue-500"><Search size={16} /></button>
-                                </div>
-
-                                <div className="flex-1 overflow-y-auto custom-scrollbar px-8 pb-8 space-y-4">
-                                    {clinicalVault.length > 0 ? clinicalVault.map(doc => (
-                                        <div key={doc.id} className="group relative bg-slate-50 p-6 rounded-xl border border-slate-100 hover:border-blue-500/30 transition-all flex items-center justify-between">
-                                            <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-lg border-2 border-slate-100 text-blue-500 group-hover:scale-110 transition-transform">
-                                                    <FileText size={24} />
-                                                </div>
-                                                <div>
-                                                    <h4 className="text-sm font-black uppercase text-slate-900 leading-none mb-1.5 truncate max-w-[200px]">{doc.name}</h4>
-                                                    <div className="flex gap-2 items-center">
-                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{new Date(doc.date).toLocaleDateString()}</span>
-                                                        <div className="w-1 h-1 rounded-full bg-slate-300" />
-                                                        <span className="text-[10px] font-black text-blue-500/70 uppercase tracking-widest">{doc.size}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <button onClick={() => removeDocument(doc.id)} className="opacity-0 group-hover:opacity-100 p-3 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
-                                                    <Trash2 size={18} />
-                                                </button>
-                                                <button className="opacity-0 group-hover:opacity-100 p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
-                                                    <Download size={18} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )) : (
-                                        <div className="h-full flex flex-col items-center justify-center opacity-20">
-                                            <Fingerprint size={60} strokeWidth={1} />
-                                            <p className="mt-4 text-[10px] font-black uppercase tracking-[0.3em]">Vault Encrypted & Empty</p>
-                                        </div>
-                                    )}
+                                <div className="max-w-xl">
+                                    <p className="text-sm font-bold text-slate-600 leading-relaxed">
+                                        Upload new records to broaden your clinical health-stack perspective, or switch to AI Analysis to verify molecular bio-signatures based on the current data density.
+                                    </p>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="col-span-12 lg:col-span-7 bg-slate-50 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center p-10">
-                            <div className="max-w-md space-y-6">
-                                <div className="w-20 h-20 bg-white rounded-xl flex items-center justify-center text-blue-500 shadow-xl border border-slate-100 mx-auto">
-                                    <Database size={40} />
+                            <div className="flex flex-row md:flex-col items-center md:items-end gap-6 md:gap-3 w-full md:w-auto justify-between md:justify-end">
+                                <div className="text-left md:text-right">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Database Density</p>
+                                    <p className="text-2xl font-black text-slate-900 leading-none">{clinicalVault.length} <span className="text-xs font-bold text-slate-400 ml-1">Active</span></p>
                                 </div>
-                                <h2 className="text-xl font-black uppercase text-slate-900 italic">Data Management Console</h2>
-                                <p className="text-[11px] font-bold text-slate-500 uppercase leading-loose italic">
-                                    Select a document to verify its molecular bio-signature or upload new records to broaden your clinical health-stack perspective.
-                                </p>
                                 <button
                                     onClick={() => setCurrentTab('analysis')}
-                                    className="px-10 py-5 bg-blue-600 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-md shadow-blue-500/30 hover:bg-blue-700 transition-all whitespace-nowrap"
                                 >
                                     Switch to AI Analysis
                                 </button>
                             </div>
                         </div>
+
+                        {/* ═══ DOCUMENT LIST ═══ */}
+                        <div className="flex-1 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col min-h-0">
+                            <div className="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-3">
+                                    <FileText size={18} className="text-blue-500" />
+                                    Ingested Molecular Data
+                                </h3>
+                                <div className="relative">
+                                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <input type="text" placeholder="Search Vault..." className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none focus:border-blue-500 transition-colors w-64" />
+                                </div>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                                {clinicalVault.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {clinicalVault.map(doc => (
+                                            <div key={doc.id} className="group relative bg-slate-50 p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all flex flex-col">
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm border border-slate-100 text-blue-500 group-hover:scale-110 transition-transform">
+                                                        <FileText size={22} />
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button className="opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
+                                                            <Download size={16} />
+                                                        </button>
+                                                        <button onClick={() => removeDocument(doc.id)} className="opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all">
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-auto">
+                                                    <h4 className="text-sm font-black uppercase text-slate-900 leading-tight mb-2 line-clamp-2">{doc.name}</h4>
+                                                    <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-200/60">
+                                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{new Date(doc.date).toLocaleDateString()}</span>
+                                                        <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest px-2 py-1 bg-blue-100 rounded-md">{doc.size}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="h-full flex flex-col items-center justify-center opacity-40">
+                                        <Fingerprint size={64} strokeWidth={1} className="mb-6 text-slate-400" />
+                                        <p className="text-xs font-black uppercase tracking-[0.3em] text-slate-500">Vault Encrypted & Empty</p>
+                                        <p className="text-[10px] font-bold text-slate-400 mt-2">Upload clinical records to populate the registry.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 ) : (
-                    <div className="h-full w-full grid grid-cols-12 gap-8 animate-in fade-in slide-in-from-right duration-500">
+                    <div className="h-full w-full flex flex-col gap-8 animate-in fade-in slide-in-from-right duration-500">
                         {/* ═══ AI ANALYSIS (ANALYSIS) ═══ */}
-                        <div className="col-span-12 lg:col-span-12 flex flex-col gap-8 min-h-0 pb-10 overflow-y-auto custom-scrollbar">
-                            <div className="bg-white border border-slate-100 p-10 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.04)] relative overflow-hidden shrink-0 group">
-                                <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform duration-1000"><Sparkles size={150} /></div>
+                        <div className="col-span-12 flex flex-col gap-8 min-h-0 pb-10 overflow-y-auto custom-scrollbar">
+                            <div className="bg-white border border-slate-100 p-10 rounded-2xl shadow-sm relative overflow-hidden shrink-0 group">
+                                <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:scale-110 transition-transform duration-1000"><Sparkles size={150} /></div>
                                 <div className="flex justify-between items-start relative z-10">
-                                    <div className="space-y-4">
+                                    <div className="space-y-2">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_#3b82f6]" />
-                                            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-emerald-600 leading-none">Autonomous Biometric Synthesis</h2>
+                                            <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" />
+                                            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-blue-600 leading-none">AI Record Analysis Active</h2>
                                         </div>
-                                        <h3 className="text-3xl font-black uppercase tracking-tight leading-tight max-w-md text-slate-900 italic">Health-Stack Reasoning Core</h3>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Cross-Ref Confidence</p>
-                                        <p className="text-2xl font-black text-emerald-600">99.2%</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">AI Confidence</p>
+                                        <p className="text-2xl font-black text-blue-600">99.2%</p>
                                     </div>
                                 </div>
-                                <div className="bg-slate-50 border border-slate-100 p-8 rounded-xl relative z-10 min-h-[120px] flex items-center italic mt-6">
-                                    <p className="text-sm font-bold leading-relaxed text-slate-600 uppercase italic font-sans">
-                                        {isGlobalAnalyzing ? "Identifying molecular markers and correlating with historical baseline..." :
-                                            (activeAnalysis?.summary || "Biometric vault synced. AI is correlating thyroid baseline (doc_02) with hepatic metabolic trends (doc_05). No critical deviations detected in current node set.")}
+                                <div className="bg-slate-50 border border-slate-100 p-6 rounded-xl relative z-10 min-h-[100px] flex items-center mt-6">
+                                    <p className="text-sm font-bold leading-relaxed text-slate-600">
+                                        {isGlobalAnalyzing ? "Analyzing medical records and correlating with your baseline health profile..." :
+                                            (activeAnalysis?.summary || "Your medical records have been synced. The AI is correlating your test results to identify any underlying health trends. Upload more documents for a deeper analysis.")}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-12 gap-8 min-h-0">
-                                <div className="col-span-12 lg:col-span-6 bg-white border border-slate-100 rounded-xl p-10 shadow-xl flex flex-col min-h-0">
-                                    <h3 className="text-xs font-black uppercase tracking-widest mb-8 flex items-center gap-3"><Activity size={16} className="text-blue-500" /> Clinical Reasoning</h3>
-                                    <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 min-h-0">
+                                <div className="bg-white border border-slate-100 rounded-2xl p-8 shadow-sm flex flex-col min-h-0">
+                                    <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-3"><Activity size={16} className="text-emerald-500" /> Key Medical Observations</h3>
+                                    <div className="space-y-4 overflow-y-auto">
                                         {activeAnalysis?.clinicalInsights?.length > 0 ? activeAnalysis.clinicalInsights.map((insight: string, i: number) => (
-                                            <div key={i} className="p-5 rounded-xl bg-slate-50 border border-slate-100">
-                                                <p className="text-[11px] font-bold text-slate-600 uppercase leading-relaxed italic">"{insight}"</p>
+                                            <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                                                <p className="text-xs font-bold text-slate-700 leading-relaxed">"{insight}"</p>
                                             </div>
                                         )) : (
-                                            <div className="h-40 flex flex-col items-center justify-center opacity-30 italic p-10 text-center">
-                                                <Info size={30} className="mb-2" />
-                                                <p className="text-[9px] font-black uppercase">No specific insight nodes detected</p>
+                                            <div className="flex flex-col items-center justify-center opacity-40 p-10 text-center">
+                                                <Info size={32} className="mb-4 text-slate-400" />
+                                                <p className="text-[10px] font-black uppercase tracking-widest">No Key Observations Found</p>
                                             </div>
                                         )}
                                     </div>
                                 </div>
 
-                                <div className="col-span-12 lg:col-span-6 bg-white border border-slate-100 rounded-xl p-10 shadow-xl flex flex-col min-h-0 overflow-hidden relative">
-                                    <div className="absolute inset-0 bg-blue-500/5 pointer-events-none" />
-                                    <h3 className="text-xs font-black uppercase tracking-widest mb-8 flex items-center gap-3"><ShieldCheck size={16} className="text-emerald-500" /> Recommended Protocols</h3>
-                                    <div className="space-y-4">
-                                        {activeAnalysis?.actionableSteps?.map((step: string, i: number) => (
-                                            <div key={i} className="flex gap-4 items-center bg-white p-5 rounded-xl border border-slate-100 shadow-sm hover:scale-[1.02] transition-all">
-                                                <div className="w-8 h-8 rounded-full bg-blue-600 text-slate-900 flex items-center justify-center text-[10px] font-black shrink-0">{i + 1}</div>
-                                                <p className="text-[10px] font-black text-slate-900 uppercase leading-snug">{step}</p>
+                                <div className="bg-white border border-slate-100 rounded-2xl p-8 shadow-sm flex flex-col min-h-0 relative">
+                                    <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-3"><ShieldCheck size={16} className="text-blue-500" /> Recommended Action Plan</h3>
+                                    <div className="space-y-4 overflow-y-auto">
+                                        {activeAnalysis?.actionableSteps?.length > 0 ? activeAnalysis.actionableSteps.map((step: string, i: number) => (
+                                            <div key={i} className="flex gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0">{i + 1}</div>
+                                                <p className="text-xs font-bold text-slate-700 leading-snug">{step}</p>
                                             </div>
-                                        ))}
+                                        )) : (
+                                            <div className="flex flex-col items-center justify-center opacity-40 p-10 text-center">
+                                                <CheckCircle2 size={32} className="mb-4 text-slate-400" />
+                                                <p className="text-[10px] font-black uppercase tracking-widest">No Actions Required</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

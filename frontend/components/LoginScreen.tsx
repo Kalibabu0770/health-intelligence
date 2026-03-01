@@ -3,15 +3,17 @@ import { ShieldCheck, ChevronRight, Lock, User, MapPin, Search, Loader2, Fingerp
 import { usePatientContext } from '../core/patientContext/patientStore';
 import { startListening } from '../services/speech';
 import { INITIAL_PROFILE } from './Onboarding';
+import { languages } from '../core/patientContext/translations';
 
 const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = ({ onLogin, onRegister }) => {
-    const { t, language, updateProfile } = usePatientContext();
+    const { t, language, setLanguage, updateProfile } = usePatientContext();
     const [accounts, setAccounts] = useState<any[]>([]);
     const [selectedAccount, setSelectedAccount] = useState<any | null>(null);
     const [pin, setPin] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [loginError, setLoginError] = useState('');
+    const [showLangMenu, setShowLangMenu] = useState(false);
 
     // Auth Mode: 'register' | 'questions' | 'select' | 'reset' | 'portal'
     const [mode, setMode] = useState<'register' | 'questions' | 'select' | 'reset' | 'portal'>('portal');
@@ -81,12 +83,8 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
             const parsed = JSON.parse(saved);
             const accountList = parsed || [];
             setAccounts(accountList);
-            // Default to 'select' if accounts exist, else 'register'
-            if (accountList.length > 0) setMode('select');
-            else setMode('register');
-        } else {
-            setMode('register');
         }
+        setMode('portal');
     }, []);
 
     const handlePinSubmit = () => {
@@ -108,9 +106,14 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
     const nextProtocol = () => {
         if (regStep === 1) {
-            if (!regData.name || !regData.dob || !regData.location || !regData.nickname) return alert("All bio-metrics and nicknames are required for link initialization.");
-            setMode('questions');
-            setRegStep(2);
+            if (selectedPortalRole === 'doctor') {
+                if (!regData.name) return alert("FullName is required for Doctor Registry.");
+                setRegStep(5); // Skip health-related questions for Doctors
+            } else {
+                if (!regData.name || !regData.dob || !regData.location || !regData.nickname) return alert("All bio-metrics and nicknames are required for link initialization.");
+                setMode('questions');
+                setRegStep(2);
+            }
         } else if (regStep < 5) {
             setRegStep(prev => prev + 1);
         } else {
@@ -120,17 +123,20 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
     };
 
     const finalizeGuardianLink = () => {
-        if (!/^\d{6}$/.test(regData.location)) {
+        if (selectedPortalRole !== 'doctor' && !/^\d{6}$/.test(regData.location)) {
             return alert("Regional Pincode must be exactly 6 digits.");
         }
 
         setIsVerifying(true);
+        const role = regData.role || selectedPortalRole || 'citizen';
         const finalProfile = {
             ...regData,
             weight: parseInt(regData.weight) || 0,
             id: 'node-' + Math.random().toString(36).substr(2, 9),
-            patientId: `LS-${regData.name?.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
-            role: regData.role || 'citizen'
+            patientId: role === 'doctor'
+                ? `LS-DOC-${regData.name?.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
+                : `LS-${regData.name?.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+            role: role
         };
 
         const existing = JSON.parse(localStorage.getItem('hi_accounts') || '[]');
@@ -185,7 +191,25 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
     };
 
     const Header = () => (
-        <div className="flex flex-col items-center mb-8 shrink-0">
+        <div className="relative w-full flex flex-col items-center mb-8 shrink-0">
+            <div className="absolute top-0 right-0 z-50">
+                <button onClick={() => setShowLangMenu(!showLangMenu)} className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-[10px] uppercase font-black tracking-widest hover:bg-slate-100">
+                    <Globe size={14} /> {language.toUpperCase()}
+                </button>
+                {showLangMenu && (
+                    <>
+                        <div className="fixed inset-0 z-40" onClick={() => setShowLangMenu(false)} />
+                        <div className="absolute top-10 right-0 w-48 bg-white shadow-2xl rounded-xl z-50 border border-slate-100 flex flex-col overflow-hidden">
+                            {languages.map(l => (
+                                <button key={l.code} onClick={() => { setLanguage(l.code as any); setShowLangMenu(false); }} className={`px-4 py-3 text-[10px] font-black uppercase tracking-widest text-left hover:bg-slate-50 transition-colors flex justify-between items-center ${language === l.code ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'}`}>
+                                    <span>{l.flag} {l.name}</span>
+                                    {language === l.code && <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />}
+                                </button>
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
             <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-slate-900 shadow-lg mb-4">
                 <ShieldCheck size={28} />
             </div>
@@ -224,40 +248,43 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{t.node_telemetry_registry || 'Health Intelligence Protocol Portal'}</p>
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-4">
+                                    <div className="grid grid-cols-2 gap-4">
                                         <button
-                                            onClick={() => { setSelectedPortalRole('citizen'); setMode('select'); }}
-                                            className="group relative bg-white border-2 border-slate-100 p-6 rounded-xl flex items-center gap-5 hover:border-emerald-500 hover:shadow-2xl transition-all duration-500"
+                                            onClick={() => setSelectedPortalRole('citizen')}
+                                            className={`p-6 rounded-xl flex flex-col items-center gap-3 transition-all duration-300 border-2 ${selectedPortalRole === 'citizen' ? 'border-emerald-500 bg-emerald-50 shadow-xl' : 'border-slate-100 bg-white hover:border-emerald-300'}`}
                                         >
-                                            <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-100 group-hover:text-slate-900 transition-all duration-500">
+                                            <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${selectedPortalRole === 'citizen' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
                                                 <User size={28} />
                                             </div>
-                                            <div className="text-left">
-                                                <h3 className="text-md font-black text-slate-900 uppercase tracking-tight leading-none">Citizen Guardian</h3>
-                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2 italic shadow-sm">AI Health Triage • AYUSH Wisdom</p>
-                                            </div>
-                                            <div className="absolute right-6 text-slate-100 group-hover:text-emerald-700 transition-colors">
-                                                <Fingerprint size={32} strokeWidth={1} />
-                                            </div>
+                                            <h3 className="text-md font-black text-slate-900 uppercase tracking-tight leading-none text-center">Citizen<br />Guardian</h3>
                                         </button>
 
                                         <button
-                                            onClick={() => { setSelectedPortalRole('doctor'); setMode('select'); }}
-                                            className="group relative bg-white border-2 border-slate-100 p-6 rounded-xl flex items-center gap-5 hover:border-emerald-500 hover:shadow-2xl transition-all duration-500"
+                                            onClick={() => setSelectedPortalRole('doctor')}
+                                            className={`p-6 rounded-xl flex flex-col items-center gap-3 transition-all duration-300 border-2 ${selectedPortalRole === 'doctor' ? 'border-emerald-500 bg-emerald-50 shadow-xl' : 'border-slate-100 bg-white hover:border-emerald-300'}`}
                                         >
-                                            <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 group-hover:scale-110 group-hover:bg-emerald-100 border-2 border-emerald-500 group-hover:text-slate-900 transition-all duration-500">
+                                            <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${selectedPortalRole === 'doctor' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
                                                 <Activity size={28} />
                                             </div>
-                                            <div className="text-left">
-                                                <h3 className="text-md font-black text-slate-900 uppercase tracking-tight leading-none">Medical Doctor</h3>
-                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2 italic shadow-sm">Clinical Synapse • ID Intelligence</p>
-                                            </div>
-                                            <div className="absolute right-6 text-slate-100 group-hover:text-emerald-700 transition-colors">
-                                                <Brain size={32} strokeWidth={1} />
-                                            </div>
+                                            <h3 className="text-md font-black text-slate-900 uppercase tracking-tight leading-none text-center">Medical<br />Doctor</h3>
                                         </button>
+                                    </div>
 
-
+                                    <div className={`transition-all duration-500 overflow-hidden ${selectedPortalRole ? 'h-32 opacity-100 mt-8' : 'h-0 opacity-0 mt-0'}`}>
+                                        <div className="flex flex-col gap-3">
+                                            <button
+                                                onClick={() => setMode('select')}
+                                                className="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-slate-800 transition-colors shadow-lg"
+                                            >
+                                                Login
+                                            </button>
+                                            <button
+                                                onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }}
+                                                className="w-full bg-emerald-100 text-emerald-900 py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-emerald-200 transition-colors shadow-lg border-2 border-emerald-500"
+                                            >
+                                                Sign Up
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -307,23 +334,25 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                         onClick={() => { setSelectedAccount(null); setPin(''); setLoginError(''); }}
                                                         className="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-emerald-500 transition-colors"
                                                     >
-                                                        Not {selectedAccount.name.split(' ')[0]}? Switch Identity
+                                                        Not {selectedAccount?.name?.split(' ')[0] || 'Selected User'}? Switch Identity
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
-                                            <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center justify-between mb-4">
                                                 <div className="flex flex-col">
                                                     <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">{selectedPortalRole === 'doctor' ? 'Clinical Doctors' : 'Authorized Citizens'}</h3>
-                                                    <button onClick={() => { setMode('portal'); setSelectedPortalRole(null); }} className="text-[8px] font-black text-emerald-500 uppercase tracking-widest mt-1 hover:underline flex items-center gap-1">
-                                                        <ArrowLeft size={8} /> Switch Gateway
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <button onClick={() => { setMode('portal'); setSelectedPortalRole(null); }} className="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1 shadow-sm border border-slate-200">
+                                                        <ArrowLeft size={12} /> Back
+                                                    </button>
+                                                    <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1 shadow-sm border border-emerald-100">
+                                                        <Plus size={12} /> New
                                                     </button>
                                                 </div>
-                                                <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline flex items-center gap-1">
-                                                    <Plus size={12} /> New {selectedPortalRole === 'doctor' ? 'Doctor Node' : 'Link'}
-                                                </button>
                                             </div>
                                             {(() => {
                                                 const filtered = accounts.filter(acc => (acc.role === selectedPortalRole) || (!acc.role && selectedPortalRole === 'citizen'));
@@ -351,8 +380,8 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">No Authorized {selectedPortalRole === 'doctor' ? 'Clinical' : 'Citizen'} Nodes Detected</p>
                                                             <div className="flex flex-col gap-3 px-8">
                                                                 <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="bg-emerald-100 border-2 border-emerald-500 text-slate-900 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100">Initialize New {selectedPortalRole === 'doctor' ? 'Doctor Node' : 'Guardian Link'}</button>
-                                                                <button onClick={() => { setMode('portal'); setSelectedPortalRole(null); }} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-emerald-500 py-2 italic flex items-center justify-center gap-2">
-                                                                    <ArrowLeft size={10} /> Switch Gateway Protocol
+                                                                <button onClick={() => { setMode('portal'); setSelectedPortalRole(null); }} className="bg-slate-100 text-slate-600 hover:bg-slate-200 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm transition-colors border border-slate-200 flex items-center justify-center gap-2">
+                                                                    <ArrowLeft size={14} /> Go Back to Gateway
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -367,17 +396,28 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                             {/* Registration Flow */}
                             {(mode === 'register' || mode === 'questions') && (
                                 <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-400">
-                                    <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center justify-between mb-4">
                                         <div className="flex flex-col">
                                             <h3 className="text-xs font-black text-emerald-600 uppercase tracking-widest pl-1">
                                                 {selectedPortalRole === 'doctor' ? 'Doctor Personnel Registry' : 'Guardian Link Setup'}
                                             </h3>
-                                            <button onClick={() => setMode('select')} className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1 hover:underline flex items-center gap-1">
-                                                <ArrowLeft size={8} /> Return to Accounts
-                                            </button>
                                         </div>
-                                        <div className="bg-emerald-50 px-3 py-1 rounded-full text-[9px] font-black text-emerald-600 uppercase tracking-widest">
-                                            Step {regStep}/4
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={() => {
+                                                    if (regStep > 1) {
+                                                        setRegStep(prev => prev - 1);
+                                                    } else {
+                                                        setMode('portal');
+                                                    }
+                                                }}
+                                                className="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1 shadow-sm border border-slate-200"
+                                            >
+                                                <ArrowLeft size={12} /> Back
+                                            </button>
+                                            <div className="bg-emerald-50 px-3 py-1 rounded-full text-[9px] font-black text-emerald-600 uppercase tracking-widest shadow-sm border border-emerald-100">
+                                                Step {regStep}/4
+                                            </div>
                                         </div>
                                     </div>
 
@@ -441,12 +481,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                     <div className="absolute -top-2 left-4 px-2 bg-white text-[8px] font-black text-emerald-500 uppercase tracking-widest">Age</div>
                                                 </div>
                                             </div>
-                                            <div className="grid grid-cols-1 gap-4">
-                                                <div className="relative">
-                                                    <input type="number" placeholder="Weight (Kg)" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-emerald-500 outline-none" value={regData.weight} onChange={e => setRegData({ ...regData, weight: e.target.value })} />
-                                                    <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase italic">Body Mass Node</div>
-                                                </div>
-                                            </div>
+
                                             <div className="relative group">
                                                 <input
                                                     type="text"
@@ -469,18 +504,28 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 />
                                                 <MapPin className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
                                             </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <select className="bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-emerald-500 outline-none" value={regData.gender} onChange={e => setRegData({ ...regData, gender: e.target.value as any })}>
-                                                    <option value="male">Male</option>
-                                                    <option value="female">Female</option>
-                                                </select>
-                                                <button
-                                                    onClick={() => setRegData({ ...regData, isTribal: !regData.isTribal })}
-                                                    className={`p-5 rounded-xl font-bold text-[10px] uppercase border-2 transition-all ${regData.isTribal ? 'bg-amber-500 text-slate-900 border-amber-500' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
-                                                >
-                                                    {regData.isTribal ? 'Tribal Node ✅' : 'Tribal Initial?'}
-                                                </button>
-                                            </div>
+                                            {selectedPortalRole !== 'doctor' && (
+                                                <>
+                                                    <div className="grid grid-cols-1 gap-4">
+                                                        <div className="relative">
+                                                            <input type="number" placeholder="Weight (Kg)" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-emerald-500 outline-none" value={regData.weight} onChange={e => setRegData({ ...regData, weight: e.target.value })} />
+                                                            <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase italic">Body Mass Node</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <select className="bg-slate-50 border-2 border-slate-100 p-5 rounded-xl font-bold text-sm focus:border-emerald-500 outline-none" value={regData.gender} onChange={e => setRegData({ ...regData, gender: e.target.value as any })}>
+                                                            <option value="male">Male</option>
+                                                            <option value="female">Female</option>
+                                                        </select>
+                                                        <button
+                                                            onClick={() => setRegData({ ...regData, isTribal: !regData.isTribal })}
+                                                            className={`p-5 rounded-xl font-bold text-[10px] uppercase border-2 transition-all ${regData.isTribal ? 'bg-amber-500 text-slate-900 border-amber-500' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
+                                                        >
+                                                            {regData.isTribal ? 'Tribal Node ✅' : 'Tribal Initial?'}
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     )}
 
