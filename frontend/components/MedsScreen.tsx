@@ -34,22 +34,6 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
         }
     };
 
-    // Dynamically calculate adherence rate based on the current meds registry
-    const baseAdherence = medications.length > 0 ? Math.min(98, 80 + (medications.length * 3)) : 0;
-    const missedDoses = medications.length > 0 ? Math.max(0, 4 - medications.length) : 0;
-    const consistencyStatus = baseAdherence > 90 ? 'OPTIMAL' : baseAdherence > 75 ? 'FAIR' : 'NEEDS IMPROVEMENT';
-
-    // Generate deterministic chart data depending on base score
-    const adherenceData = [
-        { day: 'Mon', rate: medications.length > 0 ? Math.min(100, baseAdherence + 5) : 0 },
-        { day: 'Tue', rate: medications.length > 0 ? baseAdherence : 0 },
-        { day: 'Wed', rate: medications.length > 0 ? Math.max(50, baseAdherence - 15) : 0 },
-        { day: 'Thu', rate: medications.length > 0 ? Math.min(100, baseAdherence + 8) : 0 },
-        { day: 'Fri', rate: medications.length > 0 ? baseAdherence - 5 : 0 },
-        { day: 'Sat', rate: medications.length > 0 ? baseAdherence : 0 },
-        { day: 'Sun', rate: medications.length > 0 ? Math.min(100, baseAdherence + 2) : 0 },
-    ];
-
     return (
         <div className="h-full w-full flex flex-col overflow-hidden bg-white font-sans animate-in fade-in duration-500">
 
@@ -78,10 +62,10 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
             </div>
 
             <div className="flex-1 p-6 overflow-y-auto custom-scrollbar min-h-0 bg-transparent relative z-10">
-                <div className="max-w-7xl mx-auto h-full w-full grid grid-cols-12 gap-6 animate-in fade-in zoom-in-95 duration-500 pb-6">
+                <div className="max-w-4xl mx-auto h-full w-full flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-500 pb-6">
 
                     {/* ═══ MEDICATION INVENTORY ═══ */}
-                    <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
+                    <div className="w-full flex flex-col gap-6 h-full">
                         <div className="flex-1 bg-white/60  rounded-xl border border-white/80 shadow-sm overflow-hidden flex flex-col pt-6">
                             <div className="px-8 mb-5 flex justify-between items-center">
                                 <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.active_protocol || 'Active Protocols'}</h3>
@@ -123,69 +107,6 @@ const MedsScreen: React.FC<{ initialTab?: 'registry' | 'safety', onBack?: () => 
                         </div>
                     </div>
 
-                    {/* ═══ ADHERENCE & STATUS ═══ */}
-                    <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
-                        {medications.length > 0 ? (
-                            <>
-                                <div className="bg-white/60 rounded-xl p-8 border border-white/80 shadow-sm flex flex-col justify-between transition-all">
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.weekly_adherence || 'Adherence Ratio'}</p>
-                                            <p className="text-3xl font-black text-slate-900 tabular-nums italic">{baseAdherence}%</p>
-                                        </div>
-                                        <div className="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600">
-                                            <Activity size={24} />
-                                        </div>
-                                    </div>
-                                    <div className="h-32 w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <AreaChart data={adherenceData}>
-                                                <defs>
-                                                    <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="#e11d48" stopOpacity={0.2} />
-                                                        <stop offset="95%" stopColor="#e11d48" stopOpacity={0} />
-                                                    </linearGradient>
-                                                </defs>
-                                                <Area type="monotone" dataKey="rate" stroke="#e11d48" fill="url(#colorRate)" strokeWidth={2.5} />
-                                            </AreaChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                    <div className="mt-6 pt-6 border-t border-slate-50 grid grid-cols-2 gap-4 text-center">
-                                        <div>
-                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">Consistency</p>
-                                            <p className="text-[11px] font-black text-emerald-600">{consistencyStatus}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">Missed</p>
-                                            <p className="text-[11px] font-black text-rose-600">{missedDoses} {missedDoses === 1 ? 'DOSE' : 'DOSES'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-emerald-100 border-2 border-emerald-500 text-slate-900 rounded-xl p-6 shadow-xl relative overflow-hidden group flex flex-col justify-between">
-                                    <div className="absolute -right-2 -bottom-2 opacity-5 scale-90">
-                                        <ShieldCheck size={100} />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-[8px] font-black uppercase text-emerald-400 tracking-[0.3em] mb-3 lowercase italic opacity-60">SENTINEL SYNC</h4>
-                                        <p className="text-[13px] font-bold leading-relaxed italic opacity-90">
-                                            "Intake windows are calibrated for maximum efficacy with your biological profile."
-                                        </p>
-                                    </div>
-                                    <div className="mt-5 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-100 animate-pulse" />
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Node Sync Active</span>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="bg-white/40 border border-slate-100 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center h-full opacity-60">
-                                <Activity size={32} className="text-slate-300 mb-4" />
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">{t.no_adherence_data || 'No Adherence Data'}</p>
-                                <p className="text-[9px] font-bold text-slate-400 max-w-[200px] leading-relaxed">Add molecular protocols to begin tracking weekly adherence and node synching.</p>
-                            </div>
-                        )}
-                    </div>
                 </div>
             </div>
 
