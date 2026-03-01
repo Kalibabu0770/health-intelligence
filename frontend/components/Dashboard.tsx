@@ -3,7 +3,7 @@ import {
     ShieldCheck, Activity, Heart, Zap, RefreshCcw,
     Apple, Dumbbell, Clock, Pill, CheckCircle2,
     Calendar, TrendingUp, Sparkles, Layout, Stethoscope, ChevronRight,
-    ArrowUpRight, Target, BrainCircuit, ActivitySquare
+    ArrowUpRight, Target, BrainCircuit, ActivitySquare, HelpCircle, X
 } from 'lucide-react';
 import { usePatientContext } from '../core/patientContext/patientStore';
 
@@ -20,6 +20,7 @@ const Dashboard: React.FC<{
     theme: 'light' | 'dark'
 }> = ({ unifiedData, isOrchestrating, onRefresh, onOpenCheckIn, onOpenMeds, onSetScreen, onOpenFoodLog }) => {
     const { nutritionLogs, activityLogs, profile, riskScores, medications, meditationLogs, t, language } = usePatientContext();
+    const [showUserGuide, setShowUserGuide] = React.useState(false);
 
     const today = new Date().toDateString();
     const todayFood = (nutritionLogs || []).filter((l: any) => l.timestamp && new Date(l.timestamp).toDateString() === today);
@@ -70,8 +71,55 @@ const Dashboard: React.FC<{
                     <button onClick={onRefresh} className="w-12 h-12 rounded-xl bg-white border-2 border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:bg-slate-50">
                         <RefreshCcw size={20} className={isOrchestrating ? 'animate-spin' : ''} strokeWidth={2.5} />
                     </button>
+                    <button onClick={() => setShowUserGuide(true)} className="w-12 h-12 rounded-xl bg-white border-2 border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200">
+                        <HelpCircle size={20} strokeWidth={2.5} />
+                    </button>
                 </div>
             </header>
+
+            {/* USER GUIDE MODAL */}
+            {showUserGuide && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-5 border-b border-emerald-100 flex justify-between items-center bg-emerald-50 shrink-0">
+                            <div className="flex items-center gap-3">
+                                <HelpCircle size={24} className="text-emerald-600" />
+                                <h2 className="text-sm font-black text-emerald-950 uppercase tracking-widest">User Guide</h2>
+                            </div>
+                            <button onClick={() => setShowUserGuide(false)} className="text-slate-400 hover:text-rose-500 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="p-6 overflow-y-auto space-y-6 text-sm font-medium text-slate-600">
+                            <p className="font-bold text-slate-800">Welcome to your Personal AI Health Guardian!</p>
+
+                            <div className="space-y-2">
+                                <h3 className="text-xs font-black uppercase text-emerald-600 flex items-center gap-2"><Stethoscope size={14} /> I Feel Sick (Check Symptoms)</h3>
+                                <p>Tap the big green button on the dashboard to chat or speak with the AI Guardian. It will evaluate your symptoms, consider your medical history, and give you immediate guidance and triage levels.</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <h3 className="text-xs font-black uppercase text-emerald-600 flex items-center gap-2"><Activity size={14} /> Vitals & Health Score</h3>
+                                <p>Your <strong>Molecular Readiness Score</strong> is an AI-calculated metric that tracks your overall well-being based on conditions, age, weight, and logs. Aim for 80% or higher!</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <h3 className="text-xs font-black uppercase text-emerald-600 flex items-center gap-2"><Pill size={14} /> Medications</h3>
+                                <p>Manage your prescriptions in the <em>MEDICATION</em> hub. The intelligent safety scanner checks for dangerous drug interactions automatically based on your condition profile.</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <h3 className="text-xs font-black uppercase text-emerald-600 flex items-center gap-2"><Sparkles size={14} /> AYUSH AI</h3>
+                                <p>Discover traditional Indian medicine alignments (like Ayurveda protocol) specific to your body type (Prakriti) and current season in the AYUSH AI hub.</p>
+                            </div>
+
+                            <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 mt-4">
+                                <p className="text-xs text-amber-900 leading-relaxed font-bold"><strong>Note:</strong> You can change the language anytime using the Language Selector in the menu or on the login page.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <main className="flex flex-col lg:grid grid-cols-12 gap-5 min-h-min pb-4">
 

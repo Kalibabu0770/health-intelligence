@@ -66,7 +66,7 @@ async def transcribe(audio: UploadFile = File(...), language: str = Form("en-IN"
     if not key:
         raise HTTPException(status_code=500, detail="Backend missing GROQ_API_KEY")
 
-    url = 'https://api.groq.com/openai/v1/audio/transcriptions'
+    url = 'https://api.groq.com/openai/v1/audio/translations'
     
     # Whisper expects 2-letter codes mostly, but some others work
     language_code = language.split('-')[0] if '-' in language else language
