@@ -187,7 +187,8 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 // Sync multiple accounts for the login screen
                 const saved = localStorage.getItem('hi_accounts');
                 const currentAccounts = (saved && saved !== 'null') ? JSON.parse(saved) : [];
-                const existingIdx = currentAccounts.findIndex((a: any) => a.name === p.name);
+                // Use ID primarily (or fallback to an exact name match if ID is unexpectedly missing on old accounts)
+                const existingIdx = currentAccounts.findIndex((a: any) => p.id && a.id ? a.id === p.id : a.name === p.name);
                 if (existingIdx >= 0) {
                     currentAccounts[existingIdx] = p;
                 } else {

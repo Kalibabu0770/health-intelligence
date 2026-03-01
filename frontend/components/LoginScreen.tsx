@@ -139,8 +139,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
             role: role
         };
 
-        const existing = JSON.parse(localStorage.getItem('hi_accounts') || '[]');
-        localStorage.setItem('hi_accounts', JSON.stringify([...existing, finalProfile]));
+        // Patient context will handle persisting the new account using its unique ID
 
         setTimeout(() => {
             updateProfile(finalProfile as any);
