@@ -1643,7 +1643,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 overflow-y-auto custom-scrollbar pr-2 pb-10">
 
                             {/* Protocol Card 1 */}
-                            <a href="https://main.mohfw.gov.in/sites/default/files/24%20Chapter%204444.pdf" target="_blank" rel="noopener noreferrer" className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-left block group">
+                            <a href="https://www.nhp.gov.in/standard-treatment-guidelines_pg" target="_blank" rel="noopener noreferrer" className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-left block group">
                                 <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-inner">
                                     <FileText size={28} />
                                 </div>
@@ -1653,7 +1653,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                             </a>
 
                             {/* Protocol Card 2 */}
-                            <a href="https://ayush.gov.in/docs/National-Clinical-Management-Protocol-based-on-Ayurveda-and-Yoga-for-management-of-Covid-19.pdf" target="_blank" rel="noopener noreferrer" className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-left block group">
+                            <a href="https://ayush.gov.in" target="_blank" rel="noopener noreferrer" className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-left block group">
                                 <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors shadow-inner">
                                     <Activity size={28} />
                                 </div>
@@ -1663,7 +1663,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                             </a>
 
                             {/* Protocol Card 3 */}
-                            <a href="https://ndma.gov.in/sites/default/files/PDF/Guidelines/medical.pdf" target="_blank" rel="noopener noreferrer" className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-left block group">
+                            <a href="https://ndma.gov.in/Resources/Guidelines" target="_blank" rel="noopener noreferrer" className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-left block group">
                                 <div className="w-14 h-14 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-rose-600 group-hover:text-white transition-colors shadow-inner">
                                     <AlertTriangle size={28} />
                                 </div>
@@ -1673,21 +1673,24 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                             </a>
 
                             {/* Protocol Card 4 */}
-                            <a href="https://nmc.org.in/information-desk/indian-medical-register/" target="_blank" rel="noopener noreferrer" className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-left block group">
+                            <a href="https://www.nmc.org.in/information-desk/indian-medical-register/" target="_blank" rel="noopener noreferrer" className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-left block group">
                                 <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-600 group-hover:text-white transition-colors shadow-inner">
                                     <Users size={28} />
                                 </div>
                                 <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">Specialist Network Directory</h3>
-                                <p className="text-xs font-bold text-slate-500 mb-6 line-clamp-3 leading-relaxed">Secure communication channel to consult with top-tier specialists, surgeons, and department heads across the state.</p>
+                                <p className="text-xs font-bold text-slate-500 mb-6 line-clamp-3 leading-relaxed">Secure communication channel to consult with top-tier specialists, surgeons, and department heads.</p>
                                 <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest group-hover:underline">Access Module →</span>
                             </a>
 
-                            {/* Feature Coming Soon */}
-                            <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center opacity-70">
-                                <Brain size={48} className="text-slate-400 mb-4" />
-                                <h3 className="text-sm font-black text-slate-600 uppercase tracking-widest mb-1">AI Diagnostic Assistant</h3>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase">Training underway. Expected Q3 2026.</p>
-                            </div>
+                            {/* Feature Coming Soon replaced with Ayush AIKosh Link */}
+                            <a href="https://aikosh.ayush.gov.in" target="_blank" rel="noopener noreferrer" className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 text-left block group">
+                                <div className="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors shadow-inner">
+                                    <Brain size={28} />
+                                </div>
+                                <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">AI Diagnostic Assistant (AIKosh)</h3>
+                                <p className="text-xs font-bold text-slate-500 mb-6 line-clamp-3 leading-relaxed">Centralized repository for AI/ML resources and standard clinical datasets provided by the Ministry of Ayush.</p>
+                                <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest group-hover:underline">Access Module →</span>
+                            </a>
                         </div>
                     </div>
                 )}
