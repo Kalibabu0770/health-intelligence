@@ -149,6 +149,34 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     }, [context, isInitialized]);
 
+    // Global Full-DOM Translation Sync (Industry Standard Auto-Translate)
+    useEffect(() => {
+        if (!context.language) return;
+        const applyGoogleTranslate = () => {
+            try {
+                const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+                if (!select) return;
+                let targetLang = context.language;
+                if (targetLang === 'zh') targetLang = 'zh-CN'; // Google translate uses zh-CN
+                // Only trigger if actually different to prevent infinite loops
+                if (select.value !== targetLang) {
+                    select.value = targetLang;
+                    select.dispatchEvent(new Event('change'));
+                }
+            } catch (e) {
+                console.warn("Translation dispatch error:", e);
+            }
+        };
+
+        // Try applying it immediately and setup staggered retries for slow networks
+        applyGoogleTranslate();
+        const t1 = setTimeout(applyGoogleTranslate, 500);
+        const t2 = setTimeout(applyGoogleTranslate, 1500);
+        const t3 = setTimeout(applyGoogleTranslate, 3000);
+
+        return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    }, [context.language]);
+
     // Actions
     const updateProfile = useCallback((p: UserProfile) => {
         setContext(prev => {
