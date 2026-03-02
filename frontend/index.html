@@ -240,55 +240,59 @@
 }
 </script>
     <script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          emerald: {
-            50: '#E6F4EC',
-            100: '#cce9d8',
-            200: '#99d2b2',
-            300: '#66bc8b',
-            400: '#33a565',
-            500: '#0E7C4A', // Deep Medical Green
-            600: '#0b633b',
-            700: '#084a2c',
-            800: '#06311d',
-            900: '#03190f',
-          },
-          slate: {
-            50: '#f8fafc',
-            100: '#f1f5f9',
-            200: '#e2e8f0',
-            300: '#cbd5e1',
-            400: '#94a3b8',
-            500: '#64748b',
-            800: '#1e293b',
-            900: '#0f172a',
-          }
-        },
-        fontFamily: {
-          sans: ['Inter', 'sans-serif'],
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            50: '#E6F4EC',
+                            100: '#cce9d8',
+                            200: '#99d2b2',
+                            300: '#66bc8b',
+                            400: '#33a565',
+                            500: '#0E7C4A', // Deep Medical Green
+                            600: '#0b633b',
+                            700: '#084a2c',
+                            800: '#06311d',
+                            900: '#03190f',
+                        },
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
         }
-      }
-    }
-  }
     </script>
     <link rel="stylesheet" href="/index.css">
     <style>
-        /* Hide Google Translate UI elements */
+        /* Hide Google Translate UI elements and Banner completely */
         #google_translate_element {
             display: none !important;
         }
 
+        .goog-te-banner-frame.skiptranslate,
         .goog-te-banner-frame {
             display: none !important;
+            visibility: hidden !important;
         }
 
-        .goog-tooltip {
+        #goog-gt-tt,
+        .goog-te-balloon-frame {
             display: none !important;
         }
 
+        .goog-tooltip,
         .goog-tooltip:hover {
             display: none !important;
         }
@@ -299,8 +303,17 @@
             box-shadow: none !important;
         }
 
+        /* Prevent Google Translate from pushing the page down */
         body {
-            top: 0 !important;
+            top: 0px !important;
+            margin-top: 0px !important;
+            position: static !important;
+        }
+
+        html {
+            top: 0px !important;
+            margin-top: 0px !important;
+            position: static !important;
         }
     </style>
 </head>
