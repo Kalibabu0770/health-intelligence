@@ -1188,33 +1188,24 @@ export const orchestrateHealth = async (context: PatientContext, options: {
                 Known Conditions: ${profile.conditions.map((c: any) => c.name).join(', ')}
                 
                 TASK:
-                1. Interpret the medical intent from the dictation, handling any language mixing.
-                2. SYNTHESIZE: Do NOT just transcribe. Extract the actual "Chief Complaint" as a professional medical term (e.g., "Acute Gastritis" instead of "stomach pain").
+                1. Interpret the medical intent from the dictation, translating any regional languages (Telugu/Hindi etc.) into English.
+                2. SYNTHESIZE: Extract the actual "Chief Complaint" as a professional medical term (e.g., "Acute Gastritis" instead of "stomach pain").
                 3. PROFESSIONALISM: All fields in the JSON must be in fluent, professional clinical English.
                 
-                Respond ONLY with a raw JSON object matching this schema:
+                Respond ONLY with a raw JSON object matching this schema exactly:
                 {
-                    "encounter_id": "AHMIS-ENC-${Date.now()}",
-                    "visit_date": "${new Date().toISOString()}",
-                    "visit_type": "Consultation",
+                    "ehr_id": "AHMIS-SENTINEL-NODE",
                     "chief_complaint": "Extracted professional clinical term",
-                    "history_of_present_illness": "Detailed narrative synthesis of the present illness fused with history",
-                    "vitals": {"blood_pressure": "120/80 mmHg", "pulse": 75, "temperature": 98.6, "oxygen_saturation": 98, "weight": ${profile.weight}},
-                    "physical_examination": "Observed clinical signs and symptoms recorded during consultation",
-                    "ayush_assessment": {"prakriti_type": "Inferred Prakriti", "vata_score": 0.3, "pitta_score": 0.4, "kapha_score": 0.3},
-                    "diagnosis": {
-                        "primary_diagnosis": "Primary clinical finding",
-                        "secondary_diagnosis": "Associated condition",
-                        "icd_code": "Most relevant ICD-10 code"
-                    },
-                    "treatment_plan": {
-                        "herbal_prescription": [{"name": "Specific Herb", "dosage": "Exact dose", "rationale": "Why prescribed"}],
-                        "diet_plan": ["Recommended food 1", "Recommended food 2"],
-                        "yoga_recommendation": ["Asana 1", "Pranayama 1"],
-                        "lifestyle_advice": "Actionable lifestyle modification"
-                    },
-                    "follow_up_date": "YYYY-MM-DD",
-                    "doctor_notes": "Internal physician observations and next steps"
+                    "hpi": "Detailed narrative synthesis of the present illness fused with history",
+                    "clinical_notes": "Internal physician observations and next steps",
+                    "vital_signs": {"BP": "120/80 mmHg", "HR": "75 bpm", "Temp": "98.6 F", "RR": "16 bpm", "SpO2": "98%"},
+                    "triage_status": "Priority",
+                    "icd_10_code": "Most relevant ICD-10 code",
+                    "ayush_metrics": {"Prakriti": "Inferred Prakriti", "Agni": "Vishamagni"},
+                    "treatment_plan": "Prescription + lifestyle advice",
+                    "differential_diagnosis": ["Primary finding", "Secondary finding"],
+                    "doctor_suggestions": ["Lab test 1", "Actionable advice"],
+                    "digital_signature": "AI-SENTINEL-LOCAL"
                 }
                 `;
 
@@ -1236,9 +1227,28 @@ export const orchestrateHealth = async (context: PatientContext, options: {
                     const data = await cloudResp.json();
                     const resultStr = data.choices[0].message.content;
                     localEhr = JSON.parse(resultStr);
+                } else {
+                    console.warn("Groq EHR parse failed, falling back to local Ollama Llama3...");
+                    const ollamaResp = await fetch('http://localhost:11434/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'llama3',
+                            messages: [
+                                { role: 'system', content: CLINICAL_SYSTEM_PROMPT },
+                                { role: 'user', content: ehrPrompt }
+                            ],
+                            stream: false,
+                            format: 'json'
+                        })
+                    });
+                    if (ollamaResp.ok) {
+                        const ollamaData = await ollamaResp.json();
+                        localEhr = JSON.parse(ollamaData.message.content);
+                    }
                 }
             } catch (err) {
-                console.warn("Local Groq EHR parse failed", err);
+                console.warn("Local Groq + Ollama EHR parse failed completely.", err);
             }
         }
 
