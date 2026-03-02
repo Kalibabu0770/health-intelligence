@@ -31,21 +31,10 @@
 
 ### 👤 Client / User Module
 
-**1. Unified Individual Health Dashboard**
-*Empowering individuals with a deeply personalized interface to manage daily health.*
-- **Prakriti Auto-Detection:** Automatically deduces the patient's energetic constitution (Vata, Pitta, Kapha) through integrated vital and symptom analysis.
-- **Dynamic Organ Stress Map:** Visual representation plotting precise ML risk probabilities for Cardio, Liver, Kidney, and Respiratory systems based on the individual's telemetry.
-- **AI Health Guardian (Conversational Assistant):** A sophisticated 24/7 AI chatbot capable of triaging symptoms, offering dietary advice, and explaining health scores in the user's local language.
-
-**2. Early Warning & Spatiotemporal Epidemic Forecasting (Population Node Integration)**
-*Linking individual telemetry to broader public health systems.*
-- **Geo-Spatial Bio-Risk Monitoring:** Patient metadata contributes (anonymously) to flag localized disease surges (e.g., unexpected spikes in breathing issues in a specific pin code).
-- **Automated Alerts:** Identifies anomalous clinical patterns from historical data, warning users of regional outbreaks while empowering administrators to preemptively allocate regional resources.
-
-**3. The 6-Pillar Health Hub (Patient Dashboard)**
+**The 6-Pillar Health Hub (Patient Dashboard)**
 *The primary interactive interface for citizens, providing direct access to 6 specialized modules:*
 - **🏥 DISEASE FINDER (Triage Hub):** An AI-driven diagnostic engine that evaluates user symptoms, lists probable diseases, and triggers urgent alerts.
-- **🌿 AYUSH AI:** Detects bodily constitution (Prakriti) and provides localized herbal, dietary, and Yoga recommendations.
+- **🌿 AYUSH AI:** Detects bodily constitution (Prakriti) and provides localized herbal, dietary, and Yoga recommendations. It also features a real-time Regional Health Radar, warning you of dangerous health problems and peak transmission cases in your specific geographic area (like localized AP outbreaks).
 - **💊 MEDICATION:** A comprehensive tracker to log, manage, and review active prescriptions.
 - **🛡️ SAFETY & ADHERENCE:** Evaluates ongoing treatments against liver/renal thresholds using the predictive Safety Scanner.
 - **📈 VITALS TREND:** Visualizes longitudinal health metrics, such as the Molecular Readiness Score and daily activity.
