@@ -49,47 +49,7 @@ export const startListening = (
 
     aura.classList.add('active');
 
-    // Layer 1: Real-Time Browser API
-    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognitionAPI) {
-        try {
-            const recognition = new SpeechRecognitionAPI();
-            currentNativeRec = recognition;
-
-            const getBcp47Code = (lang: string) => {
-                const map: Record<string, string> = {
-                    'hi': 'hi-IN', 'te': 'te-IN', 'ta': 'ta-IN', 'kn': 'kn-IN', 'mr': 'mr-IN',
-                    'es': 'es-ES', 'fr': 'fr-FR', 'de': 'de-DE', 'zh': 'zh-CN', 'ja': 'ja-JP',
-                    'ar': 'ar-SA', 'ru': 'ru-RU', 'pt': 'pt-BR', 'en': 'en-IN'
-                };
-                return map[lang] || 'en-IN';
-            };
-
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = getBcp47Code(language);
-
-            recognition.onresult = (event: any) => {
-                let finalTxt = '';
-                let interimTxt = '';
-                for (let i = 0; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTxt += event.results[i][0].transcript;
-                    } else {
-                        interimTxt += event.results[i][0].transcript;
-                    }
-                }
-                const text = (finalTxt + " " + interimTxt).trim();
-                if (text && transcriptEl) {
-                    transcriptEl.textContent = text;
-                    latestNativeTranscript = text; // Track to fallback if Groq API fails
-                }
-            };
-
-            recognition.onerror = (e: any) => console.warn("Native speech error setup:", e.error);
-            recognition.start();
-        } catch (e) { console.warn(e) }
-    }
+    // Strict Backend Whisper Analytics Routing (Native overrides removed to preserve cross-language translations)
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
         const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
@@ -128,19 +88,11 @@ export const startListening = (
                     if (transcriptEl) transcriptEl.textContent = text;
                     onTranscript(text);
                 } else {
-                    // Fallback to native Chrome layer if Whisper returns empty
-                    if (latestNativeTranscript && transcriptEl) {
-                        transcriptEl.textContent = latestNativeTranscript;
-                        onTranscript(latestNativeTranscript);
-                    }
+                    if (transcriptEl) transcriptEl.textContent = "Transcription empty. Please try again.";
                 }
             } catch (error) {
                 console.error("Transcription Failed:", error);
-                // Fallback to native layer
-                if (latestNativeTranscript && transcriptEl) {
-                    transcriptEl.textContent = latestNativeTranscript;
-                    onTranscript(latestNativeTranscript);
-                } else if (transcriptEl) {
+                if (transcriptEl) {
                     transcriptEl.textContent = "Transcription failed. Please try again.";
                 }
             } finally {
