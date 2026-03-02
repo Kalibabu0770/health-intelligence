@@ -49,7 +49,46 @@ export const startListening = (
 
     aura.classList.add('active');
 
-    // Strict Backend Whisper Analytics Routing (Native overrides removed to preserve cross-language translations)
+    // 1. Start Native Web Speech API for real-time transcription and fallback
+    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognitionAPI) {
+        try {
+            currentNativeRec = new SpeechRecognitionAPI();
+            currentNativeRec.continuous = true;
+            currentNativeRec.interimResults = true;
+
+            const getBcp47Code = (lang: string) => {
+                const map: Record<string, string> = {
+                    'hi': 'hi-IN', 'te': 'te-IN', 'ta': 'ta-IN', 'kn': 'kn-IN', 'mr': 'mr-IN',
+                    'es': 'es-ES', 'fr': 'fr-FR', 'de': 'de-DE', 'zh': 'zh-CN', 'ja': 'ja-JP',
+                    'ar': 'ar-SA', 'ru': 'ru-RU', 'pt': 'pt-BR', 'en': 'en-IN'
+                };
+                return map[lang] || 'en-IN';
+            };
+            currentNativeRec.lang = getBcp47Code(language);
+
+            currentNativeRec.onresult = (event: any) => {
+                let finalTxt = '';
+                let interimTxt = '';
+                for (let i = 0; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTxt += event.results[i][0].transcript;
+                    } else {
+                        interimTxt += event.results[i][0].transcript;
+                    }
+                }
+                const text = (finalTxt + " " + interimTxt).trim();
+                if (text) {
+                    latestNativeTranscript = text;
+                    if (transcriptEl) transcriptEl.textContent = text;
+                }
+            };
+
+            currentNativeRec.start();
+        } catch (e) {
+            console.warn("Could not start real-time layer", e);
+        }
+    }
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
         const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
@@ -87,13 +126,21 @@ export const startListening = (
                 if (text && text.trim().length > 0) {
                     if (transcriptEl) transcriptEl.textContent = text;
                     onTranscript(text);
+                } else if (latestNativeTranscript.trim().length > 0) {
+                    if (transcriptEl) transcriptEl.textContent = latestNativeTranscript;
+                    onTranscript(latestNativeTranscript);
                 } else {
                     if (transcriptEl) transcriptEl.textContent = "Transcription empty. Please try again.";
                 }
             } catch (error) {
                 console.error("Transcription Failed:", error);
-                if (transcriptEl) {
-                    transcriptEl.textContent = "Transcription failed. Please try again.";
+                if (latestNativeTranscript.trim().length > 0) {
+                    if (transcriptEl) transcriptEl.textContent = latestNativeTranscript;
+                    onTranscript(latestNativeTranscript);
+                } else {
+                    if (transcriptEl) {
+                        transcriptEl.textContent = "Transcription failed. Please try again.";
+                    }
                 }
             } finally {
                 setTimeout(cleanup, 1000);

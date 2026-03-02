@@ -711,24 +711,14 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">AI-Enabled NLP Clinical Transcription & Synthesis</p>
                                                 </div>
                                                 <div className="flex items-center gap-4">
-                                                    {isRecording && <div className="flex items-center gap-2"><div className="w-2 h-2 bg-rose-500 rounded-full animate-ping" /> <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">Recording Active</span></div>}
                                                     <button
-                                                        onClick={() => {
-                                                            if (!isRecording) {
-                                                                const lang = localStorage.getItem('hi_lang') || 'en-IN';
-                                                                startListening(
-                                                                    lang,
-                                                                    (text) => setEhrText(prev => (prev + " " + text).trim()),
-                                                                    () => setIsRecording(false)
-                                                                );
-                                                                setIsRecording(true);
-                                                            } else {
-                                                                setIsRecording(false);
-                                                            }
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { selector: '#ehr-textarea' } }));
                                                         }}
-                                                        className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isRecording ? 'bg-rose-500 text-white shadow-rose-200' : 'bg-emerald-600 text-white shadow-emerald-200'} shadow-lg hover:scale-105 active:scale-95`}
+                                                        className="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-emerald-600 text-white shadow-emerald-200 shadow-lg hover:scale-105 active:scale-95"
                                                     >
-                                                        {isRecording ? "Terminate Capture" : "Initialize Audio Capture"}
+                                                        Initialize Audio Capture
                                                     </button>
                                                 </div>
                                             </div>

@@ -18,7 +18,7 @@ from ml_engine import HealthRiskModel
 # ── Config ────────────────────────────────────────────────────────────────────
 GROQ_API_KEY    = os.getenv("GROQ_API_KEY", "")
 GROQ_API_URL    = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL      = "llama-3.3-70b-versatile"
+GROQ_MODEL      = "llama3-8b-8192"
 ML_BACKEND_URL  = os.getenv("ML_BACKEND_URL", "https://health-intelligence-backend.onrender.com/predict")
 
 
@@ -546,35 +546,13 @@ Be empathetic, specific, and actionable. Base your advice on the FUSION of all t
             body["response_format"] = {"type": "json_object"}
 
         async with httpx.AsyncClient() as client:
-            if GROQ_API_KEY:
-                try:
-                    res = await client.post(GROQ_API_URL, json=body, headers=headers, timeout=15.0)
-                    if res.status_code == 200:
-                        return res.json()["choices"][0]["message"]["content"]
-                    else:
-                        print(f"[Groq] Error {res.status_code}: {res.text[:200]}. Falling back to local Ollama...")
-                except Exception as e:
-                    print(f"[Groq] Request failed: {e}. Falling back to local Ollama...")
-            else:
-                print("[Groq] No GROQ_API_KEY configured. Falling back to local Ollama...")
-
-            # --- OLLAMA LOCAL FALLBACK ---
             try:
-                ollama_body = {
-                    "model": "llama3",
-                    "messages": [{"role": "user", "content": prompt}],
-                    "stream": False
-                }
-                if json_mode:
-                    ollama_body["format"] = "json"
-                
-                print(f"[Local AI] Requesting Ollama fallback...")
-                ollama_res = await client.post("http://localhost:11434/api/chat", json=ollama_body, timeout=60.0)
-                if ollama_res.status_code == 200:
-                    return ollama_res.json()["message"]["content"]
-                
-                print(f"[Local AI] Error {ollama_res.status_code}: Ollama failed to respond.")
+                res = await client.post(GROQ_API_URL, json=body, headers=headers, timeout=15.0)
+                if res.status_code == 200:
+                    return res.json()["choices"][0]["message"]["content"]
+                else:
+                    print(f"[Groq] Error {res.status_code}: {res.text[:200]}")
             except Exception as e:
-                print(f"[Local AI] Exception: {e}. Ensure Ollama is running and 'llama3' is installed.")
+                print(f"[Groq] Request failed: {e}")
             
-            return "{}" if json_mode else "AI service temporarily unavailable (Both Cloud and Local engines offline)."
+            return "{}" if json_mode else "AI service temporarily unavailable."
