@@ -44,9 +44,10 @@ Health Intelligence utilizes a powerful, decoupled architecture balancing edge A
    - **Data Tier:** LocalStorage/Local-first architecture paired with a sophisticated unified risk modeling engine running securely on-device.
    - **Multi-Role Gateways:** Modular UI Command Hubs adapting for Citizens, AYUSH Doctors, and Epidemiology Officers.
 
-2. **Backend Module (Data Processing & AI Analysis):**
+2. **Backend Module (Data Processing, ML Modeling & AI Analysis):**
    - **Framework:** FastAPI with Uvicorn.
-   - **AI Serving:** LangChain integrating Groq Cloud inference and robust fallback protocols.
+   - **Machine Learning (ML) Engine:** Integrates predictive ML models to compute localized Organ Stress Risk Scores (Hepatic, Renal, Cardiac, Respiratory) and process spatiotemporal anomaly detection for early disease outbreak forecasting.
+   - **LLM / AI Serving:** LangChain integrating advanced large language models (like Groq) and robust fallback protocols for clinical NLP (Voice-to-EHR) and hybrid recommendation architectures.
    - **Datastore/DB Node:** Seamless Firebase integration to safely retain cross-regional bio-metrics for population scanning.
 
 ---
