@@ -95,6 +95,7 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
             <div className="p-6 bg-white border-t border-slate-50 shrink-0">
                 <div className="relative group/input">
                     <input
+                        id="assistant-input-box"
                         type="text"
                         className="w-full bg-slate-50 border-2 border-slate-100 p-5 pr-24 rounded-xl font-black text-xs outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-inner placeholder:text-slate-300 placeholder:uppercase"
                         placeholder={t.ask_me_anything || "Ask me anything about your health..."}
@@ -107,13 +108,11 @@ const PersonalAssistant: React.FC<{ onClose: () => void, analysis?: any, epidemi
                             type="button"
                             onClick={(e) => {
                                 e.preventDefault();
-                                if (isListening) return;
-                                setIsListening(true);
-                                startListening(language, (text) => setInput(text), () => setIsListening(false));
+                                window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { selector: '#assistant-input-box' } }));
                             }}
-                            className={`w-10 h-10 flex items-center justify-center rounded-xl border border-slate-100 shadow-sm transition-all active:scale-95 ${isListening ? 'bg-rose-500 text-slate-900 animate-pulse' : 'bg-white text-slate-400 hover:text-emerald-600'}`}
+                            className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-100 shadow-sm transition-all active:scale-95 bg-white text-slate-400 hover:text-emerald-600"
                         >
-                            <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new CustomEvent("start-global-dictation", { detail: { target: e.currentTarget } })); }} className="cursor-pointer hover:scale-110 active:scale-95 inline-flex z-50 relative" title="Voice Input"><Mic size={18} /></span>
+                            <Mic size={18} />
                         </button>
                         <button
                             onClick={handleSend}

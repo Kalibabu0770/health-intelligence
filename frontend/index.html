@@ -276,15 +276,20 @@
     </script>
     <link rel="stylesheet" href="/index.css">
     <style>
-        /* Hide Google Translate UI elements and Banner completely */
+        /* Hide Google Translate UI elements and Banner completely but keep functional in DOM */
         #google_translate_element,
         .goog-te-banner-frame.skiptranslate,
         .goog-te-banner-frame,
         iframe.skiptranslate,
         .skiptranslate,
         .VIpgJd-ZVi9od-ORHb-OEVmcd {
-            display: none !important;
-            visibility: hidden !important;
+            position: absolute !important;
+            top: -9999px !important;
+            left: -9999px !important;
+            width: 1px !important;
+            height: 1px !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
         }
 
         #goog-gt-tt,

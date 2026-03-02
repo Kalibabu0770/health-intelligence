@@ -96,8 +96,45 @@ const callGroq = async (messages: any[], options: any = {}): Promise<string> => 
     }
 };
 
-// ── Audio Interface: Proxy to Backend ─────────────────────────────────────────
+// ── Audio Interface: Proxy to Cloud Whisper (Groq) or Backend ────────────────
 export const transcribeAudio = async (audioBlob: Blob, language?: string): Promise<string> => {
+
+    // Attempt Tier 1: Groq Cloud Whisper (Extremely Fast, Highly Accurate, Multilingual)
+    if (GROQ_API_KEY && GROQ_API_KEY !== 'your_groq_api_key_here') {
+        try {
+            const groqData = new FormData();
+            groqData.append('file', new window.File([audioBlob], 'recording.webm', { type: 'audio/webm' }));
+            groqData.append('model', 'whisper-large-v3-turbo');
+            // 'language' parameter can optionally be passed to Groq as ISO-639-1 code if known, but auto-detect is often safer.
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+            const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${GROQ_API_KEY}`
+                },
+                body: groqData,
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                const data = await response.json();
+                const content = data.text || '';
+                console.log(`[Whisper Groq] ✅ Transcript received (${content.length} chars)`);
+                return content;
+            } else {
+                console.warn(`[Whisper Groq] HTTP ${response.status} Error. Falling back to local backend.`);
+            }
+        } catch (error) {
+            console.warn("[Whisper Groq] Request failed, trying backup local node.", error);
+        }
+    }
+
+    // Tier 2: Fallback to local node service
     const formData = new FormData();
     formData.append('audio', audioBlob, 'recording.webm');
     if (language) {
@@ -122,7 +159,7 @@ export const transcribeAudio = async (audioBlob: Blob, language?: string): Promi
 
         const data = await response.json();
         const content = data.text || '';
-        console.log(`[Whisper] ✅ Transcript received via backend (${content.length} chars)`);
+        console.log(`[Whisper Local] ✅ Transcript received via backend (${content.length} chars)`);
         return content;
     } catch (error: any) {
         clearTimeout(timeoutId);
@@ -1173,35 +1210,32 @@ export const orchestrateHealth = async (context: PatientContext, options: {
                 digital_signature: "LOCAL-FAILSAFE-VERIFIED"
             };
 
-            const fallbackKey = "your_fallback_api_key_here";
-            const activeKey = GROQ_API_KEY || fallbackKey;
-
             try {
                 const ehrPrompt = `
                 You are a senior Chief Medical Officer for AHMIS (Ayush Hospital Management Information System).
                 
                 PHYSICIAN DICTATION: "${options.query}"
-                Note: The dictation may be in a mix of English and regional languages (Telugu/Hindi).
+                Note: The dictation may be in a mix of English and regional languages (Telugu/Hindi etc.). For example: "naku kadupulo oppiga vindi" means stomach pain.
                 
                 PATIENT CONTEXT:
                 Name: ${profile.name}, Age: ${profile.age}, Gender: ${profile.gender}
                 Known Conditions: ${profile.conditions.map((c: any) => c.name).join(', ')}
                 
                 TASK:
-                1. Interpret the medical intent from the dictation, translating any regional languages (Telugu/Hindi etc.) into English.
-                2. SYNTHESIZE: Extract the actual "Chief Complaint" as a professional medical term (e.g., "Acute Gastritis" instead of "stomach pain").
-                3. PROFESSIONALISM: All fields in the JSON must be in fluent, professional clinical English.
+                1. Interpret the medical intent from the dictation, TRANSLATING any regional languages (Telugu/Hindi/slang) directly into PROFESSIONAL CLINICAL ENGLISH.
+                2. SYNTHESIZE: Extract the actual "Chief Complaint" as a formal medical term (e.g., "Acute Gastritis" instead of "stomach pain", "Pyrexia" for fever).
+                3. PROFESSIONALISM: All fields in the JSON must be in fluent, professional clinical English. NEVER include raw slang. Do not write "Raw dictates".
                 
                 Respond ONLY with a raw JSON object matching this schema exactly:
                 {
                     "ehr_id": "AHMIS-SENTINEL-NODE",
                     "chief_complaint": "Extracted professional clinical term",
-                    "hpi": "Detailed narrative synthesis of the present illness fused with history",
+                    "hpi": "Detailed professional narrative synthesis of the present illness fused with history",
                     "clinical_notes": "Internal physician observations and next steps",
                     "vital_signs": {"BP": "120/80 mmHg", "HR": "75 bpm", "Temp": "98.6 F", "RR": "16 bpm", "SpO2": "98%"},
                     "triage_status": "Priority",
                     "icd_10_code": "Most relevant ICD-10 code",
-                    "ayush_metrics": {"Prakriti": "Inferred Prakriti", "Agni": "Vishamagni"},
+                    "ayush_metrics": {"Prakriti": "Inferred Prakriti", "Agni": "Vishamagni", "Warning": "None"},
                     "treatment_plan": "Prescription + lifestyle advice",
                     "differential_diagnosis": ["Primary finding", "Secondary finding"],
                     "doctor_suggestions": ["Lab test 1", "Actionable advice"],
@@ -1209,46 +1243,16 @@ export const orchestrateHealth = async (context: PatientContext, options: {
                 }
                 `;
 
-                const cloudResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${activeKey}` },
-                    body: JSON.stringify({
-                        model: 'llama-3.3-70b-versatile',
-                        messages: [
-                            { role: 'system', content: CLINICAL_SYSTEM_PROMPT },
-                            { role: 'user', content: ehrPrompt }
-                        ],
-                        temperature: 0.2,
-                        response_format: { type: "json_object" }
-                    })
-                });
-
-                if (cloudResp.ok) {
-                    const data = await cloudResp.json();
-                    const resultStr = data.choices[0].message.content;
-                    localEhr = JSON.parse(resultStr);
+                const aiResult = await callAI([{ role: 'system', content: CLINICAL_SYSTEM_PROMPT }, { role: 'user', content: ehrPrompt }], { json: true });
+                const parsedResult = JSON.parse(aiResult);
+                if (parsedResult) {
+                    localEhr = parsedResult;
                 } else {
-                    console.warn("Groq EHR parse failed, falling back to local Ollama Llama3...");
-                    const ollamaResp = await fetch('http://localhost:11434/api/chat', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            model: 'llama3',
-                            messages: [
-                                { role: 'system', content: CLINICAL_SYSTEM_PROMPT },
-                                { role: 'user', content: ehrPrompt }
-                            ],
-                            stream: false,
-                            format: 'json'
-                        })
-                    });
-                    if (ollamaResp.ok) {
-                        const ollamaData = await ollamaResp.json();
-                        localEhr = JSON.parse(ollamaData.message.content);
-                    }
+                    throw new Error("Invalid EHR JSON returned");
                 }
             } catch (err) {
-                console.warn("Local Groq + Ollama EHR parse failed completely.", err);
+                console.warn("EHR AI Synthesis failed completely.", err);
+                localEhr.clinical_notes = `Heuristic fallback triggered for dictates: ${options.query}`;
             }
         }
 

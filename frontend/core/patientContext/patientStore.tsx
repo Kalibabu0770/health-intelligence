@@ -154,14 +154,25 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (!context.language) return;
         const applyGoogleTranslate = () => {
             try {
-                const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
-                if (!select) return;
                 let targetLang = context.language;
                 if (targetLang === 'zh') targetLang = 'zh-CN'; // Google translate uses zh-CN
-                // Only trigger if actually different to prevent infinite loops
-                if (select.value !== targetLang) {
+
+                // 1. Hardcore Cookie Bypass (Forces Google API to read this on initialization/reload)
+                document.cookie = `googtrans=/en/${targetLang}; path=/`;
+                document.cookie = `googtrans=/en/${targetLang}; domain=${window.location.hostname}; path=/`;
+
+                // 2. Direct Widget Bypass 
+                const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+                if (select && select.value !== targetLang) {
                     select.value = targetLang;
-                    select.dispatchEvent(new Event('change'));
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+
+                    // Bypass React synthetic events and fire a native event to be completely sure
+                    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value")?.set;
+                    if (nativeInputValueSetter) {
+                        nativeInputValueSetter.call(select, targetLang);
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
                 }
             } catch (e) {
                 console.warn("Translation dispatch error:", e);
