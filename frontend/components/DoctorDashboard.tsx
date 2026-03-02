@@ -188,18 +188,18 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                 },
                 // 4. CURRENT HEALTH STATUS
                 status: {
-                    complaints: analysis.ehr_record?.chief_complaint || ehrText,
-                    hpi: analysis.ehr_record?.hpi || "Patient presents for evaluation of symptoms as dictated.",
-                    severity: analysis.ehr_record?.triage_priority || "Moderate",
-                    ros: "Cardiovascular: Normal; Respiratory: Normal; GI: Stable; Neuro: Intact."
+                    complaints: analysis.ehr_record?.chief_complaint || "Undetermined Complaint",
+                    hpi: analysis.ehr_record?.hpi || "Patient presents for evaluation of symptoms.",
+                    severity: analysis.triage?.triage_level || analysis.ehr_record?.triage_status || "Moderate",
+                    ros: analysis.ehr_record?.clinical_notes || "Cardiovascular: Normal; Respiratory: Normal; GI: Stable; Neuro: Intact."
                 },
                 // 5. VITAL SIGNS
                 vitals: {
-                    bp: "120/80 mmHg",
-                    pulse: "72 bpm",
-                    temp: "98.6 F",
-                    rr: "16 bpm",
-                    spo2: "98%",
+                    bp: analysis.ehr_record?.vital_signs?.["BP"] || "120/80 mmHg",
+                    pulse: analysis.ehr_record?.vital_signs?.["HR"] || "72 bpm",
+                    temp: analysis.ehr_record?.vital_signs?.["Temp"] || "98.6 F",
+                    rr: analysis.ehr_record?.vital_signs?.["RR"] || "16 bpm",
+                    spo2: analysis.ehr_record?.vital_signs?.["SpO2"] || "98%",
                     weight: currentPatientContext.profile.weight || "72kg"
                 },
                 // 6. PHYSICAL EXAMINATION
@@ -218,46 +218,46 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                 ],
                 // 8. AYUSH ASSESSMENT
                 ayush: {
-                    prakriti: "Vata-Pitta Dominant",
+                    prakriti: analysis.ayush?.prakriti || analysis.ehr_record?.ayush_metrics?.["Prakriti"] || "Vata-Pitta Dominant",
                     vata: 45,
                     pitta: 35,
                     kapha: 20,
-                    imbalance: "Minor Vata provocation detected due to sleep fragmentation."
+                    imbalance: analysis.ehr_record?.ayush_metrics?.["Agni"] || analysis.ayush?.analysis || "Minor Vata provocation detected due to sleep fragmentation."
                 },
                 // 9. DIAGNOSIS
                 diagnosis: {
-                    primary: analysis.ehr_record?.triage_status || "Routine Observation",
-                    secondary: "Lifestyle induced biomarker volatility"
+                    primary: analysis.ehr_record?.differential_diagnosis?.[0] || analysis.ehr_record?.icd_10_code || "Routine Observation",
+                    secondary: analysis.ehr_record?.differential_diagnosis?.[1] || "Lifestyle induced biomarker volatility"
                 },
                 // 10. TREATMENT PLAN
                 treatment: {
-                    herbal: "REAL-TIME AYUSH SCAN FOR KIK IN 532201. BIORHYTHM ALIGNMENT IS STABLE.",
-                    dietary: ["Low Sodium", "Increased Fiber"],
-                    yoga: ["Surya Namaskar", "Pranayama"],
+                    herbal: analysis.ehr_record?.treatment_plan || "REAL-TIME AYUSH SCAN RECOMMENDED.",
+                    dietary: analysis.ayush?.recommendations?.find(r => r.category.includes('Diet'))?.benefits || ["Low Sodium", "Increased Fiber"],
+                    yoga: analysis.ayush?.dinacharya || ["Surya Namaskar", "Pranayama"],
                     lifestyle: "Optimize sleep cycle, target 8 hours."
                 },
                 // 11. CLINICAL NOTE (SOAP)
                 notes: {
-                    subjective: `Patient reports: ${ehrText}`,
-                    objective: "Vitals stable, general examination unremarkable.",
-                    assessment: "Clinical correlation with Integrated AI matrix shows 88% stability.",
-                    plan: "Follow home care protocol and monitor vitals daily."
+                    subjective: analysis.ehr_record?.clinical_notes || `Patient reports general symptoms related to their complaint.`,
+                    objective: `Vitals stable: ${analysis.ehr_record?.vital_signs?.["BP"] || "120/80 mmHg"}, ${analysis.ehr_record?.vital_signs?.["HR"] || "72 bpm"}.`,
+                    assessment: analysis.ehr_record?.differential_diagnosis?.join(", ") || "Clinical correlation with Integrated AI matrix.",
+                    plan: analysis.ehr_record?.doctor_suggestions?.join("\n") || analysis.ehr_record?.treatment_plan || "Follow home care protocol and monitor vitals daily."
                 },
                 // 12. FOLLOW-UP
                 follow_up: {
                     date: "2026-03-15",
                     tests: ["Fasting Glucose", "BP monitoring"],
-                    warning_signs: "Excessive fatigue, sudden chest pain, or vision blurriness."
+                    warning_signs: analysis.ehr_record?.ayush_metrics?.["Warning"] || "Excessive fatigue, sudden chest pain, or vision blurriness."
                 },
                 // 13. PROGRESS
                 progress: {
-                    improvement: "STABLE BASELINE MAINTAINED.",
+                    improvement: "STABLE BASELINE INITIATED.",
                     recovery: "90% RECOVERY PROJECTED.",
                     response: "AWAITING TREATMENT INITIATION.",
                     complications: "NONE."
                 },
                 verification: {
-                    signature: "0xAHMIS-IX-K2IT181R7_19CA8467A47",
+                    signature: analysis.ehr_record?.digital_signature || "0xAHMIS-IX-K2IT181R7_19CA8467A47",
                     seal: "VERIFIED BY AHMIS-CORE-STABLE"
                 },
                 // MISSING FIELDS FOR CLINICAL INTELLIGENCE PAGE
