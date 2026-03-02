@@ -1162,13 +1162,13 @@ export const orchestrateHealth = async (context: PatientContext, options: {
         let localEhr: any = null;
         if (options.query) {
             localEhr = {
-                ehr_id: `AHMIS-SYNC-${Date.now()}`,
-                chief_complaint: options.query.substring(0, 50) + "...",
-                hpi: "Review extracted context.",
+                ehr_id: `AHMIS-OFFLINE-${Date.now()}`,
+                chief_complaint: "Pending Clinical NLP Synthesis",
+                hpi: "System is in pure offline failsafe mode. LLM Engine is unreachable. Analysis of patient dictation is deferred until node sync.",
                 vital_signs: {},
-                icd_10_code: "NLP-REVIEW",
-                treatment_plan: "1. Follow up with physician.\n2. Reconnect AI backend nodes.",
-                clinical_notes: options.query,
+                icd_10_code: "NLP-OFFLINE",
+                treatment_plan: "1. Follow up with physician.\n2. Reconnect AI backend nodes (Groq Cloud or Local Ollama).",
+                clinical_notes: `Raw dictates logged: ${options.query}`,
                 triage_status: "Moderate",
                 digital_signature: "LOCAL-FAILSAFE-VERIFIED"
             };
