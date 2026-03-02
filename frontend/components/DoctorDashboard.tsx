@@ -232,7 +232,7 @@ const DoctorDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                 // 10. TREATMENT PLAN
                 treatment: {
                     herbal: analysis.ehr_record?.treatment_plan || "REAL-TIME AYUSH SCAN RECOMMENDED.",
-                    dietary: analysis.ayush?.recommendations?.find(r => r.category.includes('Diet'))?.benefits || ["Low Sodium", "Increased Fiber"],
+                    dietary: analysis.ayush?.recommendations?.find?.((r: any) => r?.category?.includes?.('Diet'))?.benefits || ["Low Sodium", "Increased Fiber"],
                     yoga: analysis.ayush?.dinacharya || ["Surya Namaskar", "Pranayama"],
                     lifestyle: "Optimize sleep cycle, target 8 hours."
                 },
