@@ -42,6 +42,15 @@
 - **Geo-Spatial Bio-Risk Monitoring:** Patient metadata contributes (anonymously) to flag localized disease surges (e.g., unexpected spikes in breathing issues in a specific pin code).
 - **Automated Alerts:** Identifies anomalous clinical patterns from historical data, warning users of regional outbreaks while empowering administrators to preemptively allocate regional resources.
 
+**3. The 6-Pillar Health Hub (Patient Dashboard)**
+*The primary interactive interface for citizens, providing direct access to 6 specialized modules:*
+- **🏥 DISEASE FINDER (Triage Hub):** An AI-driven diagnostic engine that evaluates user symptoms, lists probable diseases, and triggers urgent alerts.
+- **🌿 AYUSH AI:** Detects bodily constitution (Prakriti) and provides localized herbal, dietary, and Yoga recommendations.
+- **💊 MEDICATION:** A comprehensive tracker to log, manage, and review active prescriptions.
+- **🛡️ SAFETY & ADHERENCE:** Evaluates ongoing treatments against liver/renal thresholds using the predictive Safety Scanner.
+- **📈 VITALS TREND:** Visualizes longitudinal health metrics, such as the Molecular Readiness Score and daily activity.
+- **📁 HEALTH FILES:** A secure clinical vault storing all medical reports, scanned prescriptions, and lab results.
+
 ---
 
 ## 🏗 System Architecture
