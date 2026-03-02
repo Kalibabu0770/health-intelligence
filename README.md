@@ -6,32 +6,41 @@
 
 ## 🌟 Key Features (Aligned with AHMIS Objectives)
 
-### 1. Secure, Voice-Based Multilingual EHR Creation
+### 🩺 Doctor / Clinical Module
+
+**1. Secure, Voice-Based Multilingual EHR Creation**
 *An intelligent, seamless interface for AYUSH professionals to capture patient data securely and efficiently.*
 - **Live Voice-to-EHR Hub:** A live Dictate overlay (AI Guardian) allows doctors to capture clinical notes hands-free.
 - **Advanced NLP & Synthesis:** Leverages Whisper NLP and cutting-edge LLMs to instantly structure raw dictations into formal, standard electronic health schemas (Symptoms, Vitals, Diagnoses).
-- **Multilingual Support:** Native support for dictation and translation across English, Hindi, Telugu, Tamil, Kannada, and Marathi without switching keyboards, breaking regional language barriers at the grass-root level.
+- **Multilingual Support:** Native support for dictation and translation across English, Hindi, Telugu, Tamil, Kannada, and Marathi without switching keyboards.
 
-### 2. Early Warning & Spatiotemporal Epidemic Forecasting
-*Dynamic detection and prediction of disease outbreaks to support proactive public health interventions.*
-- **Population AHMIS (Officer Node):** A strategic gateway dashboard exclusively for government officials to monitor regional epidemiological data.
-- **Geo-Spatial Bio-Risk Monitoring:** Analyzes incoming real-time patient metadata to flag localized disease surges (e.g., unexpected spikes in breathing issues in a specific pin code).
-- **Automated Alerts:** Identifies anomalous clinical patterns from historical data, empowering administrators to preemptively allocate regional resources.
-
-### 3. Personalised AYUSH Treatment Plans & RL Feedback
+**2. Personalised AYUSH Treatment Plans & RL Feedback**
 *Data-driven, hybrid recommendations merging codified AYUSH knowledge with modern clinical metrics.*
-- **Prakriti Auto-Detection:** Automatically deduces the patient's energetic constitution (Vata, Pitta, Kapha) through integrated vital and symptom analysis.
 - **Hybrid Recommendation Engine:** Generates highly tailored regimens based on conditions (hypertension, obesity, etc.):
     - **Chikitsa (Herbal Formulation):** Specifying Ayurvedic herbs and safe dosages.
     - **Pathya/Apathya:** Dietary boundaries strictly mapped to the current ailment.
     - **Vihaar (Yoga & Lifestyle):** Tailoring asanas and pranayama targeting specific organic stress points.
 - **Physician Feedback Loop (Reinforcement Learning):** Features active clinical validation endpoints (👍 Validate & Reinforce / 👎 Report Deviation) allowing doctors to continuously refine and fine-tune AI policy generation based on real-world outcomes.
 
-### 4. Explainable AI & Confidence Scoring
+**3. Explainable AI & Confidence Scoring**
 *Building clinical trust through transparency and evidence generation.*
+- **Confidence Scoring:** Diagnostic pathways display predictive confidence percentages (e.g., "Prediction Confidence: 94.2%").
+- **Medication Safety Scanner:** Instantly flags "Safe," "Caution," or "Danger" interaction risks when combining medicines against liver/renal thresholds.
+
+---
+
+### 👤 Client / User Module
+
+**1. Unified Individual Health Dashboard**
+*Empowering individuals with a deeply personalized interface to manage daily health.*
+- **Prakriti Auto-Detection:** Automatically deduces the patient's energetic constitution (Vata, Pitta, Kapha) through integrated vital and symptom analysis.
 - **Dynamic Organ Stress Map:** Visual representation plotting precise ML risk probabilities for Cardio, Liver, Kidney, and Respiratory systems based on the individual's telemetry.
-- **Confidence Scoring:** Diagnostic pathways display predictive confidence percentages (e.g., "Prediction Confidence: 94.2%"), ensuring recommendations remain transparent.
-- **Medication Safety Scanner:** Instantly flags "Safe," "Caution," or "Danger" interaction risks when combining medicines against liver/renal thresholds, providing short, clear medical rationale as evidence.
+- **AI Health Guardian (Conversational Assistant):** A sophisticated 24/7 AI chatbot capable of triaging symptoms, offering dietary advice, and explaining health scores in the user's local language.
+
+**2. Early Warning & Spatiotemporal Epidemic Forecasting (Population Node Integration)**
+*Linking individual telemetry to broader public health systems.*
+- **Geo-Spatial Bio-Risk Monitoring:** Patient metadata contributes (anonymously) to flag localized disease surges (e.g., unexpected spikes in breathing issues in a specific pin code).
+- **Automated Alerts:** Identifies anomalous clinical patterns from historical data, warning users of regional outbreaks while empowering administrators to preemptively allocate regional resources.
 
 ---
 
