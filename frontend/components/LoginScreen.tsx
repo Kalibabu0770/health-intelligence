@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, ChevronRight, Lock, User, MapPin, Search, Loader2, Fingerprint, Mic, Check, Activity, Heart, Wind, Droplets, Sparkles, Box, ShieldAlert, Plus, X, ArrowRight, ArrowLeft, RefreshCcw, Brain, Globe } from 'lucide-react';
+import { ShieldCheck, ChevronRight, Lock, User, MapPin, Search, Loader2, Fingerprint, Mic, Check, Activity, Heart, Wind, Droplets, Sparkles, Box, ShieldAlert, Plus, X, ArrowRight, ArrowLeft, RefreshCcw, Brain, Globe, Orbit } from 'lucide-react';
 import { usePatientContext } from '../core/patientContext/patientStore';
 import { startListening } from '../services/speech';
+import { db } from '../services/firebase';
+import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
 import { INITIAL_PROFILE } from './Onboarding';
 import { languages } from '../core/patientContext/translations';
 
@@ -17,7 +19,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
     // Auth Mode: 'register' | 'questions' | 'select' | 'reset' | 'portal'
     const [mode, setMode] = useState<'register' | 'questions' | 'select' | 'reset' | 'portal'>('portal');
-    const [selectedPortalRole, setSelectedPortalRole] = useState<'citizen' | 'doctor' | null>(null);
+    const [selectedPortalRole, setSelectedPortalRole] = useState<'citizen' | 'doctor' | 'nurse' | null>(null);
     const [regStep, setRegStep] = useState(1);
     const [resetStep, setResetStep] = useState(1);
     const [resetData, setResetData] = useState({ location: '', dob: '', nickname: '', newPassword: '' });
@@ -78,12 +80,42 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
     }, [regData.dobDay, regData.dobMonth, regData.dobYear]);
 
     useEffect(() => {
-        const saved = localStorage.getItem('hi_accounts');
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            const accountList = parsed || [];
+        const loadAccounts = async () => {
+            // Load from LocalStorage (Fast Path)
+            const saved = localStorage.getItem('hi_accounts');
+            let accountList = [];
+            if (saved) {
+                accountList = JSON.parse(saved) || [];
+            }
+
+            // Sync from Firebase (Centralized Data Path)
+            try {
+                const q = query(collection(db, "ls_accounts"));
+                const querySnapshot = await getDocs(q);
+                const fbAccounts: any[] = [];
+                querySnapshot.forEach((doc) => {
+                    fbAccounts.push({ ...doc.data(), firebaseId: doc.id });
+                });
+
+                if (fbAccounts.length > 0) {
+                    // Merge strategies: Firebase takes priority for freshness
+                    const merged = [...accountList];
+                    fbAccounts.forEach(fbAcc => {
+                        const idx = merged.findIndex(a => a.id === fbAcc.id);
+                        if (idx >= 0) merged[idx] = fbAcc;
+                        else merged.push(fbAcc);
+                    });
+                    accountList = merged;
+                    localStorage.setItem('hi_accounts', JSON.stringify(merged));
+                }
+            } catch (e) {
+                console.warn("Firebase Sync Offline:", e);
+            }
+
             setAccounts(accountList);
-        }
+        };
+
+        loadAccounts();
         setMode('portal');
     }, []);
 
@@ -107,8 +139,8 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
     const nextProtocol = () => {
         if (regStep === 1) {
             if (selectedPortalRole === 'doctor') {
-                if (!regData.name) return alert("FullName is required for Doctor Registry.");
-                setRegStep(5); // Skip health-related questions for Doctors
+                if (!regData.name) return alert(`FullName is required for Doctor Registry.`);
+                setRegStep(5); // Skip health-related questions for Clinicians
             } else {
                 if (!regData.name || !regData.dob || !regData.location || !regData.nickname) return alert("All bio-metrics and nicknames are required for link initialization.");
                 setMode('questions');
@@ -134,12 +166,22 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
             weight: parseInt(regData.weight) || 0,
             id: 'node-' + Math.random().toString(36).substr(2, 9),
             patientId: role === 'doctor'
-                ? `LS-DOC-${regData.name?.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
+                ? `LS-DOCTOR-${regData.name?.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
                 : `LS-${regData.name?.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
             role: role
         };
 
         // Patient context will handle persisting the new account using its unique ID
+
+        // Persist to Firebase for Centralized Registry
+        const persistToFirebase = async () => {
+            try {
+                await addDoc(collection(db, "ls_accounts"), finalProfile);
+            } catch (e) {
+                console.error("Firebase Persistence Failed:", e);
+            }
+        };
+        persistToFirebase();
 
         setTimeout(() => {
             updateProfile(finalProfile as any);
@@ -247,7 +289,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{t.node_telemetry_registry || 'Health Intelligence Protocol Portal'}</p>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid md:grid-cols-3 gap-4">
                                         <button
                                             onClick={() => setSelectedPortalRole('citizen')}
                                             className={`p-6 rounded-xl flex flex-col items-center gap-3 transition-all duration-300 border-2 ${selectedPortalRole === 'citizen' ? 'border-emerald-500 bg-emerald-50 shadow-xl' : 'border-slate-100 bg-white hover:border-emerald-300'}`}
@@ -259,11 +301,21 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                         </button>
 
                                         <button
+                                            onClick={() => setSelectedPortalRole('nurse')}
+                                            className={`p-6 rounded-xl flex flex-col items-center gap-3 transition-all duration-300 border-2 ${selectedPortalRole === 'nurse' ? 'border-rose-500 bg-rose-50 shadow-xl' : 'border-slate-100 bg-white hover:border-rose-300'}`}
+                                        >
+                                            <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${selectedPortalRole === 'nurse' ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                                <Activity size={28} />
+                                            </div>
+                                            <h3 className="text-md font-black text-slate-900 uppercase tracking-tight leading-none text-center">ICU<br />Nurse</h3>
+                                        </button>
+
+                                        <button
                                             onClick={() => setSelectedPortalRole('doctor')}
                                             className={`p-6 rounded-xl flex flex-col items-center gap-3 transition-all duration-300 border-2 ${selectedPortalRole === 'doctor' ? 'border-emerald-500 bg-emerald-50 shadow-xl' : 'border-slate-100 bg-white hover:border-emerald-300'}`}
                                         >
                                             <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${selectedPortalRole === 'doctor' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                                                <Activity size={28} />
+                                                <Orbit size={28} />
                                             </div>
                                             <h3 className="text-md font-black text-slate-900 uppercase tracking-tight leading-none text-center">Medical<br />Doctor</h3>
                                         </button>
@@ -342,8 +394,11 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex flex-col">
-                                                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">{selectedPortalRole === 'doctor' ? 'Clinical Doctors' : 'Authorized Citizens'}</h3>
+                                                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">
+                                                        {selectedPortalRole === 'doctor' ? 'Clinical Doctors' : selectedPortalRole === 'nurse' ? 'Authorized Nurses' : 'Authorized Citizens'}
+                                                    </h3>
                                                 </div>
+
                                                 <div className="flex items-center gap-2">
                                                     <button onClick={() => { setMode('portal'); setSelectedPortalRole(null); }} className="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1 shadow-sm border border-slate-200">
                                                         <ArrowLeft size={12} /> Back
@@ -376,9 +431,14 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 } else {
                                                     return (
                                                         <div className="py-12 text-center bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-100">
-                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">No Authorized {selectedPortalRole === 'doctor' ? 'Clinical' : 'Citizen'} Nodes Detected</p>
+                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
+                                                                No Authorized {selectedPortalRole === 'doctor' ? 'Clinical' : selectedPortalRole === 'nurse' ? 'ICU Nurse' : 'Citizen'} Nodes Detected
+                                                            </p>
                                                             <div className="flex flex-col gap-3 px-8">
-                                                                <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="bg-emerald-100 border-2 border-emerald-500 text-slate-900 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100">Initialize New {selectedPortalRole === 'doctor' ? 'Doctor Node' : 'Guardian Link'}</button>
+                                                                <button onClick={() => { setMode('register'); setRegData(prev => ({ ...prev, role: selectedPortalRole || 'citizen' })); }} className="bg-emerald-100 border-2 border-emerald-500 text-slate-900 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100">
+                                                                    Initialize New {selectedPortalRole === 'doctor' ? 'Doctor Node' : selectedPortalRole === 'nurse' ? 'Nurse Station' : 'Guardian Link'}
+                                                                </button>
+
                                                                 <button onClick={() => { setMode('portal'); setSelectedPortalRole(null); }} className="bg-slate-100 text-slate-600 hover:bg-slate-200 w-full py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm transition-colors border border-slate-200 flex items-center justify-center gap-2">
                                                                     <ArrowLeft size={14} /> Go Back to Gateway
                                                                 </button>
@@ -398,8 +458,9 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex flex-col">
                                             <h3 className="text-xs font-black text-emerald-600 uppercase tracking-widest pl-1">
-                                                {selectedPortalRole === 'doctor' ? 'Doctor Personnel Registry' : 'Guardian Link Setup'}
+                                                {selectedPortalRole === 'doctor' ? 'Doctor Personnel Registry' : selectedPortalRole === 'nurse' ? 'Nurse Personnel Registry' : 'Guardian Link Setup'}
                                             </h3>
+
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <button
@@ -503,7 +564,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                                                 />
                                                 <MapPin className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
                                             </div>
-                                            {selectedPortalRole !== 'doctor' && (
+                                            {(selectedPortalRole !== 'doctor') && (
                                                 <>
                                                     <div className="grid grid-cols-1 gap-4">
                                                         <div className="relative">

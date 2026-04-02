@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBSkwvStn0ToMZrMB2Ren8H069fgorQAVk",
@@ -15,3 +16,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+
+// Saline App RTDB
+const salineConfig = {
+    databaseURL: "https://salinemonitor-6a79c-default-rtdb.firebaseio.com/"
+};
+export const salineApp = initializeApp(salineConfig, "salineApp");
+export const rtdb = getDatabase(salineApp);

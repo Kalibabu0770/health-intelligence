@@ -1,0 +1,26 @@
+
+> health-intelligence@0.0.0 build
+> vite build
+
+vite v6.4.1 building for production...
+
+/index.css doesn't exist at build time, it will remain unchanged to be resolved at runtime
+transforming...
+✓ 2460 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/node_modules/firebase/database/dist/esm/index.esm.js is dynamically imported by /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/services/healthDataService.ts but also statically imported by /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/components/SalineDashboard.tsx, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/services/dataService.ts, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/services/firebaseConfig.ts, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/components/SmartBeltDashboard.tsx, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/components/SmartBeltPatientCard.tsx, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/components/SmartBeltPatientDetail.tsx, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/components/SmartBeltSettingsModal.tsx, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/services/healthDataService.ts, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/services/smartBeltPatientService.ts, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/utils/sampleDataGenerator.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/services/dataStorageService.ts is dynamically imported by /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/components/SmartBeltPatientDetail.tsx, /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/components/SmartBeltPatientDetail.tsx but also statically imported by /Users/kalibabupragada/Downloads/Code/lifeshield-–-ai-personal-tablet-safety-guardian (11)/frontend/saline-integrated/smart-belt/components/InsightsDashboard.tsx, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist/index.html                            9.38 kB │ gzip:   2.48 kB
+dist/assets/geminiService-D7QQUcLn.js      3.46 kB │ gzip:   1.51 kB
+dist/assets/index-BFsP-0HH.js          1,719.03 kB │ gzip: 453.06 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 2.29s
