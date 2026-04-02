@@ -4,6 +4,7 @@ import { buildAIPrompt } from "../core/patientContext/aiContextBuilder";
 export { buildAIPrompt };
 import { Language, languages } from "../core/patientContext/translations";
 import { assemblePatientContext } from "../core/patientContext/contextAssembler";
+import { decryptData, encryptData } from "../core/patientContext/patientStore";
 
 // ── API URLs — set via Vite define / VITE_ env vars ─────────────────────
 const OLLAMA_API_URL = '/ollama/api/chat';
@@ -1244,7 +1245,7 @@ export const orchestrateHealth = async (context: PatientContext, options: {
                 `;
 
                 const aiResult = await callAI([{ role: 'system', content: CLINICAL_SYSTEM_PROMPT }, { role: 'user', content: ehrPrompt }], { json: true });
-                const parsedResult = JSON.parse(aiResult);
+                const parsedResult = extractJson(aiResult);
                 if (parsedResult) {
                     localEhr = parsedResult;
                 } else {
@@ -1615,7 +1616,7 @@ export const generateClinicalMasterDocument = async (
     };
 
     // 3. Load Existing Encounters from Local Storage (Mocking DB)
-    const existingDocs = JSON.parse(localStorage.getItem('hi_lcmhd_registry') || '{}');
+    const existingDocs = decryptData(localStorage.getItem('hi_lcmhd_registry')) || {};
     const patientDoc = existingDocs[masterProfile.patient_global_id] || { encounters: [] };
 
     const encounters: ClinicalEncounter[] = patientDoc.encounters;
@@ -1647,7 +1648,7 @@ export const generateClinicalMasterDocument = async (
 
     // Persist to Mock Registry
     existingDocs[masterProfile.patient_global_id] = masterDoc;
-    localStorage.setItem('hi_lcmhd_registry', JSON.stringify(existingDocs));
+    localStorage.setItem('hi_lcmhd_registry', encryptData(existingDocs));
 
     return masterDoc;
 };

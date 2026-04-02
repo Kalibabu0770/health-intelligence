@@ -37,6 +37,7 @@ import HistoryModal from './HistoryModal';
 import LinkDeviceModal from './LinkDeviceModal';
 import SensorManagementModal from './SensorManagementModal';
 import DischargedPatientsModal from './DischargedPatientsModal';
+import AlarmAudioLock from '../../utils/alarmAudioLock';
 
 const Dashboard: React.FC = () => {
     const [patients, setPatients] = useState<Patient[]>([]);
@@ -81,12 +82,7 @@ const Dashboard: React.FC = () => {
 
     const [isMuted, setIsMuted] = useState(false);
 
-    // Persistent Alarm sound instance
-    const [alarmAudio] = useState(() => {
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.loop = true;
-        return audio;
-    });
+    // Persistent Alarm is now handled by AlarmAudioLock
 
     // Text to Speech
     const speakAlert = (text: string) => {
@@ -128,14 +124,11 @@ const Dashboard: React.FC = () => {
     // Alarm Sound Control
     useEffect(() => {
         if (criticalCount > 0 && !isMuted) {
-            if (alarmAudio.paused) {
-                alarmAudio.play().catch(e => console.error("Audio block:", e));
-            }
+            AlarmAudioLock.play('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3', true);
         } else {
-            alarmAudio.pause();
-            alarmAudio.currentTime = 0;
+            AlarmAudioLock.stop();
         }
-    }, [criticalCount, isMuted, alarmAudio]);
+    }, [criticalCount, isMuted]);
 
     // Voice Alert Interval
     useEffect(() => {
@@ -157,9 +150,9 @@ const Dashboard: React.FC = () => {
 
     useEffect(() => {
         return () => {
-            alarmAudio.pause();
+            AlarmAudioLock.stop();
         };
-    }, [alarmAudio]);
+    }, []);
 
     const handleSimToggle = async (deviceId: string, currentStatus: boolean) => {
         await setDeviceStatus(deviceId, !currentStatus);

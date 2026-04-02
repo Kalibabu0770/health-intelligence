@@ -21,6 +21,7 @@ import {
     ExternalLink,
     Clock
 } from 'lucide-react';
+import AlarmAudioLock from '../../../utils/alarmAudioLock';
 
 interface EmergencyAlertsCenterProps {
     patientId?: number; // If provided, show only that patient's alerts
@@ -94,9 +95,8 @@ const EmergencyAlertsCenter: React.FC<EmergencyAlertsCenterProps> = ({ patientId
 
     const playAlertSound = (severity: AlertSeverity) => {
         if (severity === 'critical') {
-            // Play critical alert sound
-            const audio = new Audio('/alert-critical.mp3');
-            audio.play().catch(() => { });
+            // Play critical alert sound using centralized lock
+            AlarmAudioLock.play('/alert-critical.mp3', false);
         }
     };
 

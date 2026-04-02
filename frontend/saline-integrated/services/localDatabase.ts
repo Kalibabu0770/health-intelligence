@@ -1,11 +1,12 @@
 import { Patient } from '../types/types';
+import { decryptData, encryptData } from '../../core/patientContext/patientStore';
 
 const STORAGE_KEY = 'saline_patients_v1';
 
 export const getLocalPatients = (): Patient[] => {
     try {
         const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
+        return decryptData(data) || [];
     } catch (e) {
         console.error("Failed to load patients from local storage", e);
         return [];
@@ -29,13 +30,13 @@ export const saveLocalPatient = (patient: Omit<Patient, 'id'> & { id?: number })
         patients.push(newPatient);
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(patients));
+    localStorage.setItem(STORAGE_KEY, encryptData(patients));
     return newPatient;
 };
 
 export const deleteLocalPatient = (id: number) => {
     const patients = getLocalPatients().filter(p => p.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(patients));
+    localStorage.setItem(STORAGE_KEY, encryptData(patients));
 };
 
 export const updatePatient = (id: number, updates: Partial<Patient>): Patient | null => {
@@ -44,7 +45,7 @@ export const updatePatient = (id: number, updates: Partial<Patient>): Patient | 
     if (index >= 0) {
         // Merge existing with updates
         patients[index] = { ...patients[index], ...updates };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(patients));
+        localStorage.setItem(STORAGE_KEY, encryptData(patients));
         return patients[index];
     }
     return null;

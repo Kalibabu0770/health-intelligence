@@ -11,7 +11,7 @@ const App: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
     const [activeTab, setActiveTab] = useState<'saline' | 'belt' | 'timer'>('belt');
 
     return (
-        <div className="h-screen bg-[#F8FAFC] flex overflow-hidden">
+        <div className="notranslate h-screen bg-[#F8FAFC] flex overflow-hidden">
             {/* Professional Sidebar Navigation */}
             <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={onLogout} />
 

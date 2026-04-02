@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { usePatientContext } from '../core/patientContext/patientStore';
 import { translations, languages } from '../core/patientContext/translations';
+import GoogleTranslate from './GoogleTranslate';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -57,7 +58,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeScreen, setActiveScreen
 
   return (
     <div className="h-screen w-screen bg-slate-50 overflow-hidden flex font-sans text-slate-900 border-8 border-emerald-100 bg-white box-border p-2">
-
+      <GoogleTranslate />
       {/* Sidebar Navigation */}
       <div className="w-72 bg-white rounded-xl shadow-xl border border-slate-100 flex flex-col h-full mr-2 p-6 overflow-y-auto">
         <div className="flex items-center gap-4 mb-8 shrink-0">

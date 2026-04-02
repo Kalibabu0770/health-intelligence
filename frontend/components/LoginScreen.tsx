@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, ChevronRight, Lock, User, MapPin, Search, Loader2, Fingerprint, Mic, Check, Activity, Heart, Wind, Droplets, Sparkles, Box, ShieldAlert, Plus, X, ArrowRight, ArrowLeft, RefreshCcw, Brain, Globe, Orbit } from 'lucide-react';
-import { usePatientContext } from '../core/patientContext/patientStore';
+import { usePatientContext, decryptData, encryptData } from '../core/patientContext/patientStore';
 import { startListening } from '../services/speech';
 import { db } from '../services/firebase';
 import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
 import { INITIAL_PROFILE } from './Onboarding';
 import { languages } from '../core/patientContext/translations';
+import GoogleTranslate from './GoogleTranslate';
 
 const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = ({ onLogin, onRegister }) => {
     const { t, language, setLanguage, updateProfile } = usePatientContext();
@@ -83,10 +84,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
         const loadAccounts = async () => {
             // Load from LocalStorage (Fast Path)
             const saved = localStorage.getItem('hi_accounts');
-            let accountList = [];
-            if (saved) {
-                accountList = JSON.parse(saved) || [];
-            }
+            let accountList = decryptData(saved) || [];
 
             // Sync from Firebase (Centralized Data Path)
             try {
@@ -106,7 +104,7 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
                         else merged.push(fbAcc);
                     });
                     accountList = merged;
-                    localStorage.setItem('hi_accounts', JSON.stringify(merged));
+                    localStorage.setItem('hi_accounts', encryptData(merged));
                 }
             } catch (e) {
                 console.warn("Firebase Sync Offline:", e);
@@ -209,11 +207,11 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
             setIsVerifying(true);
             setTimeout(() => {
-                const allAccounts = JSON.parse(localStorage.getItem('hi_accounts') || '[]');
+                const allAccounts = decryptData(localStorage.getItem('hi_accounts')) || [];
                 const updated = allAccounts.map((acc: any) =>
                     acc.id === selectedAccount.id ? { ...acc, password: resetData.newPassword } : acc
                 );
-                localStorage.setItem('hi_accounts', JSON.stringify(updated));
+                localStorage.setItem('hi_accounts', encryptData(updated));
                 setAccounts(updated);
                 setSelectedAccount({ ...selectedAccount, password: resetData.newPassword });
                 setMode('select');
@@ -233,24 +231,26 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
 
     const Header = () => (
         <div className="relative w-full flex flex-col items-center mb-8 shrink-0">
-            <div className="absolute top-0 right-0 z-50">
-                <button onClick={() => setShowLangMenu(!showLangMenu)} className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-[10px] uppercase font-black tracking-widest hover:bg-slate-100">
-                    <Globe size={14} /> {language.toUpperCase()}
-                </button>
-                {showLangMenu && (
-                    <>
-                        <div className="fixed inset-0 z-40" onClick={() => setShowLangMenu(false)} />
-                        <div className="absolute top-10 right-0 w-48 bg-white shadow-2xl rounded-xl z-50 border border-slate-100 flex flex-col overflow-hidden">
-                            {languages.map(l => (
-                                <button key={l.code} onClick={() => { setLanguage(l.code as any); setShowLangMenu(false); }} className={`px-4 py-3 text-[10px] font-black uppercase tracking-widest text-left hover:bg-slate-50 transition-colors flex justify-between items-center ${language === l.code ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'}`}>
-                                    <span>{l.flag} {l.name}</span>
-                                    {language === l.code && <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />}
-                                </button>
-                            ))}
-                        </div>
-                    </>
-                )}
-            </div>
+            {selectedPortalRole !== 'doctor' && selectedPortalRole !== 'nurse' && (
+                <div className="absolute top-0 right-0 z-50">
+                    <button onClick={() => setShowLangMenu(!showLangMenu)} className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-[10px] uppercase font-black tracking-widest hover:bg-slate-100">
+                        <Globe size={14} /> {language.toUpperCase()}
+                    </button>
+                    {showLangMenu && (
+                        <>
+                            <div className="fixed inset-0 z-40" onClick={() => setShowLangMenu(false)} />
+                            <div className="absolute top-10 right-0 w-48 bg-white shadow-2xl rounded-xl z-50 border border-slate-100 flex flex-col overflow-hidden">
+                                {languages.map(l => (
+                                    <button key={l.code} onClick={() => { setLanguage(l.code as any); setShowLangMenu(false); }} className={`px-4 py-3 text-[10px] font-black uppercase tracking-widest text-left hover:bg-slate-50 transition-colors flex justify-between items-center ${language === l.code ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'}`}>
+                                        <span>{l.flag} {l.name}</span>
+                                        {language === l.code && <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />}
+                                    </button>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
             <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-slate-900 shadow-lg mb-4">
                 <ShieldCheck size={28} />
             </div>
@@ -260,8 +260,8 @@ const LoginScreen: React.FC<{ onLogin: () => void, onRegister: () => void }> = (
     );
 
     return (
-        <div className="fixed inset-0 z-[100] h-screen w-screen bg-slate-50 overflow-hidden flex items-center justify-center font-sans text-slate-900 border-4 border-emerald-600 box-border p-4 selection:bg-emerald-100 selection:text-emerald-900">
-
+        <div className={`fixed inset-0 z-[100] h-screen w-screen bg-slate-50 overflow-hidden flex items-center justify-center font-sans text-slate-900 border-4 border-emerald-600 box-border p-4 selection:bg-emerald-100 selection:text-emerald-900 ${selectedPortalRole === 'doctor' || selectedPortalRole === 'nurse' ? 'notranslate' : ''}`}>
+            {selectedPortalRole !== 'doctor' && selectedPortalRole !== 'nurse' && <GoogleTranslate />}
             <div className="relative z-10 w-full max-w-[500px] bg-white rounded-xl shadow-xl border-2 border-slate-100 flex flex-col p-8 sm:p-10 animate-in fade-in zoom-in-95 duration-500 max-h-full overflow-hidden">
 
                 {isVerifying ? (
