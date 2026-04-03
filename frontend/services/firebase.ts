@@ -3,23 +3,29 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
+/**
+ * LIFESHIELD - Unified Firebase Configuration
+ * Project: SalineMonitor (salinemonitor-6a79c)
+ * This unified instance handles both clinical Cloud Firestore (EHR/AI)
+ * and high-frequency Realtime Database (IoT/ICU Telemetry).
+ */
 const firebaseConfig = {
-    apiKey: "AIzaSyBSkwvStn0ToMZrMB2Ren8H069fgorQAVk",
-    authDomain: "ai-summit-2e5a7.firebaseapp.com",
-    projectId: "ai-summit-2e5a7",
-    storageBucket: "ai-summit-2e5a7.firebasestorage.app",
-    messagingSenderId: "469164085940",
-    appId: "1:469164085940:web:1b06a300222a491e75fde1",
-    measurementId: "G-G2H63JKCEC"
+  apiKey: "AIzaSyCdBcF0EUTuV8VQYZPNjZEtKDXX-uZMcmg",
+  authDomain: "salinemonitor-6a79c.firebaseapp.com",
+  databaseURL: "https://salinemonitor-6a79c-default-rtdb.firebaseio.com",
+  projectId: "salinemonitor-6a79c",
+  storageBucket: "salinemonitor-6a79c.firebasestorage.app",
+  messagingSenderId: "35012509586",
+  appId: "1:35012509586:web:23241e1e689cfda2590b4b",
+  measurementId: "G-G2H63JKCEC"
 };
 
+// Initialize Unified Firebase App
 const app = initializeApp(firebaseConfig);
+
+// Export Services
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const rtdb = getDatabase(app);
 
-// Saline App RTDB
-const salineConfig = {
-    databaseURL: "https://salinemonitor-6a79c-default-rtdb.firebaseio.com/"
-};
-export const salineApp = initializeApp(salineConfig, "salineApp");
-export const rtdb = getDatabase(salineApp);
+export default app;

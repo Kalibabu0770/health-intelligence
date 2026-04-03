@@ -3,6 +3,7 @@ import { usePatientContext } from './core/patientContext/patientStore';
 import { UserProfile } from './types';
 import { checkAIStatus, AIStatus, orchestrateHealth } from './services/ai';
 import { calculateComprehensiveRisk } from './core/patientContext/riskEngine';
+import { initializeFirebaseSchema } from './services/dbInit'; // Added Schema Init
 
 // Components
 import Layout from './components/Layout';
@@ -46,6 +47,9 @@ const App: React.FC = () => {
   const [analysis, setAnalysis] = useState<any>(null);
 
   useEffect(() => {
+    // 🧬 Initialize the production database schema automatically on refresh
+    initializeFirebaseSchema();
+
     checkAIStatus().then(setAIStatus);
     if (profile) {
       setIsAuthenticated(true);
