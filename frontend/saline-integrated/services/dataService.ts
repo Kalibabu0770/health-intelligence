@@ -182,7 +182,16 @@ export const subscribeToDevices = (callback: (devices: Record<string, Device>) =
                 // REAL-TIME ANALYSIS LOGIC
                 let timeRemaining = '--';
                 let percentage = 100;
-                let status: 'normal' | 'empty' | 'low_battery' | 'offline' = isEmpty ? 'empty' : 'normal';
+                
+                // 💓 Heartbeat / Offline Logic (DEF-042)
+                const lastUpdatedVal = deviceData.last_updated;
+                const nowTime = Date.now();
+                
+                // 🏆 ROBUST DISCONNECT: Offline if no heartbeat for 10s
+                // (Using 10s instead of 4s to prevent false-alarms from network jitter)
+                const isOffline = !lastUpdatedVal || (nowTime - Number(lastUpdatedVal)) > 10000 || deviceData.connection_status === 'disconnected';
+
+                let status: 'normal' | 'empty' | 'low_battery' | 'offline' = isOffline ? 'offline' : (isEmpty ? 'empty' : 'normal');
                 let calculatedSeconds = 0;
 
                 if (!isEmpty && flowRate > 0 && bottleMl && startTimeStr) {
@@ -246,13 +255,15 @@ export const subscribeToDevices = (callback: (devices: Record<string, Device>) =
                     device_id: deviceData.device_id || key,
                     is_empty: isEmpty,
                     last_updated: deviceData.last_updated || new Date().toISOString(),
+                    raw_last_updated: lastUpdatedVal || 0, // 🏆 PASS RAW TIMESTAMP AS NUMBER
                     bottle_ml: bottleMl,
                     flow_rate: flowRate,
                     time_remaining: timeRemaining,
                     percentage: percentage,
                     battery_level: deviceData.battery_level || 100,
                     status: status,
-                    start_time: startTimeStr
+                    start_time: startTimeStr,
+                    connection_status: deviceData.connection_status
                 };
             });
         }

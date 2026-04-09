@@ -193,7 +193,8 @@ const NurseDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             spo2: 98 - (seed === 2 ? Math.floor(Math.random() * 4) : 0), // Bed 2 has slight drops
             temperature: 36.5 + (seed * 0.2),
             risk_score: seed === 3 ? 45 : 12,
-            anomaly_detected: seed === 3
+            anomaly_detected: seed === 3,
+            timestamp: Date.now()
         };
     };
 
@@ -291,13 +292,20 @@ const NurseDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                        <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 content-start">
                         {activeBeds.map(bed => {
                             const vitals = getSimulatedVitals(bed);
+                            const lastVitalsTime = vitals.timestamp || 0;
+                            const isBeltOffline = (Date.now() - lastVitalsTime) > 15000;
+
                             const saline = getSalineStatus(bed);
                             const isCritical = (activeTab !== 'saline' && vitals.anomaly_detected) || (activeTab !== 'belt' && saline.is_empty);
 
                             return (
-                                <div key={bed} className={`bg-white rounded-2xl border-2 transition-all p-5 shadow-lg flex flex-col gap-4 relative overflow-hidden group ${isCritical ? 'border-rose-500 shadow-[0_0_30px_rgba(244,63,94,0.15)] bg-rose-50' : 'border-slate-200 hover:border-emerald-500'}`}>
+                                <div key={bed} className={`bg-white rounded-2xl border-2 transition-all p-5 shadow-lg flex flex-col gap-4 relative overflow-hidden group ${isBeltOffline ? 'border-amber-400 bg-amber-50/20 opacity-90' : (isCritical ? 'border-rose-500 shadow-[0_0_30px_rgba(244,63,94,0.15)] bg-rose-50' : 'border-slate-200 hover:border-emerald-500')}`}>
                                     
-                                    {isCritical && (
+                                    {isBeltOffline && (
+                                        <div className="absolute top-0 left-0 w-full bg-amber-500 text-white text-[9px] font-black py-1 text-center uppercase tracking-widest z-10">ICU NODE OFFLINE</div>
+                                    )}
+                                    
+                                    {isCritical && !isBeltOffline && (
                                         <div className="absolute top-0 left-0 w-full h-1 bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)] animate-pulse" />
                                     )}
 
@@ -310,9 +318,9 @@ const NurseDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                                             <div>
                                                 <h3 className="text-sm font-black uppercase tracking-tighter text-slate-800">Patient {bed}</h3>
                                                 <div className="flex items-center gap-1 mt-0.5">
-                                                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${activeTab === 'saline' ? (saline.is_empty ? 'bg-rose-500 animate-pulse' : 'bg-blue-500') : (vitals.anomaly_detected ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500')}`} />
+                                                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isBeltOffline ? 'bg-slate-300' : (activeTab === 'saline' ? (saline.is_empty ? 'bg-rose-500 animate-pulse' : 'bg-blue-500') : (vitals.anomaly_detected ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'))}`} />
                                                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">
-                                                        {activeTab === 'saline' ? 'Saline Monitored' : 'Smart Belt Active'}
+                                                        {activeTab === 'saline' ? 'Saline Monitored' : (isBeltOffline ? 'Belt Disconnected' : 'Smart Belt Active')}
                                                     </span>
                                                 </div>
                                             </div>
@@ -352,18 +360,19 @@ const NurseDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
 
                                             {/* ECG Simulation Wave */}
                                             <div className="h-10 bg-slate-50 rounded-lg relative overflow-hidden border border-slate-200 flex items-center px-1">
-                                                <div className={`w-full h-full flex items-center opacity-70 ${isCritical ? 'text-rose-500' : 'text-emerald-500'}`}>
+                                                <div className={`w-full h-full flex items-center opacity-70 ${isBeltOffline ? 'text-slate-300' : (isCritical ? 'text-rose-500' : 'text-emerald-500')}`}>
                                                     <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 20">
                                                         <polyline 
                                                             fill="none" 
                                                             stroke="currentColor" 
                                                             strokeWidth="1.5" 
-                                                            points="0,10 15,10 20,5 25,15 30,2 35,18 40,8 45,10 60,10 65,5 70,15 75,2 80,18 85,8 90,10 100,10"
-                                                            className="origin-left"
+                                                            points="0,10 15,10 20,10 25,10 30,10 35,10 40,10 45,10 60,10 100,10"
+                                                            className={isBeltOffline ? "" : "origin-left"}
+                                                            style={isBeltOffline ? {} : {points: "0,10 15,10 20,5 25,15 30,2 35,18 40,8 45,10 60,10 65,5 70,15 75,2 80,18 85,8 90,10 100,10"}}
                                                         />
                                                     </svg>
                                                 </div>
-                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-slate-50/90 w-full animate-[scan_2s_linear_infinite]" />
+                                                {!isBeltOffline && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-slate-50/90 w-full animate-[scan_2s_linear_infinite]" />}
                                             </div>
                                             
                                             {/* Expanded Belt Details */}

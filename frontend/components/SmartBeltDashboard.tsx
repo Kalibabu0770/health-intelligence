@@ -131,15 +131,20 @@ const SmartBeltDashboard: React.FC = () => {
                     const profile = safePatients[key];
                     const data = getSimulatedSensor(profile.device_id);
                     
-                    // Basic Inference Logic
-                    const isHypoxia = data.spo2 < 94;
-                    const isFever = data.temperature > 37.8;
-                    const isTachycardia = data.bpm > 100;
+                    // 💓 Heartbeat / Offline Logic (DEF-042)
+                    const lastUpdatedTime = data.timestamp || 0;
+                    const nowTime = Date.now();
+                    const isOffline = (nowTime - lastUpdatedTime) > 15000; // 15s Threshold
 
-                    const isDanger = isHypoxia || isTachycardia;
+                    // Basic Inference Logic
+                    const isHypoxia = !isOffline && data.spo2 < 94;
+                    const isFever = !isOffline && data.temperature > 37.8;
+                    const isTachycardia = !isOffline && data.bpm > 100;
+
+                    const isDanger = !isOffline && (isHypoxia || isTachycardia);
 
                     return (
-                        <div key={key} className={`rounded-3xl border-2 transition-all p-5 flex flex-col gap-4 shadow-md bg-white hover:shadow-xl hover:-translate-y-1 ${isDanger ? 'border-rose-500' : 'border-slate-200 hover:border-emerald-500'}`}>
+                        <div key={key} className={`rounded-3xl border-2 transition-all p-5 flex flex-col gap-4 shadow-md bg-white hover:shadow-xl hover:-translate-y-1 ${isOffline ? 'border-amber-400 bg-amber-50/30' : (isDanger ? 'border-rose-500' : 'border-slate-200 hover:border-emerald-500')}`}>
                             
                             {/* Card Header */}
                             <div className="flex justify-between items-start border-b border-slate-100 pb-4">
@@ -159,8 +164,8 @@ const SmartBeltDashboard: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${isDanger ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
-                                    {isDanger ? 'CRITICAL ALERT' : 'VITALS STABLE'}
+                                <div className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${isOffline ? 'bg-amber-100 border-amber-300 text-amber-700' : (isDanger ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-emerald-50 border-emerald-200 text-emerald-600')}`}>
+                                    {isOffline ? 'DISCONNECTED' : (isDanger ? 'CRITICAL ALERT' : 'VITALS STABLE')}
                                 </div>
                             </div>
 
@@ -206,6 +211,11 @@ const SmartBeltDashboard: React.FC = () => {
                                     </svg>
                                 </div>
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-slate-50/90 w-full animate-[scan_1.5s_linear_infinite]" />
+                                {isOffline && (
+                                    <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[1px] flex items-center justify-center">
+                                        <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest bg-white/80 px-4 py-1 rounded-full border border-amber-200">Watchdog: No Data</span>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Wearable Diagnostics */}

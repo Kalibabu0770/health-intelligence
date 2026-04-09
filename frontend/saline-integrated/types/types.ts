@@ -12,6 +12,8 @@ export interface Device {
   bottle_hours?: number;
   start_time?: string;
   percentage?: number;
+  raw_last_updated?: number;
+  connection_status?: string;
 }
 
 export interface Patient {

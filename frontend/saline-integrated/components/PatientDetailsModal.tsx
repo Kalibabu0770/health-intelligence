@@ -83,9 +83,15 @@ const PatientDetailsModal: React.FC<PatientDetailsModalProps> = ({
     const handleWhatsAppShare = () => {
         if (!patient) return;
 
-        const deviceStatus = patient.device_id
-            ? `Linked to Sensor: ${patient.device_id} (${devices[patient.device_id]?.is_empty ? 'Empty' : 'Normal'})`
-            : 'No Sensor Linked';
+        const device = patient.device_id ? devices[patient.device_id] : null;
+        let deviceStatusMarker = 'No Sensor Linked';
+        if (patient.device_id && device) {
+            if (device.status === 'offline') deviceStatusMarker = `Device Disconnected (Offline)`;
+            else if (device.is_empty) deviceStatusMarker = `Linked: ${patient.device_id} (Empty Alert)`;
+            else deviceStatusMarker = `Linked: ${patient.device_id} (Active/Normal)`;
+        }
+
+        const deviceStatus = deviceStatusMarker;
 
         const message = `*PATIENT REPORT - Saline 2.0*
         

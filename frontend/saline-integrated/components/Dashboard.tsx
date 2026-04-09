@@ -22,7 +22,8 @@ import {
     ChevronRight,
     Search,
     VolumeX,
-    Volume2
+    Volume2,
+    WifiOff
 } from 'lucide-react';
 import { Patient, Device } from '../types/types';
 import {
@@ -58,6 +59,13 @@ const Dashboard: React.FC = () => {
         setLoading(false);
     };
 
+    // 🏆 WATCHDOG TIMER (DEF-044): Force re-render every 1s to catch silent disconnections
+    const [tick, setTick] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => setTick(t => t + 1), 1000);
+        return () => clearInterval(interval);
+    }, []);
+
     useEffect(() => {
         loadData();
         const unsubscribe = subscribeToDevices((currentDevices) => {
@@ -77,7 +85,7 @@ const Dashboard: React.FC = () => {
     });
     const criticalCount = criticalPatients.length;
     const criticalNames = criticalPatients.map(p => p.name).join(' and ');
-    const sensorCount = Object.keys(devices).length;
+    const sensorCount = (Object.values(devices) as Device[]).filter(d => d.status !== 'offline').length;
     const usedDeviceIds = patients.map(p => p.device_id).filter(Boolean) as string[];
 
     const [isMuted, setIsMuted] = useState(false);
@@ -274,8 +282,15 @@ const Dashboard: React.FC = () => {
                     ) : (
                         patients.map((patient, index) => {
                             const device = patient.device_id ? devices[patient.device_id] : null;
+                            
+                            // 🏆 INSTANT OFFLINE CHECK: Compare now with the raw timestamp every render
+                            const rawLastSeen = device?.raw_last_updated || 0;
+                            const isTimedOut = rawLastSeen > 0 && (Date.now() - Number(rawLastSeen)) > 4000;
+                            
                             const isCritical = device?.is_empty;
-                            const status = device?.status || (patient.device_id ? 'normal' : 'disconnected');
+                            const isOffline = isTimedOut || device?.status === 'offline' || device?.connection_status === 'disconnected';
+                            const status = isOffline ? 'offline' : (device?.status || (patient.device_id ? 'normal' : 'disconnected'));
+                            
                             // metrics
                             const flowRate = device?.flow_rate || 0;
                             const timeRemaining = device?.time_remaining || '--';
@@ -289,15 +304,35 @@ const Dashboard: React.FC = () => {
                             return (
                                 <div
                                     key={patient.id}
-                                    className={`bg-white rounded-2xl border transition-all duration-300 hover-card-lift flex flex-col overflow-hidden
-                                    ${isCritical ? 'border-rose-200 shadow-[0_0_20px_rgba(225,29,72,0.15)] ring-1 ring-rose-100' : 'border-slate-100 shadow-sm hover:border-indigo-100'}`}
+                                    className={`bg-white rounded-2xl border transition-all duration-300 hover-card-lift flex flex-col overflow-hidden relative
+                                    ${isCritical ? 'border-rose-200 shadow-[0_0_20px_rgba(225,29,72,0.15)] ring-1 ring-rose-100' : 
+                                      isOffline ? 'border-slate-200 grayscale-[0.6]' : 'border-slate-100 shadow-sm hover:border-indigo-100'}`}
                                 >
-                                    {/* Critical Alert Banner */}
-                                    {isCritical && (
-                                        <div className="bg-rose-500 text-white text-[10px] font-bold px-4 py-1.5 flex items-center justify-between animate-pulse">
-                                            <span className="flex items-center gap-1"><AlertTriangle size={12} /> CRITICAL ALERT</span>
-                                            <span>SALINE EMPTY</span>
+                                    {/* Offline Overlay - Data Freeze UI - TOP PRIORITY */}
+                                    {isOffline ? (
+                                        <div className="absolute inset-x-0 bottom-0 top-0 bg-white/95 backdrop-blur-xl z-[20] flex flex-col items-center justify-center text-center p-6 space-y-4">
+                                            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 animate-pulse border-2 border-rose-100">
+                                                <WifiOff size={32} />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <h3 className="text-slate-900 font-black text-xl leading-tight uppercase tracking-tight">DEVICE OFFLINE</h3>
+                                                <p className="text-rose-600 text-[12px] font-bold tracking-wider animate-bounce uppercase">Monitoring Suspended</p>
+                                                <p className="text-slate-400 text-[10px] mt-2 font-medium max-w-[200px]">Data pulse lost for 4s. Please check bed sensor connection.</p>
+                                            </div>
+                                            <div className="px-4 py-1.5 bg-slate-100 rounded-full text-[9px] font-bold text-slate-400 border border-slate-200 uppercase tracking-widest mt-4">
+                                                Safety Protocol Active
+                                            </div>
                                         </div>
+                                    ) : (
+                                        <>
+                                            {/* Critical Alert Banner (Only if Online) */}
+                                            {isCritical && (
+                                                <div className="bg-rose-500 text-white text-[10px] font-bold px-4 py-1.5 flex items-center justify-between animate-pulse z-10">
+                                                    <span className="flex items-center gap-1"><AlertTriangle size={12} /> CRITICAL ALERT</span>
+                                                    <span>SALINE EMPTY</span>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
 
                                     <div className="p-5 flex-1 flex flex-col relative">
@@ -343,11 +378,19 @@ const Dashboard: React.FC = () => {
                                                             <div className={`text-[10px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1 ${isCritical ? 'text-rose-400' : 'text-indigo-400'}`}>
                                                                 <Timer size={10} /> Time Left
                                                             </div>
-                                                            <div className={`text-sm font-bold ${isCritical ? 'text-rose-700' : 'text-indigo-700'}`}>
+                                                            <div className={`text-sm font-bold ${isOffline ? 'text-amber-500' : (isCritical ? 'text-rose-700' : 'text-indigo-700')}`}>
                                                                 {timeRemaining}
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    {/* Offline Warning */}
+                                                    {isOffline && (
+                                                        <div className="text-[10px] text-amber-600 font-bold bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center gap-2">
+                                                            <Unlink size={12} />
+                                                            Device heartbeat lost. Check hospital Wi-Fi.
+                                                        </div>
+                                                    )}
 
                                                     {/* Progress Bar (Visual Only) */}
                                                     <div>
